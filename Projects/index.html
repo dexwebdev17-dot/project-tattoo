@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piattaforma Template Tattoo</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f0f11; color: #f0f0f0; padding: 40px 20px; }
+        header { text-align: center; margin-bottom: 50px; }
+        h1 { font-size: 2.5rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; color: #fff; }
+        p { color: #888; font-size: 1.1rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
+        .card { background: #1a1a1e; border: 1px solid #2a2a30; border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, border-color 0.2s; }
+        .card:hover { transform: translateY(-5px); border-color: #ff3e3e; }
+        .card h3 { font-size: 1.3rem; margin-bottom: 15px; text-transform: capitalize; color: #fff; }
+        .btn { display: inline-block; text-align: center; background: #ff3e3e; color: #fff; text-decoration: none; padding: 12px 20px; border-radius: 6px; font-weight: bold; transition: background 0.2s; }
+        .btn:hover { background: #e03232; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Catalogo Template Tatuatori</h1>
+        <p>Scegli un layout per anteprima e personalizzazione</p>
+    </header>
+
+    <div class="grid">
+        <!-- Scheda Template 1 -->
+        <div class="card">
+            <h3>Alchemical</h3>
+            <a href="alchemical.html" class="btn" target="_blank">Vedi Template Live</a>
+        </div>
+
+        <!-- Scheda Template 2 -->
+        <div class="card">
+            <h3>Alone</h3>
+            <a href="alone.html" class="btn" target="_blank">Vedi Template Live</a>
+        </div>
+
+        <!-- Scheda Template 3 -->
+        <div class="card">
+            <h3>Archivio</h3>
+            <a href="archivio.html" class="btn" target="_blank">Vedi Template Live</a>
+        </div>
+
+        <!-- Scheda Template 4 -->
+        <div class="card">
+            <h3>Bottega Inchiostro</h3>
+            <a href="bottega-inchiostro.html" class="btn" target="_blank">Vedi Template Live</a>
+        </div>
+        
+        <!-- Aggiungi qui gli altri template seguendo lo stesso schema -->
+    </div>
+
+</body>
+</html>
