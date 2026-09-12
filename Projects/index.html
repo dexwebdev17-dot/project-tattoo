@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATELIER • Tattoo Template Collection</title>
-    <!-- Google Fonts: Cinzel per un'estetica luxury/editorial e Inter per un design pulito -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -15,7 +14,7 @@
             --card-bg: #0f0f11;
             --card-border: #1d1d22;
             --border-hover: #3a3a42;
-            --accent: #d4af37; /* Oro Luxury Muted */
+            --accent: #d4af37;
             --text-primary: #f5f5f7;
             --text-secondary: #7e7e8a;
             --text-muted: #52525c;
@@ -73,25 +72,39 @@
         }
 
         .container {
-            max-width: 1320px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
+        /* Griglia a 3 colonne per mantenere l'ordine uniforme */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 24px;
+        }
+
+        /* Adattabilità per schermi tablet e mobile */
+        @media (max-width: 1024px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 4px; /* Angoli squadrati minimali per un look sartoriale */
+            border-radius: 4px;
             padding: 32px 28px 28px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 180px;
+            min-height: 170px;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             text-decoration: none;
@@ -120,7 +133,7 @@
 
         .card h3 {
             font-family: 'Cinzel', serif;
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 500;
             letter-spacing: 2px;
             color: var(--text-primary);
