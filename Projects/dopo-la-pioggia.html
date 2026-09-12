@@ -1,0 +1,411 @@
+<meta charset="utf-8">
+<title>Dopo la Pioggia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400;1,7..72,500&family=Figtree:wght@300;400;500;600&display=swap">
+
+<style>
+  :root{
+    --bg:#e8ebf1;
+    --bg-panel:#dde1ea;
+    --panel-2:#d2d8e4;
+    --ink:#333a47;
+    --muted:#7c8494;
+    --accent:#7b88c2;
+    --accent-soft:#c4cbe6;
+    --ir1:#e0c9e8;--ir2:#c9dde8;--ir3:#c9e8dc;--ir4:#e8dcc9;--ir5:#e8c9d3;
+    --shadow:rgba(51,58,71,.18);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Figtree',Helvetica,Arial,sans-serif;font-weight:400;
+    -webkit-font-smoothing:antialiased;position:relative;
+  }
+  a{color:inherit;}
+  ::selection{background:var(--accent-soft);color:var(--ink);}
+  h1,h2,h3{font-family:'Literata',serif;font-weight:500;margin:0;text-wrap:balance;}
+  p{line-height:1.8;color:var(--muted);max-width:58ch;}
+  .eyebrow{font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);}
+  @media (prefers-reduced-motion: reduce){ *{transition-duration:0s !important;animation-duration:0s !important;} .rain-drop{display:none;} }
+
+  .wrap{max-width:1160px;margin:0 auto;padding-inline:6vw;position:relative;z-index:1;}
+  @media (max-width:640px){ .wrap{padding-inline:24px;} }
+
+  /* ---------- ambient rain ---------- */
+  .rain{position:absolute;top:0;left:0;right:0;height:900px;overflow:hidden;pointer-events:none;z-index:0;}
+  .rain-drop{
+    position:absolute;top:-40px;width:1.5px;border-radius:2px;
+    background:linear-gradient(180deg, transparent, color-mix(in srgb, var(--accent) 55%, transparent));
+    animation:fall linear infinite;
+  }
+  @keyframes fall{ to{ transform:translateY(940px); } }
+
+  /* ---------- masthead ---------- */
+  .masthead{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:26px 6vw;font-size:.7rem;letter-spacing:.1em;color:var(--muted);
+    position:relative;z-index:1;
+  }
+  @media (max-width:640px){ .masthead{padding-inline:24px;flex-direction:column;gap:6px;text-align:center;} }
+  .wordmark{font-family:'Literata',serif;font-style:italic;font-size:1.25rem;color:var(--ink);}
+
+  /* ---------- hero ---------- */
+  .hero{padding:56px 0 30px;text-align:center;}
+  .hero h1{font-size:clamp(2.3rem,5.4vw,4rem);font-style:italic;line-height:1.14;}
+  .hero p{margin:22px auto 0;text-align:center;font-size:1.05rem;}
+
+  /* ---------- vetro / portfolio ---------- */
+  .glass-section{padding:44px 0 100px;position:relative;z-index:1;}
+  .glass-head{text-align:center;margin-bottom:50px;}
+  .glass-head h2{font-size:clamp(1.9rem,3.8vw,2.5rem);font-style:italic;margin-top:10px;}
+  .glass-head p{margin:14px auto 0;}
+
+  .glass-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:34px 28px;}
+  @media (max-width:900px){ .glass-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:520px){ .glass-grid{grid-template-columns:1fr;} }
+
+  .pane{position:relative;}
+  .pane-frame{
+    position:relative;aspect-ratio:4/5;border-radius:4px;overflow:hidden;
+    box-shadow:0 24px 46px -26px var(--shadow);
+  }
+  .reveal{
+    position:absolute;inset:0;
+    background:
+      radial-gradient(85% 65% at 32% 22%, color-mix(in srgb, var(--ink) 12%, transparent), transparent 58%),
+      repeating-linear-gradient(112deg, color-mix(in srgb, var(--ink) 6%, transparent) 0 1.5px, transparent 1.5px 15px),
+      linear-gradient(150deg, var(--panel-2), var(--accent-soft) 120%);
+    filter:blur(2.5px) saturate(.85);
+    transition:filter .5s ease;
+  }
+  .pane:hover .reveal{filter:blur(0) saturate(1);}
+  .fog{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none;}
+  .wipe-hint{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    font-family:'Literata',serif;font-style:italic;font-size:.9rem;color:var(--ink);
+    opacity:.5;pointer-events:none;text-align:center;
+  }
+  .story{
+    position:absolute;left:0;right:0;bottom:0;padding:18px 16px;
+    background:linear-gradient(0deg, color-mix(in srgb, var(--ink) 82%, transparent) 0%, transparent 95%);
+    color:#fff;transform:translateY(100%);opacity:0;
+    transition:transform .4s cubic-bezier(.3,.1,.2,1), opacity .4s ease;
+  }
+  .pane:hover .story{transform:translateY(0);opacity:1;}
+  .story b{font-family:'Literata',serif;font-style:italic;font-weight:500;font-size:1.05rem;display:block;}
+  .story span{font-size:.78rem;line-height:1.5;display:block;margin-top:6px;color:rgba(255,255,255,.88);}
+
+  .caption{margin-top:14px;}
+  .caption b{font-family:'Literata',serif;font-style:italic;font-weight:500;font-size:1.05rem;}
+  .caption .meta{font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);margin-top:2px;display:block;}
+  .caption p{font-size:.82rem;margin-top:6px;}
+
+  /* ---------- filosofia ---------- */
+  .philosophy{padding:0 0 90px;text-align:center;position:relative;z-index:1;}
+  .phil-inner{max-width:620px;margin:0 auto;}
+  .philosophy h2{font-size:clamp(1.8rem,3.6vw,2.4rem);font-style:italic;}
+  .philosophy p{margin:20px auto 0;text-align:center;}
+  .pull{margin-top:30px;}
+  .pull q{font-family:'Literata',serif;font-style:italic;font-size:1.4rem;color:var(--ink);quotes:"“" "”";display:block;}
+  .pull .who{margin-top:12px;}
+
+  /* ---------- stili ---------- */
+  .styles{padding:0 0 90px;position:relative;z-index:1;}
+  .styles-head{text-align:center;margin-bottom:44px;}
+  .styles-head h2{font-size:clamp(1.9rem,3.8vw,2.5rem);font-style:italic;margin-top:10px;}
+  .style-table{border-top:1px solid color-mix(in srgb, var(--ink) 12%, transparent);max-width:760px;margin:0 auto;}
+  .style-row{
+    display:grid;grid-template-columns:1fr auto auto;gap:20px;align-items:baseline;
+    padding:18px 4px;border-bottom:1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  }
+  @media (max-width:560px){ .style-row{grid-template-columns:1fr;} }
+  .style-row h3{font-size:1.2rem;font-style:italic;}
+  .style-row p{font-size:.84rem;margin-top:2px;}
+  .style-row .sr-dur,.style-row .sr-price{font-size:.74rem;color:var(--muted);white-space:nowrap;}
+  .style-row .sr-price{color:var(--ink);font-weight:600;}
+
+  /* ---------- contatti ---------- */
+  .studio{padding:0 0 90px;position:relative;z-index:1;}
+  .studio-panel{background:var(--bg-panel);padding:54px 6vw;border-radius:6px;}
+  .studio-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:54px;max-width:1000px;margin:0 auto;}
+  @media (max-width:820px){ .studio-grid{grid-template-columns:1fr;gap:32px;} }
+  .studio h2{font-size:1.9rem;font-style:italic;margin-bottom:14px;}
+  .info-list{margin-top:18px;display:flex;flex-direction:column;gap:12px;font-size:.9rem;}
+  .info-list span:first-child{color:var(--muted);display:block;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;}
+  .field{display:flex;flex-direction:column;gap:8px;margin-bottom:22px;}
+  .field label{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+  .field input,.field textarea{
+    all:unset;border-bottom:1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+    padding:8px 2px;font-size:1rem;font-family:'Figtree',sans-serif;color:var(--ink);
+    transition:border-color .25s ease;
+  }
+  .field input:focus,.field textarea:focus{border-color:var(--accent);}
+  .submit{
+    all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:10px;
+    font-family:'Literata',serif;font-style:italic;font-size:1.1rem;
+    background:var(--accent);color:#fff;padding:14px 26px;border-radius:999px;
+    transition:background .25s ease;
+  }
+  .submit:hover{background:#5f6da8;}
+
+  footer{padding:24px 6vw;font-size:.68rem;color:var(--muted);display:flex;justify-content:space-between;position:relative;z-index:1;}
+  @media (max-width:640px){ footer{flex-direction:column;gap:6px;text-align:center;padding-inline:24px;} }
+</style>
+
+<div class="rain" id="rain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <span>BOLOGNA</span>
+  <span class="wordmark">Dopo la Pioggia</span>
+  <span>SU APPUNTAMENTO</span>
+</header>
+
+<section class="hero wrap">
+  <span class="eyebrow">Chiarezza, non previsione del tempo</span>
+  <h1>Il disegno arriva<br>quando l'aria si schiarisce</h1>
+  <p>Ogni idea passa da un vetro appannato prima di essere nitida. Non abbiamo fretta di asciugarlo: aspettiamo che sia il cliente a volerlo fare.</p>
+</section>
+
+<section class="glass-section wrap" id="vetro">
+  <div class="glass-head">
+    <span class="eyebrow">Il Portfolio</span>
+    <h2>Oltre il Vetro</h2>
+    <p style="max-width:46ch;margin-inline:auto;text-align:center;">Trascina il dito o il cursore per asciugare la condensa. Passa sopra per leggerne la storia.</p>
+  </div>
+  <div class="glass-grid">
+
+    <article class="pane" data-idx="0">
+      <div class="pane-frame">
+        <div class="reveal"></div>
+        <canvas class="fog"></canvas>
+        <span class="wipe-hint">trascina per<br>asciugare</span>
+        <div class="story"><b>Tempesta</b><span>Un cliente che voleva ricordarsi di aver attraversato una tempesta, non di averla evitata.</span></div>
+      </div>
+      <div class="caption"><b>Tempesta</b><span class="meta">Avambraccio · Blackwork</span></div>
+    </article>
+
+    <article class="pane" data-idx="1">
+      <div class="pane-frame">
+        <div class="reveal"></div>
+        <canvas class="fog"></canvas>
+        <span class="wipe-hint">trascina per<br>asciugare</span>
+        <div class="story"><b>Gronda</b><span>Una linea sottile come l'acqua lungo una grondaia, disegnata dopo una separazione.</span></div>
+      </div>
+      <div class="caption"><b>Gronda</b><span class="meta">Caviglia · Fineline</span></div>
+    </article>
+
+    <article class="pane" data-idx="2">
+      <div class="pane-frame">
+        <div class="reveal"></div>
+        <canvas class="fog"></canvas>
+        <span class="wipe-hint">trascina per<br>asciugare</span>
+        <div class="story"><b>Nuvola Bassa</b><span>Una composizione a più sedute, cresciuta come una nuvola che si addensa lentamente.</span></div>
+      </div>
+      <div class="caption"><b>Nuvola Bassa</b><span class="meta">Schiena · Irezumi</span></div>
+    </article>
+
+    <article class="pane" data-idx="3">
+      <div class="pane-frame">
+        <div class="reveal"></div>
+        <canvas class="fog"></canvas>
+        <span class="wipe-hint">trascina per<br>asciugare</span>
+        <div class="story"><b>Vetro Smerigliato</b><span>Ombre morbide, mai nitide fino in fondo: la richiesta era proprio quella.</span></div>
+      </div>
+      <div class="caption"><b>Vetro Smerigliato</b><span class="meta">Petto · Chicano</span></div>
+    </article>
+
+    <article class="pane" data-idx="4">
+      <div class="pane-frame">
+        <div class="reveal"></div>
+        <canvas class="fog"></canvas>
+        <span class="wipe-hint">trascina per<br>asciugare</span>
+        <div class="story"><b>Rugiada</b><span>Il primo tatuaggio di una cliente che aspettava da anni il momento giusto.</span></div>
+      </div>
+      <div class="caption"><b>Rugiada</b><span class="meta">Polso · Fineline</span></div>
+    </article>
+
+    <article class="pane" data-idx="5">
+      <div class="pane-frame">
+        <div class="reveal"></div>
+        <canvas class="fog"></canvas>
+        <span class="wipe-hint">trascina per<br>asciugare</span>
+        <div class="story"><b>Bacino</b><span>Una forma piena, pensata per restare leggibile anche a distanza.</span></div>
+      </div>
+      <div class="caption"><b>Bacino</b><span class="meta">Costato · Blackwork</span></div>
+    </article>
+
+  </div>
+</section>
+
+<section class="philosophy wrap" style="background:var(--bg-panel);">
+  <div class="phil-inner">
+    <span class="eyebrow">Filosofia</span>
+    <h2 style="margin-top:12px;">Elia Bassi</h2>
+    <p>Lavoro a Bologna, sotto i portici costruiti apposta per la pioggia. Mi piace pensare che un buon tatuaggio funzioni allo stesso modo: un riparo che si sceglie di portare addosso, non un'emergenza.</p>
+    <div class="pull">
+      <q>Non affretto mai la seduta. L'appannamento serve a rallentare chi guarda.</q>
+      <div class="eyebrow who">— Elia</div>
+    </div>
+  </div>
+</section>
+
+<section class="styles wrap">
+  <div class="styles-head">
+    <span class="eyebrow">Tecniche</span>
+    <h2>Stili</h2>
+  </div>
+  <div class="style-table">
+    <div class="style-row">
+      <div><h3>Blackwork</h3><p>Campiture piene, nessuna sfumatura.</p></div>
+      <span class="sr-dur">2–6H</span><span class="sr-price">DA 180€</span>
+    </div>
+    <div class="style-row">
+      <div><h3>Fineline</h3><p>Linea sottile e continua.</p></div>
+      <span class="sr-dur">1–3H</span><span class="sr-price">DA 120€</span>
+    </div>
+    <div class="style-row">
+      <div><h3>Irezumi</h3><p>Composizione tradizionale giapponese, a tappe.</p></div>
+      <span class="sr-dur">A TAPPE</span><span class="sr-price">SU PREVENT.</span>
+    </div>
+    <div class="style-row">
+      <div><h3>Chicano</h3><p>Ombreggiatura a scala di grigi.</p></div>
+      <span class="sr-dur">3–5H</span><span class="sr-price">DA 200€</span>
+    </div>
+  </div>
+</section>
+
+<section class="studio wrap" id="contatti">
+  <div class="studio-panel">
+    <div class="studio-grid">
+      <div>
+        <span class="eyebrow">Consulenza</span>
+        <h2>Contatti</h2>
+        <p>Racconta la tua idea: zona del corpo, riferimenti, disponibilità. Rispondiamo entro 48 ore lavorative.</p>
+        <div class="info-list">
+          <div><span>Studio</span>Via Zamboni 40, Bologna</div>
+          <div><span>Orari</span>Mar–Sab, 11:00–19:00</div>
+          <div><span>Email</span><a href="mailto:vetro@dopolapioggia.it">vetro@dopolapioggia.it</a></div>
+        </div>
+      </div>
+      <form onsubmit="return false;">
+        <div class="field"><label for="dp-name">Nome</label><input id="dp-name" type="text" placeholder="Nome e cognome"></div>
+        <div class="field"><label for="dp-email">Email</label><input id="dp-email" type="email" placeholder="nome@email.it"></div>
+        <div class="field"><label for="dp-msg">La tua idea</label><textarea id="dp-msg" rows="3" placeholder="Riferimenti, zona del corpo, disponibilità"></textarea></div>
+        <button class="submit" type="submit">Richiedi una consulenza</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 DOPO LA PIOGGIA</span>
+  <span>P.IVA 00000000000 — TEMPLATE DI STUDIO</span>
+</footer>
+
+<script>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ambient background rain */
+  var rain = document.getElementById('rain');
+  if (rain && !reduced) {
+    for (var i = 0; i < 26; i++){
+      var d = document.createElement('span');
+      d.className = 'rain-drop';
+      d.style.left = (Math.random() * 100) + '%';
+      d.style.height = (30 + Math.random() * 60) + 'px';
+      d.style.opacity = (0.25 + Math.random() * 0.4).toFixed(2);
+      d.style.animationDuration = (2.5 + Math.random() * 3.5) + 's';
+      d.style.animationDelay = (-Math.random() * 6) + 's';
+      rain.appendChild(d);
+    }
+  }
+
+  /* iridescent droplet trail that slides down slightly then fades */
+  var trailLayer = document.createElement('div');
+  trailLayer.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:70;';
+  document.body.appendChild(trailLayer);
+  var irColors = ['var(--ir1)','var(--ir2)','var(--ir3)','var(--ir4)','var(--ir5)'];
+  var lastTrail = 0;
+  function spawnDroplet(x, y){
+    if (reduced) return;
+    var now = Date.now();
+    if (now - lastTrail < 40) return;
+    lastTrail = now;
+    var drop = document.createElement('span');
+    var c = irColors[Math.floor(Math.random() * irColors.length)];
+    var w = 6 + Math.random() * 6, h = w * 1.4;
+    drop.style.cssText =
+      'position:fixed;left:' + x + 'px;top:' + y + 'px;width:' + w + 'px;height:' + h + 'px;' +
+      'border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;background:' + c + ';opacity:.75;filter:blur(1px);' +
+      'transform:translate(-50%,-50%);' +
+      'transition:transform 1.1s cubic-bezier(.3,.4,.4,1), opacity 1.1s ease;';
+    trailLayer.appendChild(drop);
+    requestAnimationFrame(function(){
+      drop.style.transform = 'translate(-50%,-50%) translateY(22px)';
+      drop.style.opacity = '0';
+    });
+    setTimeout(function(){ drop.remove(); }, 1150);
+  }
+
+  /* fog-wipe canvases */
+  document.querySelectorAll('canvas.fog').forEach(function(canvas){
+    var W = 480, H = 600;
+    canvas.width = W; canvas.height = H;
+    var ctx = canvas.getContext('2d');
+
+    function paintFog(){
+      ctx.globalCompositeOperation = 'source-over';
+      var g = ctx.createLinearGradient(0, 0, W, H);
+      g.addColorStop(0, 'rgba(221,225,234,.94)');
+      g.addColorStop(1, 'rgba(196,203,230,.94)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = 'rgba(255,255,255,.5)';
+      for (var i = 0; i < 60; i++){
+        var r = 10 + Math.random() * 26;
+        ctx.beginPath();
+        ctx.arc(Math.random()*W, Math.random()*H, r, 0, Math.PI*2);
+        ctx.fill();
+      }
+    }
+    paintFog();
+
+    var drawing = false, lastX = 0, lastY = 0;
+    function toCanvasPoint(e){
+      var r = canvas.getBoundingClientRect();
+      var sx = W / r.width, sy = H / r.height;
+      return { x: (e.clientX - r.left) * sx, y: (e.clientY - r.top) * sy, cx: e.clientX, cy: e.clientY };
+    }
+    function wipe(x0,y0,x1,y1){
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = 50;
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(x1, y1);
+      ctx.stroke();
+    }
+
+    canvas.addEventListener('pointerdown', function(e){
+      drawing = true;
+      canvas.setPointerCapture(e.pointerId);
+      var p = toCanvasPoint(e);
+      lastX = p.x; lastY = p.y;
+      wipe(p.x, p.y, p.x + 0.1, p.y + 0.1);
+      spawnDroplet(p.cx, p.cy);
+    });
+    canvas.addEventListener('pointermove', function(e){
+      if (!drawing) return;
+      var p = toCanvasPoint(e);
+      wipe(lastX, lastY, p.x, p.y);
+      lastX = p.x; lastY = p.y;
+      spawnDroplet(p.cx, p.cy);
+    });
+    canvas.addEventListener('pointerup', function(){ drawing = false; });
+    canvas.addEventListener('pointercancel', function(){ drawing = false; });
+  });
+})();
+</script>

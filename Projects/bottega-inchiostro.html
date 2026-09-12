@@ -1,0 +1,520 @@
+<meta charset="utf-8">
+<title>Bottega Inchiostro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=JetBrains+Mono:wght@400;500;600&display=swap">
+
+<style>
+  :root{
+    --surface:#dcecf3;
+    --surface-alt:#cee3ec;
+    --surface-raised:#e9f4f8;
+    --text:#0f232c;
+    --text-muted:#456470;
+    --accent:#6e3fa3;
+    --accent-soft:#9b76c4;
+    --line:#bcd8e2;
+    --shadow:rgba(15,35,44,.18);
+    --needle:#0f232c;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --surface:#0b1a20;
+      --surface-alt:#112530;
+      --surface-raised:#153039;
+      --text:#dcecf3;
+      --text-muted:#9fbac5;
+      --accent:#c39ce8;
+      --accent-soft:#8a63b8;
+      --line:#254352;
+      --shadow:rgba(0,0,0,.5);
+      --needle:#dcecf3;
+    }
+  }
+  :root[data-theme="dark"]{
+    --surface:#0b1a20;
+    --surface-alt:#112530;
+    --surface-raised:#153039;
+    --text:#dcecf3;
+    --text-muted:#9fbac5;
+    --accent:#c39ce8;
+    --accent-soft:#8a63b8;
+    --line:#254352;
+    --shadow:rgba(0,0,0,.5);
+    --needle:#dcecf3;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--surface);
+    color:var(--text);
+    font-family:'Fraunces',Georgia,'Times New Roman',serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    cursor:none;
+  }
+  @media (pointer:coarse){
+    body{cursor:auto;}
+  }
+  ::selection{background:var(--accent);color:var(--surface);}
+
+  h1,h2,h3{
+    font-family:'Big Shoulders Display',system-ui,sans-serif;
+    text-transform:uppercase;
+    font-weight:800;
+    letter-spacing:.01em;
+    line-height:.92;
+    margin:0;
+    text-wrap:balance;
+  }
+  .mono{
+    font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;
+    letter-spacing:.06em;
+  }
+  a{color:inherit;}
+  p{color:var(--text-muted);line-height:1.65;max-width:62ch;}
+
+  /* ---------- custom needle cursor ---------- */
+  .needle{
+    position:fixed;top:0;left:0;width:0;height:0;
+    pointer-events:none;z-index:999;
+    will-change:transform;
+  }
+  .needle span{
+    position:absolute;border-radius:50%;
+    background:var(--needle);
+    transition:background .25s ease, opacity .25s ease;
+  }
+  .needle .core{width:5px;height:5px;margin:-2.5px 0 0 -2.5px;}
+  .needle .d{width:2px;height:2px;margin:-1px 0 0 -1px;opacity:.75;}
+  .needle.active .core{background:var(--accent);width:8px;height:8px;margin:-4px 0 0 -4px;}
+  .needle.active span{background:var(--accent);}
+  @media (pointer:coarse){ .needle{display:none;} }
+
+  /* ---------- registration ruler (left edge) ---------- */
+  .ruler{
+    position:fixed;left:0;top:0;bottom:0;width:26px;
+    display:flex;flex-direction:column;justify-content:space-between;
+    padding:24px 0;pointer-events:none;z-index:5;
+    border-right:1px solid var(--line);
+  }
+  .ruler i{
+    display:block;height:1px;width:12px;background:var(--line);
+    position:relative;
+  }
+  .ruler i:nth-child(5n+1){width:20px;}
+  @media (max-width:900px){ .ruler{display:none;} }
+
+  .wrap{max-width:1180px;margin:0 auto;padding-inline:64px;}
+  @media (max-width:900px){ .wrap{padding-inline:24px;} }
+  @media (min-width:901px){ body{padding-left:26px;} }
+
+  section{position:relative;padding:120px 0;}
+  section + section{border-top:1px solid var(--line);}
+  .alt{background:var(--surface-alt);}
+
+  .reg{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:.72rem;color:var(--text-muted);
+    margin-bottom:28px;
+  }
+  .reg::before{
+    content:"";width:11px;height:11px;
+    background:
+      linear-gradient(var(--accent),var(--accent)) center/1px 100% no-repeat,
+      linear-gradient(90deg,var(--accent),var(--accent)) center/100% 1px no-repeat;
+  }
+
+  /* ---------- hero ---------- */
+  .hero{padding-top:96px;padding-bottom:96px;}
+  .hero-top{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    gap:24px;margin-bottom:64px;font-size:.78rem;color:var(--text-muted);
+  }
+  .hero-top .tag{
+    border:1px solid var(--line);padding:6px 12px;border-radius:2px;
+  }
+  .press{
+    font-size:clamp(3.2rem,10vw,8.4rem);
+    color:var(--text);
+    overflow:hidden;
+  }
+  .press span{display:block;transform:translateY(0);}
+  @media (prefers-reduced-motion:no-preference){
+    .press span{
+      animation:pressin .9s cubic-bezier(.2,.9,.25,1) both;
+      animation-delay:calc(var(--i,0) * .08s);
+    }
+  }
+  @keyframes pressin{
+    0%{transform:translateY(70%) scaleY(1.4);opacity:0;filter:blur(2px);}
+    100%{transform:translateY(0) scaleY(1);opacity:1;filter:blur(0);}
+  }
+  .hero-sub{
+    display:grid;grid-template-columns:1.1fr .9fr;gap:48px;
+    margin-top:56px;align-items:end;
+  }
+  @media (max-width:760px){ .hero-sub{grid-template-columns:1fr;} }
+  .hero-sub p{font-size:1.05rem;}
+  .hero-meta{
+    font-size:.78rem;color:var(--text-muted);
+    display:flex;flex-direction:column;gap:10px;
+    border-left:1px solid var(--line);padding-left:20px;
+  }
+  .hero-meta b{color:var(--text);font-weight:600;}
+
+  /* ---------- about ---------- */
+  .about-grid{
+    display:grid;grid-template-columns:.85fr 1.15fr;gap:72px;align-items:center;
+  }
+  @media (max-width:820px){ .about-grid{grid-template-columns:1fr;gap:48px;} }
+  .skin{
+    aspect-ratio:4/5;max-width:78%;border-radius:2px;position:relative;
+    background:
+      radial-gradient(120% 90% at 30% 20%, var(--surface-raised), transparent 60%),
+      repeating-linear-gradient(115deg, color-mix(in srgb, var(--text) 5%, transparent) 0 2px, transparent 2px 26px),
+      var(--surface-raised);
+    box-shadow:0 30px 60px -30px var(--shadow);
+    transform:rotate(-1.5deg);
+  }
+  .skin::after{
+    content:"SH.00 — RITRATTO";
+    position:absolute;bottom:16px;left:16px;
+    font-size:.68rem;color:var(--text-muted);
+  }
+  .about-text .lead{font-family:'Fraunces',serif;font-style:italic;font-size:1.45rem;color:var(--text);max-width:32ch;margin-bottom:24px;}
+
+  /* ---------- styles / flash sheets ---------- */
+  .flash-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:2px;
+    background:var(--line);border:1px solid var(--line);
+  }
+  @media (max-width:900px){ .flash-grid{grid-template-columns:repeat(2,1fr);} }
+  .flash-card{
+    background:var(--surface);padding:36px 28px;
+    display:flex;flex-direction:column;gap:18px;
+    transition:transform .35s ease, background .35s ease;
+    transform-style:preserve-3d;will-change:transform;
+  }
+  .flash-card:nth-child(2){padding-top:70px;}
+  .flash-card:nth-child(3){padding-top:16px;}
+  .flash-card:nth-child(4){padding-top:96px;}
+  .flash-card:hover{background:var(--surface-raised);}
+  .flash-code{font-size:.7rem;color:var(--accent);}
+  .flash-card h3{font-size:1.55rem;}
+  .flash-card p{font-size:.9rem;}
+  .flash-mark{
+    margin-top:auto;font-size:.68rem;color:var(--text-muted);
+    display:flex;justify-content:space-between;border-top:1px dashed var(--line);padding-top:12px;
+  }
+
+  /* ---------- portfolio ---------- */
+  .folio{
+    display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:110px;gap:22px;
+  }
+  @media (max-width:900px){ .folio{grid-template-columns:repeat(2,1fr);grid-auto-rows:120px;} }
+  .polaroid{
+    background:var(--surface-raised);border:1px solid var(--line);
+    padding:10px 10px 34px;position:relative;
+    box-shadow:0 18px 34px -20px var(--shadow);
+    transition:transform .3s ease;
+  }
+  .polaroid .tape{
+    position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(-3deg);
+    width:56px;height:20px;background:color-mix(in srgb, var(--accent) 22%, var(--surface-raised) 78%);
+    opacity:.85;
+  }
+  .polaroid .ink{
+    width:100%;height:100%;
+    background:
+      radial-gradient(60% 60% at 40% 35%, color-mix(in srgb, var(--text) 22%, transparent), transparent 70%),
+      repeating-radial-gradient(circle at 70% 65%, color-mix(in srgb, var(--text) 14%, transparent) 0 2px, transparent 2px 5px);
+  }
+  .polaroid figcaption{
+    position:absolute;left:10px;right:10px;bottom:10px;
+    font-size:.68rem;color:var(--text-muted);display:flex;justify-content:space-between;
+  }
+  .p1{grid-column:span 2;grid-row:span 2;transform:rotate(-2deg);}
+  .p2{grid-column:span 2;grid-row:span 3;transform:rotate(1.5deg);margin-top:26px;}
+  .p3{grid-column:span 2;grid-row:span 2;transform:rotate(-1deg);}
+  .p4{grid-column:span 3;grid-row:span 2;transform:rotate(1deg);}
+  .p5{grid-column:span 3;grid-row:span 3;transform:rotate(-1.5deg);margin-top:10px;}
+  @media (max-width:900px){ .p1,.p2,.p3,.p4,.p5{grid-column:span 1;grid-row:span 2;margin-top:0;transform:none;} }
+
+  /* ---------- faq / consulenza ---------- */
+  .intake{display:grid;grid-template-columns:.9fr 1.1fr;gap:64px;}
+  @media (max-width:820px){ .intake{grid-template-columns:1fr;gap:40px;} }
+  .card-stub{
+    border:1px solid var(--line);padding:28px;border-radius:2px;background:var(--surface-raised);
+  }
+  .card-stub .row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--line);font-size:.78rem;}
+  .card-stub .row:last-child{border-bottom:none;}
+  .card-stub .row b{color:var(--text);font-weight:600;}
+
+  .qa{border-top:1px solid var(--line);}
+  .qa-item{border-bottom:1px solid var(--line);}
+  .qa-item button{
+    width:100%;text-align:left;background:none;border:none;color:var(--text);
+    font-family:'Big Shoulders Display',sans-serif;font-size:1.3rem;text-transform:uppercase;
+    padding:22px 0;cursor:none;display:flex;justify-content:space-between;align-items:center;gap:16px;
+  }
+  @media (pointer:coarse){ .qa-item button{cursor:pointer;} }
+  .qa-item button .x{color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:1rem;transition:transform .3s ease;}
+  .qa-item[open] button .x{transform:rotate(45deg);}
+  .qa-item p{padding-bottom:22px;margin:0;}
+
+  /* ---------- testimonials ---------- */
+  .guestbook{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line);border:1px solid var(--line);}
+  @media (max-width:820px){ .guestbook{grid-template-columns:1fr;} }
+  .entry{background:var(--surface);padding:32px 28px;}
+  .entry q{font-style:italic;font-size:1.08rem;display:block;color:var(--text);quotes:"“" "”";margin-bottom:16px;}
+  .entry .who{font-size:.72rem;color:var(--text-muted);}
+
+  /* ---------- contact ---------- */
+  .ticket{
+    border:1px solid var(--line);border-radius:2px;display:grid;grid-template-columns:1.4fr 1fr;
+    background:var(--surface-raised);position:relative;overflow:hidden;
+  }
+  @media (max-width:760px){ .ticket{grid-template-columns:1fr;} }
+  .ticket::before{
+    content:"";position:absolute;top:0;bottom:0;left:calc(58% - 1px);width:0;
+    border-left:1px dashed var(--line);
+  }
+  @media (max-width:760px){ .ticket::before{display:none;} }
+  .ticket-main{padding:48px;}
+  .ticket-side{padding:48px;display:flex;flex-direction:column;justify-content:space-between;gap:24px;}
+  .social-row{display:flex;gap:18px;}
+  .social-row a{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border:1px solid var(--line);border-radius:50%;transition:border-color .25s,color .25s;}
+  .social-row a:hover{border-color:var(--accent);color:var(--accent);}
+  .cta{
+    display:inline-flex;align-items:center;gap:10px;margin-top:28px;
+    font-family:'Big Shoulders Display',sans-serif;font-size:1.1rem;text-transform:uppercase;
+    color:var(--text);text-decoration:none;padding-bottom:4px;border-bottom:2px solid var(--accent);
+  }
+  .cta:hover{color:var(--accent);}
+
+  footer{padding:32px 0;font-size:.7rem;color:var(--text-muted);display:flex;justify-content:space-between;}
+  @media (max-width:600px){ footer{flex-direction:column;gap:8px;} }
+</style>
+
+<div class="ruler" id="ruler" aria-hidden="true"></div>
+<div class="needle" id="needle" aria-hidden="true">
+  <span class="core"></span>
+  <span class="d" style="transform:translate(9px,-3px)"></span>
+  <span class="d" style="transform:translate(-8px,4px)"></span>
+  <span class="d" style="transform:translate(3px,10px)"></span>
+  <span class="d" style="transform:translate(-4px,-9px)"></span>
+</div>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-top">
+      <span class="mono tag">MILANO — VIA TORTONA</span>
+      <span class="mono tag">SU APPUNTAMENTO</span>
+    </div>
+    <h1 class="press">
+      <span style="--i:0">BOTTEGA</span>
+      <span style="--i:1">INCHIOSTRO</span>
+    </h1>
+    <div class="hero-sub">
+      <p>Tatuaggi disegnati su misura, tirati a mano libera e trasferiti ago dopo ago. Blackwork, fineline e tradizione giapponese, in uno studio privato di due sedie.</p>
+      <div class="hero-meta mono">
+        <span>ARTISTA <b>Marco Sella</b></span>
+        <span>ATTIVO DAL <b>2016</b></span>
+        <span>AGENDA <b>3–4 settimane</b></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="about alt">
+  <div class="wrap about-grid">
+    <div class="skin"></div>
+    <div class="about-text">
+      <div class="reg mono">REG A — CHI SONO</div>
+      <p class="lead">Il tatuaggio è l'unico disegno che invecchia insieme a chi lo porta.</p>
+      <p>Dopo dieci anni tra Milano e Osaka, ho scelto di lavorare per appuntamento singolo: un incontro, uno schizzo, una sola seduta lunga invece di tre corte. Ogni pezzo nasce da una conversazione, non da un catalogo.</p>
+      <p>Specializzato in blackwork ad ampia superficie e linee fini su misura corporea, con un occhio alla composizione classica giapponese.</p>
+    </div>
+  </div>
+</section>
+
+<section class="styles">
+  <div class="wrap">
+    <div class="reg mono">REG B — STILI</div>
+    <div class="flash-grid">
+      <article class="flash-card">
+        <span class="flash-code mono">SH.01</span>
+        <h3>Blackwork</h3>
+        <p>Campiture piene, geometrie e negativo dello spazio. Ideale su bracci e schiena.</p>
+        <div class="flash-mark mono"><span>2–6H SEDUTA</span><span>DA 180€</span></div>
+      </article>
+      <article class="flash-card">
+        <span class="flash-code mono">SH.02</span>
+        <h3>Fineline</h3>
+        <p>Linea sottile e continua, botanica e ritrattistica minimale.</p>
+        <div class="flash-mark mono"><span>1–3H SEDUTA</span><span>DA 120€</span></div>
+      </article>
+      <article class="flash-card">
+        <span class="flash-code mono">SH.03</span>
+        <h3>Irezumi</h3>
+        <p>Composizione tradizionale giapponese, pannelli e sfondo a onde o nuvole.</p>
+        <div class="flash-mark mono"><span>PROGETTO A TAPPE</span><span>SU PREVENTIVO</span></div>
+      </article>
+      <article class="flash-card">
+        <span class="flash-code mono">SH.04</span>
+        <h3>Chicano</h3>
+        <p>Ombreggiatura a scala di grigi, ritratti e lettering old english.</p>
+        <div class="flash-mark mono"><span>3–5H SEDUTA</span><span>DA 200€</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="portfolio alt">
+  <div class="wrap">
+    <div class="reg mono">REG C — LAVORI RECENTI</div>
+    <div class="folio">
+      <figure class="polaroid p1"><span class="tape"></span><div class="ink"></div><figcaption class="mono"><span>AVAMBRACCIO</span><span>BLACKWORK</span></figcaption></figure>
+      <figure class="polaroid p2"><span class="tape"></span><div class="ink"></div><figcaption class="mono"><span>SCHIENA</span><span>IREZUMI</span></figcaption></figure>
+      <figure class="polaroid p3"><span class="tape"></span><div class="ink"></div><figcaption class="mono"><span>CAVIGLIA</span><span>FINELINE</span></figcaption></figure>
+      <figure class="polaroid p4"><span class="tape"></span><div class="ink"></div><figcaption class="mono"><span>PETTO</span><span>CHICANO</span></figcaption></figure>
+      <figure class="polaroid p5"><span class="tape"></span><div class="ink"></div><figcaption class="mono"><span>POLPACCIO</span><span>BLACKWORK</span></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="faq">
+  <div class="wrap intake">
+    <div>
+      <div class="reg mono">REG D — CONSULENZA</div>
+      <div class="card-stub mono">
+        <div class="row"><span>MODULO</span><b>Scheda d'intake</b></div>
+        <div class="row"><span>DURATA CONSULENZA</span><b>20 min, gratuita</b></div>
+        <div class="row"><span>DEPOSITO</span><b>50€, scalato dal totale</b></div>
+        <div class="row"><span>ETÀ MINIMA</span><b>18 anni, documento richiesto</b></div>
+      </div>
+    </div>
+    <div class="qa">
+      <details class="qa-item" open>
+        <summary><button type="button" onclick="this.closest('details').open=!this.closest('details').open">Come si prenota una seduta?<span class="x">+</span></button></summary>
+        <p>Scrivi in DM o via email con zona del corpo, dimensione indicativa e riferimenti visivi. Fisseremo prima una consulenza breve, poi la data della seduta.</p>
+      </details>
+      <details class="qa-item">
+        <summary><button type="button" onclick="this.closest('details').open=!this.closest('details').open">Quanto dura la guarigione?<span class="x">+</span></button></summary>
+        <p>In media 2–3 settimane per la pelle superficiale, fino a 6 per l'assestamento completo del colore e del nero pieno.</p>
+      </details>
+      <details class="qa-item">
+        <summary><button type="button" onclick="this.closest('details').open=!this.closest('details').open">Coprite tatuaggi esistenti?<span class="x">+</span></button></summary>
+        <p>Sì, valutiamo cover-up in consulenza: portiamo una foto con luce naturale e parliamo di cosa è realisticamente copribile.</p>
+      </details>
+      <details class="qa-item">
+        <summary><button type="button" onclick="this.closest('details').open=!this.closest('details').open">Come vengono calcolati i prezzi?<span class="x">+</span></button></summary>
+        <p>A tariffa oraria per i pezzi grandi, a prezzo fisso per i pezzi piccoli concordato prima di iniziare — mai sorprese a fine seduta.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="press-quotes alt">
+  <div class="wrap">
+    <div class="reg mono">REG E — QUADERNO FIRME</div>
+    <div class="guestbook">
+      <div class="entry">
+        <q>Un solo appuntamento, zero fretta: mi sono sentita ascoltata prima ancora di vedere la matita.</q>
+        <div class="who mono">GIULIA R. — FINELINE, CAVIGLIA</div>
+      </div>
+      <div class="entry">
+        <q>Il progetto è cambiato tre volte in consulenza finché non era esattamente giusto. Ne è valsa la pena.</q>
+        <div class="who mono">DAVIDE M. — BLACKWORK, SCHIENA</div>
+      </div>
+      <div class="entry">
+        <q>La sedia più comoda in cui abbia mai passato cinque ore. E il nero non è mai sbiadito.</q>
+        <div class="who mono">NOOR K. — IREZUMI, BRACCIO</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact">
+  <div class="wrap">
+    <div class="reg mono">REG F — CONTATTI</div>
+    <div class="ticket">
+      <div class="ticket-main">
+        <h2 style="font-size:2.4rem;">Prenota la tua seduta</h2>
+        <p>Racconta cosa hai in mente: zona del corpo, riferimenti, disponibilità. Rispondo entro 48 ore lavorative.</p>
+        <a class="cta" href="mailto:booking@bottegainchiostro.it">Scrivi a booking@bottegainchiostro.it →</a>
+      </div>
+      <div class="ticket-side mono">
+        <div>
+          <div style="margin-bottom:6px;color:var(--text-muted);">STUDIO</div>
+          <div>Via Tortona 34, Milano</div>
+          <div>Mar–Sab, 11:00–19:00</div>
+        </div>
+        <div class="social-row" aria-label="Social">
+          <a href="#" aria-label="Instagram" title="Instagram">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+          </a>
+          <a href="#" aria-label="Pinterest" title="Pinterest">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9 17c1-3 1.5-5.5 1.5-7.2a2.5 2.5 0 0 1 5 0c0 2-1 3.7-2.4 3.7-1 0-1.6-.7-1.6-1.7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="wrap mono">
+  <span>© 2026 BOTTEGA INCHIOSTRO</span>
+  <span>P.IVA 00000000000 — TEMPLATE DI STUDIO</span>
+</footer>
+
+<script>
+  (function(){
+    var ruler = document.getElementById('ruler');
+    if (ruler) {
+      var ticks = 34, html = '';
+      for (var i = 0; i < ticks; i++) html += '<i></i>';
+      ruler.innerHTML = html;
+    }
+
+    var needle = document.getElementById('needle');
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var coarse = window.matchMedia('(pointer: coarse)').matches;
+    if (needle && !coarse) {
+      var tx = 0, ty = 0, x = 0, y = 0;
+      window.addEventListener('mousemove', function(e){ tx = e.clientX; ty = e.clientY; });
+      function loop(){
+        var ease = reduced ? 1 : 0.22;
+        x += (tx - x) * ease;
+        y += (ty - y) * ease;
+        needle.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+        requestAnimationFrame(loop);
+      }
+      loop();
+
+      var hoverables = document.querySelectorAll('a, button, .flash-card, .polaroid, summary');
+      hoverables.forEach(function(el){
+        el.addEventListener('mouseenter', function(){ needle.classList.add('active'); });
+        el.addEventListener('mouseleave', function(){ needle.classList.remove('active'); });
+      });
+    }
+
+    if (!reduced) {
+      var tilts = document.querySelectorAll('.flash-card, .polaroid');
+      tilts.forEach(function(card){
+        card.addEventListener('mousemove', function(e){
+          var r = card.getBoundingClientRect();
+          var px = (e.clientX - r.left) / r.width - 0.5;
+          var py = (e.clientY - r.top) / r.height - 0.5;
+          var base = card.classList.contains('polaroid') ? (card.style.getPropertyValue('--base-rot') || '0deg') : '0deg';
+          card.style.transform = 'rotate(' + (px * 2) + 'deg) translateY(' + (py * -4) + 'px)';
+        });
+        card.addEventListener('mouseleave', function(){
+          card.style.transform = '';
+        });
+      });
+    }
+  })();
+</script>

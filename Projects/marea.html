@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marea — Studio Tatuaggi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eaf4f4;
+    --bg-2:#d9eeed;
+    --panel:#ffffff;
+    --ink:#123338;
+    --muted:#5f7d80;
+    --muted-2:#93aeb0;
+    --line:#d3e8e6;
+    --teal:#2fb6ac;
+    --teal-dark:#1f8a82;
+    --c1:#c9b6f0; --c2:#9fe3ec; --c3:#f4b8d8; --c4:#f3e5a0;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(ellipse at 50% -10%, #fdfefe 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Inter', ui-sans-serif, sans-serif;
+    font-size:16px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{ color:inherit; text-decoration:none;}
+  img{ max-width:100%; display:block;}
+  ::selection{ background:var(--c2); color:var(--ink);}
+  .display{ font-family:'Fraunces', serif; letter-spacing:-.01em;}
+
+  .wrap{ max-width:1160px; margin:0 auto; padding:0 32px;}
+
+  .holo-text{
+    background:linear-gradient(100deg, var(--teal), var(--c2), var(--c1), var(--c3));
+    background-size:280% 100%;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:holoShift 10s linear infinite;
+  }
+  @keyframes holoShift{ to{ background-position:280% 0;} }
+
+  /* ---------------- HEADER ---------------- */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(234,244,244,.82); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{ display:flex; align-items:center; justify-content:space-between; padding:18px 32px; max-width:1160px; margin:0 auto;}
+  .brand{ display:flex; align-items:center; gap:10px;}
+  .brand svg{ width:24px; height:24px; color:var(--teal);}
+  .brand b{ font-family:'Fraunces',serif; font-size:18px; font-weight:600;}
+  nav ul{ list-style:none; display:flex; gap:28px;}
+  nav ul li a{ font-size:14.5px; color:var(--muted); transition:color .2s ease;}
+  nav ul li a:hover{ color:var(--ink);}
+  .nav-cta{
+    font-family:'Fraunces',serif; font-size:13.5px; font-weight:500;
+    padding:10px 18px; border-radius:999px; background:var(--teal-dark); color:#fff;
+    transition:opacity .2s ease;
+  }
+  .nav-cta:hover{ opacity:.85;}
+  .burger{ display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer;}
+  .burger span{ width:20px; height:2px; background:var(--teal-dark); border-radius:2px;}
+
+  /* ---------------- HERO ---------------- */
+  .hero{ padding:150px 0 40px;}
+  .hero-grid{ display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center;}
+  .kicker{
+    display:inline-flex; align-items:center; gap:8px; font-family:'Fraunces',serif; font-style:italic;
+    font-size:13px; color:var(--muted); border:1px solid var(--line); background:var(--panel);
+    padding:7px 14px; border-radius:999px; margin-bottom:24px;
+  }
+  .kicker .sw{ width:8px; height:8px; border-radius:50%; background:var(--teal);}
+  h1.hero-title{
+    font-family:'Fraunces',serif; font-weight:500; letter-spacing:-.01em;
+    font-size:clamp(32px,4.6vw,50px); line-height:1.16; margin-bottom:22px;
+  }
+  .hero-desc{ color:var(--muted); font-size:16px; max-width:50ch; margin-bottom:34px;}
+  .hero-actions{ display:flex; gap:14px; flex-wrap:wrap;}
+  .btn{
+    display:inline-flex; align-items:center; gap:10px; font-family:'Fraunces',serif;
+    font-size:14px; font-weight:500; padding:14px 24px; border-radius:999px;
+    border:1px solid var(--line); color:var(--ink); background:var(--panel);
+    transition:border-color .2s ease, transform .2s ease;
+  }
+  .btn:hover{ transform:translateY(-1px); border-color:var(--muted-2);}
+  .btn.primary{ background:var(--teal-dark); color:#fff; border-color:var(--teal-dark);}
+  .btn.primary:hover{ opacity:.88;}
+
+  /* ---------------- WATER TILE (core mechanic) ---------------- */
+  .water-tile{
+    position:relative; border-radius:22px; overflow:hidden; background:var(--panel);
+    border:1px solid var(--line); touch-action:none;
+    box-shadow:0 30px 60px rgba(31,138,130,.12);
+  }
+  .water-tile .art{ position:absolute; inset:0; z-index:1;}
+  .water-tile .art svg{ width:100%; height:100%;}
+  .water-tile canvas.surface{ position:absolute; inset:0; z-index:2; width:100%; height:100%; cursor:pointer;}
+  .water-hint{
+    position:absolute; inset:0; z-index:3; display:flex; align-items:center; justify-content:center;
+    text-align:center; padding:20px; pointer-events:none;
+    font-family:'Fraunces',serif; font-style:italic; font-size:13.5px; color:var(--muted);
+    transition:opacity .5s ease;
+  }
+  .water-tile.touched .water-hint{ opacity:0;}
+  .hero-water{ aspect-ratio:1/1;}
+
+  /* ---------------- SECTION SHELL ---------------- */
+  section{ padding:100px 0;}
+  .sec-head{ display:flex; align-items:baseline; gap:18px; margin-bottom:12px; flex-wrap:wrap;}
+  .sec-head h2{ font-family:'Fraunces',serif; font-size:clamp(24px,3.2vw,32px); font-weight:500;}
+  .sec-sub{ color:var(--muted); font-size:15px; max-width:62ch; margin-bottom:52px;}
+
+  /* ---------------- LO STUDIO ---------------- */
+  .studio{ display:grid; grid-template-columns:.85fr 1.15fr; gap:56px; align-items:center;}
+  .studio-photo{ aspect-ratio:4/5; border-radius:22px; overflow:hidden; border:1px solid var(--line); background:var(--panel); display:flex; align-items:center; justify-content:center;}
+  .studio-photo svg{ width:60%; height:60%;}
+  .studio-text p{ color:var(--muted); font-size:16px; margin-bottom:20px; max-width:58ch;}
+  .studio-text p strong{ color:var(--ink); font-weight:600;}
+  .field-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-top:30px;}
+  .field{ border:1px solid var(--line); background:var(--panel); padding:16px 18px; border-radius:14px;}
+  .field .k{ font-family:'Fraunces',serif; font-style:italic; font-size:12px; color:var(--muted); margin-bottom:6px;}
+  .field .v{ font-size:15.5px;}
+
+  /* ---------------- CORRENTI (stili) ---------------- */
+  .correnti-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:20px;}
+  .corrente-card{ background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:28px 22px; transition:transform .25s ease, box-shadow .25s ease;}
+  .corrente-card:hover{ transform:translateY(-4px); box-shadow:0 18px 34px rgba(47,182,172,.15);}
+  .corrente-card .ic{ width:32px; height:32px; margin-bottom:20px; color:var(--teal-dark);}
+  .corrente-card h3{ font-family:'Fraunces',serif; font-size:16.5px; font-weight:600; margin-bottom:8px;}
+  .corrente-card p{ font-size:13px; color:var(--muted);}
+
+  /* ---------------- IL FONDALE (portfolio, floating parallax) ---------------- */
+  #fondaleGrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:34px 26px; perspective:1000px;}
+  .depth-item{ transition:transform .12s ease-out;}
+  .depth-item .water-tile{ aspect-ratio:1/1.05; cursor:pointer;}
+  .depth-item.risen .water-tile{ transform:translateY(-10px) scale(1.035); box-shadow:0 40px 70px rgba(31,138,130,.22);}
+  .depth-item .water-tile{ transition:transform .4s ease, box-shadow .4s ease;}
+  .depth-cap{ padding-top:14px;}
+  .depth-cap .fn{ font-family:'Fraunces',serif; font-style:italic; font-size:12px; color:var(--muted-2); margin-bottom:6px;}
+  .depth-cap h4{ font-family:'Fraunces',serif; font-size:15.5px; font-weight:600; margin-bottom:6px;}
+  .depth-cap p{ font-size:13px; color:var(--muted);}
+  .depth-details{
+    max-height:0; opacity:0; overflow:hidden; transition:max-height .45s ease, opacity .35s ease, margin .35s ease;
+    font-size:12.5px; color:var(--muted-2); margin-top:0;
+  }
+  .depth-item.risen .depth-details{ max-height:60px; opacity:1; margin-top:6px;}
+
+  /* ---------------- LA MAREA (percorso) ---------------- */
+  .steps{ display:flex; flex-direction:column;}
+  .step{ display:grid; grid-template-columns:70px 1fr; gap:26px; padding:26px 0; border-top:1px solid var(--line);}
+  .steps .step:last-child{ border-bottom:1px solid var(--line);}
+  .step .snum{ font-family:'Fraunces',serif; font-size:20px; font-weight:600; color:var(--muted-2);}
+  .step-body h4{ font-family:'Fraunces',serif; font-size:16px; font-weight:600; margin-bottom:8px;}
+  .step-body p{ font-size:14px; color:var(--muted); max-width:60ch;}
+
+  /* ---------------- VOCI DAL MARE ---------------- */
+  .voci-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+  .voce{ background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:24px 22px;}
+  .voce .mark{ font-family:'Fraunces',serif; font-size:24px; font-weight:600; margin-bottom:12px; display:block;}
+  .voce p.q{ font-size:14.5px; margin-bottom:16px;}
+  .voce .who{ font-size:12px; color:var(--muted-2);}
+
+  /* ---------------- CONTATTI ---------------- */
+  .contact-grid{ display:grid; grid-template-columns:1fr 1fr; gap:56px;}
+  .form-row{ display:flex; flex-direction:column; gap:7px; margin-bottom:20px;}
+  .form-row label{ font-family:'Fraunces',serif; font-style:italic; font-size:12.5px; color:var(--muted);}
+  .form-row input, .form-row select, .form-row textarea{
+    background:var(--panel); border:1px solid var(--line); color:var(--ink);
+    font-family:'Inter',sans-serif; font-size:14.5px; padding:12px 14px; border-radius:12px;
+  }
+  .form-row input:focus, .form-row select:focus, .form-row textarea:focus{ outline:none; border-color:var(--teal);}
+  .form-two{ display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .form-note{ font-size:12px; color:var(--muted-2); margin-top:10px;}
+  .form-status{ font-size:13px; color:var(--teal-dark); margin-top:14px; display:none;}
+  .info-block{ border:1px solid var(--line); background:var(--panel); border-radius:22px; padding:28px 26px;}
+  .info-block .k{ font-family:'Fraunces',serif; font-style:italic; font-size:12px; color:var(--muted); margin-bottom:5px; margin-top:20px;}
+  .info-block .k:first-child{ margin-top:0;}
+  .info-block .v{ font-size:15px;}
+  .info-block .v.muted{ color:var(--muted);}
+  .socials{ display:flex; gap:10px; margin-top:20px;}
+  .socials a{ font-family:'Fraunces',serif; font-size:12px; border:1px solid var(--line); padding:8px 13px; border-radius:999px; color:var(--muted);}
+  .socials a:hover{ color:var(--teal-dark); border-color:var(--teal);}
+
+  /* ---------------- FOOTER ---------------- */
+  footer{ border-top:1px solid var(--line); padding:34px 0;}
+  .foot-row{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; font-size:13px; color:var(--muted-2);}
+
+  /* ---------------- RESPONSIVE ---------------- */
+  @media (max-width:960px){
+    nav ul{ display:none;}
+    .burger{ display:flex;}
+    .hero-grid{ grid-template-columns:1fr; gap:36px;}
+    .studio{ grid-template-columns:1fr; gap:36px;}
+    .studio-photo{ max-width:320px; margin:0 auto;}
+    .correnti-grid{ grid-template-columns:repeat(2,1fr);}
+    #fondaleGrid{ grid-template-columns:repeat(2,1fr);}
+    .voci-grid{ grid-template-columns:1fr;}
+    .contact-grid{ grid-template-columns:1fr;}
+  }
+  @media (max-width:600px){
+    .correnti-grid{ grid-template-columns:1fr;}
+    #fondaleGrid{ grid-template-columns:1fr;}
+    .field-grid{ grid-template-columns:1fr;}
+    .form-two{ grid-template-columns:1fr;}
+    .step{ grid-template-columns:1fr; gap:8px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto;}
+    *{ transition:none !important; animation:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 12c2-3 4-3 6 0s4 3 6 0 4-3 6 0"/><path d="M3 17c2-3 4-3 6 0s4 3 6 0 4-3 6 0"/></svg>
+      <b>MAREA</b>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="#studio">Studio</a></li>
+        <li><a href="#correnti">Correnti</a></li>
+        <li><a href="#fondale">Il Fondale</a></li>
+        <li><a href="#percorso">Percorso</a></li>
+        <li><a href="#voci">Voci</a></li>
+      </ul>
+    </nav>
+    <a href="#contatti" class="nav-cta">Prenota</a>
+    <button class="burger" aria-label="menu" onclick="document.querySelector('nav ul').classList.toggle('open')"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="kicker"><span class="sw"></span>Uno specchio d'acqua, non un portfolio qualunque</div>
+        <h1 class="hero-title">Tocca l'acqua.<br><span class="holo-text">Riemerge un tatuaggio.</span></h1>
+        <p class="hero-desc">Marea è uno studio dove ogni pezzo riposa sul fondale, sotto una superficie immobile. Un clic, un movimento del cursore: l'acqua si increspa di luce e rivela cosa custodisce.</p>
+        <div class="hero-actions">
+          <a href="#fondale" class="btn primary">Esplora il fondale</a>
+          <a href="#contatti" class="btn">Prenota una seduta</a>
+        </div>
+      </div>
+      <div class="water-tile hero-water" data-water>
+        <div class="art">
+          <svg viewBox="0 0 300 300"><rect width="300" height="300" fill="#f4fbfb"/>
+            <path d="M60 220 Q150 60 240 220" fill="none" stroke="#123338" stroke-width="1.2"/>
+            <path d="M90 230 Q150 120 210 230" fill="none" stroke="#123338" stroke-width="1"/>
+            <circle cx="150" cy="140" r="14" fill="none" stroke="#123338" stroke-width="1"/>
+          </svg>
+        </div>
+        <canvas class="surface"></canvas>
+        <div class="water-hint">clicca o muovi il cursore<br>sull'acqua</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LO STUDIO ============ -->
+  <section id="studio">
+    <div class="wrap studio">
+      <div class="studio-photo">
+        <svg viewBox="0 0 200 240" fill="none" stroke="#123338" stroke-width="1">
+          <circle cx="100" cy="90" r="44"/>
+          <path d="M60 200 Q100 155 140 200"/>
+        </svg>
+      </div>
+      <div class="studio-text">
+        <div class="kicker">Lo studio</div>
+        <p><strong>Nadia Correnti</strong> tatua da nove anni pensando alla pelle come a una superficie d'acqua: mai statica del tutto, sempre pronta a restituire qualcosa se la si osserva con calma.</p>
+        <p>Le sedute iniziano spesso da una domanda semplice: cosa vuoi che riemerga? Da lì nasce la composizione, con linee fluide e nessuna fretta.</p>
+        <div class="field-grid">
+          <div class="field"><div class="k">Specializzazione</div><div class="v">Fine-line, realismo, acquerello</div></div>
+          <div class="field"><div class="k">Sedute / mese</div><div class="v">Numero limitato, su selezione</div></div>
+          <div class="field"><div class="k">Materiali</div><div class="v">Aghi monouso, inchiostri certificati</div></div>
+          <div class="field"><div class="k">Sede</div><div class="v">Studio privato, su appuntamento</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CORRENTI (stili) ============ -->
+  <section id="correnti">
+    <div class="wrap">
+      <div class="sec-head"><h2>Quattro correnti</h2></div>
+      <p class="sec-sub">Ogni stile si muove nell'acqua in modo diverso.</p>
+      <div class="correnti-grid">
+        <div class="corrente-card">
+          <svg class="ic" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4 16c8-4 16-4 24 0"/><path d="M4 20c8-4 16-4 24 0"/></svg>
+          <h3>Fine-line</h3><p>Linea sottile e continua, come un filo di corrente.</p>
+        </div>
+        <div class="corrente-card">
+          <svg class="ic" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="16" cy="16" r="10"/><circle cx="16" cy="16" r="4"/></svg>
+          <h3>Realismo</h3><p>Dettaglio fotografico, costruito a strati come sedimenti.</p>
+        </div>
+        <div class="corrente-card">
+          <svg class="ic" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M10 24c0-8 4-14 6-17 2 3 6 9 6 17"/></svg>
+          <h3>Acquerello</h3><p>Colore diluito che si dissolve senza contorno netto.</p>
+        </div>
+        <div class="corrente-card">
+          <svg class="ic" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="7" y="7" width="18" height="18" rx="2"/><path d="M7 16h18M16 7v18"/></svg>
+          <h3>Geometrico</h3><p>Griglie e simmetrie stabili come una linea di marea.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ IL FONDALE (portfolio) ============ -->
+  <section id="fondale">
+    <div class="wrap">
+      <div class="sec-head"><h2>Il fondale</h2></div>
+      <p class="sec-sub">Ogni pezzo galleggia a una profondità diversa. Clicca sull'acqua per farlo riemergere.</p>
+      <div id="fondaleGrid">
+
+        <div class="depth-item" data-depth="0.02">
+          <div class="water-tile" data-water>
+            <div class="art"><svg viewBox="0 0 300 320"><rect width="300" height="320" fill="#f4fbfb"/><path d="M60 250 Q150 80 240 250" fill="none" stroke="#123338" stroke-width="1"/></svg></div>
+            <canvas class="surface"></canvas>
+            <div class="water-hint">tocca per far riemergere</div>
+          </div>
+          <div class="depth-cap"><div class="fn">Fondale 01 — Avambraccio</div><h4>Arco fine-line</h4><p>Linea continua senza ombreggiatura.</p><div class="depth-details">2 sedute, profondità 2.0mm.</div></div>
+        </div>
+
+        <div class="depth-item" data-depth="0.035">
+          <div class="water-tile" data-water>
+            <div class="art"><svg viewBox="0 0 300 320"><rect width="300" height="320" fill="#f4fbfb"/><path d="M90 110 Q150 70 210 110 Q225 190 150 260 Q75 190 90 110Z" fill="none" stroke="#123338" stroke-width="1"/></svg></div>
+            <canvas class="surface"></canvas>
+            <div class="water-hint">tocca per far riemergere</div>
+          </div>
+          <div class="depth-cap"><div class="fn">Fondale 02 — Scapola</div><h4>Fiore acquerello</h4><p>Sfumatura su tre toni pastello.</p><div class="depth-details">3 sedute, colore a strati.</div></div>
+        </div>
+
+        <div class="depth-item" data-depth="0.05">
+          <div class="water-tile" data-water>
+            <div class="art"><svg viewBox="0 0 300 320"><rect width="300" height="320" fill="#f4fbfb"/><circle cx="150" cy="160" r="70" fill="none" stroke="#123338" stroke-width="1"/><circle cx="150" cy="160" r="40" fill="none" stroke="#123338" stroke-width="1"/></svg></div>
+            <canvas class="surface"></canvas>
+            <div class="water-hint">tocca per far riemergere</div>
+          </div>
+          <div class="depth-cap"><div class="fn">Fondale 03 — Sterno</div><h4>Cerchi concentrici</h4><p>Simmetria geometrica a doppio anello.</p><div class="depth-details">Seduta singola, linea pulita.</div></div>
+        </div>
+
+        <div class="depth-item" data-depth="0.03">
+          <div class="water-tile" data-water>
+            <div class="art"><svg viewBox="0 0 300 320"><rect width="300" height="320" fill="#f4fbfb"/><path d="M70 100 C130 70 170 70 230 100 C230 190 200 250 150 280 C100 250 70 190 70 100Z" fill="none" stroke="#123338" stroke-width="1"/></svg></div>
+            <canvas class="surface"></canvas>
+            <div class="water-hint">tocca per far riemergere</div>
+          </div>
+          <div class="depth-cap"><div class="fn">Fondale 04 — Costato</div><h4>Ritratto realistico</h4><p>Palette calda a strati morbidi.</p><div class="depth-details">4 sedute, dettaglio fotografico.</div></div>
+        </div>
+
+        <div class="depth-item" data-depth="0.045">
+          <div class="water-tile" data-water>
+            <div class="art"><svg viewBox="0 0 300 320"><rect width="300" height="320" fill="#f4fbfb"/><path d="M60 170 Q150 70 240 170" fill="none" stroke="#123338" stroke-width="1"/><path d="M60 170 Q150 270 240 170" fill="none" stroke="#123338" stroke-width="1"/></svg></div>
+            <canvas class="surface"></canvas>
+            <div class="water-hint">tocca per far riemergere</div>
+          </div>
+          <div class="depth-cap"><div class="fn">Fondale 05 — Polso</div><h4>Doppio arco a specchio</h4><p>Composizione fine-line minimale.</p><div class="depth-details">Seduta singola, 1.6mm.</div></div>
+        </div>
+
+        <div class="depth-item" data-depth="0.025">
+          <div class="water-tile" data-water>
+            <div class="art"><svg viewBox="0 0 300 320"><rect width="300" height="320" fill="#f4fbfb"/><path d="M100 260 C90 190 100 110 150 70 C200 110 210 190 200 260" fill="none" stroke="#123338" stroke-width="1"/></svg></div>
+            <canvas class="surface"></canvas>
+            <div class="water-hint">tocca per far riemergere</div>
+          </div>
+          <div class="depth-cap"><div class="fn">Fondale 06 — Polpaccio</div><h4>Foglia sfumata</h4><p>Acquerello a gradiente verde-acqua.</p><div class="depth-details">2 sedute, colore diluito.</div></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LA MAREA (percorso) ============ -->
+  <section id="percorso">
+    <div class="wrap">
+      <div class="sec-head"><h2>Il ritmo della marea</h2></div>
+      <div class="steps">
+        <div class="step"><div class="snum display">01</div><div class="step-body"><h4>Bassa marea</h4><p>Ascolto dell'idea: raccontaci zona, stile e riferimenti.</p></div></div>
+        <div class="step"><div class="snum display">02</div><div class="step-body"><h4>Correnti</h4><p>Costruzione del disegno, con eventuali varianti di composizione.</p></div></div>
+        <div class="step"><div class="snum display">03</div><div class="step-body"><h4>Alta marea</h4><p>Esecuzione a sedute programmate, secondo l'estensione del pezzo.</p></div></div>
+        <div class="step"><div class="snum display">04</div><div class="step-body"><h4>Quiete</h4><p>Indicazioni per la cura e il consolidamento del colore nel tempo.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VOCI DAL MARE ============ -->
+  <section id="voci">
+    <div class="wrap">
+      <div class="sec-head"><h2>Voci dal mare</h2></div>
+      <div class="voci-grid">
+        <div class="voce"><span class="mark holo-text">”</span><p class="q">Vedere il proprio tatuaggio "riemergere" dall'acqua prima ancora della seduta è stato spiazzante, in senso positivo.</p><div class="who">C. Alberti</div></div>
+        <div class="voce"><span class="mark holo-text">”</span><p class="q">Zero fretta, tanta attenzione alla composizione. Si sente che ogni linea è stata pensata.</p><div class="who">M. Ferraro</div></div>
+        <div class="voce"><span class="mark holo-text">”</span><p class="q">Un portfolio che si esplora invece di scorrere soltanto: raro trovarne uno così.</p><div class="who">E. Tosi</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTATTI ============ -->
+  <section id="contatti">
+    <div class="wrap">
+      <div class="sec-head"><h2>Prenota una seduta</h2></div>
+      <p class="sec-sub">Raccontaci cosa vuoi far riemergere.</p>
+      <div class="contact-grid">
+        <form id="mareaForm">
+          <div class="form-two">
+            <div class="form-row"><label for="nome">Nome e cognome</label><input id="nome" type="text" required placeholder="Il tuo nome"></div>
+            <div class="form-row"><label for="email">Email</label><input id="email" type="email" required placeholder="tuo@indirizzo.it"></div>
+          </div>
+          <div class="form-two">
+            <div class="form-row">
+              <label for="stile">Stile preferito</label>
+              <select id="stile"><option>Fine-line</option><option>Realismo</option><option>Acquerello</option><option>Geometrico</option></select>
+            </div>
+            <div class="form-row"><label for="zona">Zona del corpo</label><input id="zona" type="text" placeholder="Es. avambraccio, scapola…"></div>
+          </div>
+          <div class="form-row"><label for="msg">Racconta l'idea</label><textarea id="msg" rows="4" placeholder="Riferimenti, palette, dimensioni indicative…"></textarea></div>
+          <button type="submit" class="btn primary">Invia richiesta</button>
+          <p class="form-note">Risposta entro 2-3 giorni lavorativi.</p>
+          <p class="form-status" id="formStatus">Richiesta ricevuta — ti risponderemo a breve.</p>
+        </form>
+
+        <div class="info-block">
+          <div class="k">Studio</div>
+          <div class="v">Lungomare degli Artisti 8</div>
+          <div class="v muted">Su appuntamento</div>
+          <div class="k">Orario</div>
+          <div class="v">Mar–Sab, 11:00–19:00</div>
+          <div class="k">Corrispondenza</div>
+          <div class="v">hello@marea-studio.it</div>
+          <div class="socials"><a href="#">Instagram</a><a href="#">Pinterest</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-row">
+    <span>© 2026 Marea Studio Tatuaggi</span>
+    <span>Ogni pezzo riemerge una volta sola</span>
+  </div>
+</footer>
+
+<script>
+  // ---- mobile nav ----
+  const navStyle = document.createElement('style');
+  navStyle.textContent = `
+    @media (max-width:960px){
+      nav ul.open{
+        display:flex; flex-direction:column; position:fixed; top:64px; left:0; right:0;
+        background:#eaf4f4; border-bottom:1px solid #d3e8e6; padding:8px 0;
+      }
+      nav ul.open li a{ display:block; padding:14px 32px; border-top:1px solid #dcefee; }
+    }`;
+  document.head.appendChild(navStyle);
+
+  // ---- Water ripple reveal ----
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const rainbow = ['#c9b6f0', '#9fe3ec', '#f4b8d8', '#f3e5a0'];
+
+  function initWaterTile(tile){
+    const canvas = tile.querySelector('canvas.surface');
+    const ctx = canvas.getContext('2d');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let ripples = [];
+    let raf = null;
+
+    function paintSurface(){
+      const w = tile.clientWidth, h = tile.clientHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      ctx.globalCompositeOperation = 'source-over';
+      const grad = ctx.createLinearGradient(0,0,0,h);
+      grad.addColorStop(0, '#f4fbfb');
+      grad.addColorStop(1, '#dff2f1');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0,0,w,h);
+    }
+
+    if(prefersReduced){ return; }
+
+    paintSurface();
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => { paintSurface(); ripples = []; }, 250);
+    });
+
+    function maxRadius(){ return Math.max(tile.clientWidth, tile.clientHeight) * 0.62; }
+
+    function spawnRipple(x, y, big){
+      ripples.push({
+        x, y, r: 2,
+        maxR: big ? maxRadius() : maxRadius() * 0.32,
+        speed: big ? 5.2 : 4,
+        ringLife: 1,
+        color: rainbow[Math.floor(Math.random()*rainbow.length)]
+      });
+      if(!raf) raf = requestAnimationFrame(tick);
+    }
+
+    function tick(){
+      let active = false;
+      ripples.forEach(rp => {
+        if(rp.r < rp.maxR){
+          rp.r += rp.speed;
+          active = true;
+        } else if(rp.ringLife > 0){
+          rp.ringLife -= 0.03;
+          active = true;
+        }
+        // erase to reveal image underneath
+        ctx.globalCompositeOperation = 'destination-out';
+        const eraseGrad = ctx.createRadialGradient(rp.x, rp.y, 0, rp.x, rp.y, rp.r);
+        eraseGrad.addColorStop(0, 'rgba(0,0,0,1)');
+        eraseGrad.addColorStop(.75, 'rgba(0,0,0,.85)');
+        eraseGrad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = eraseGrad;
+        ctx.beginPath();
+        ctx.arc(rp.x, rp.y, rp.r, 0, Math.PI*2);
+        ctx.fill();
+
+        // rainbow ring at the growing edge
+        if(rp.ringLife > 0){
+          ctx.globalCompositeOperation = 'source-over';
+          ctx.globalAlpha = Math.max(rp.ringLife, 0) * .55;
+          ctx.strokeStyle = rp.color;
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(rp.x, rp.y, rp.r, 0, Math.PI*2);
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+        }
+      });
+      ripples = ripples.filter(rp => rp.r < rp.maxR || rp.ringLife > 0);
+      if(active){
+        raf = requestAnimationFrame(tick);
+      } else {
+        raf = null;
+      }
+    }
+
+    let lastMove = 0;
+    function handleClick(clientX, clientY){
+      const rect = tile.getBoundingClientRect();
+      spawnRipple(clientX-rect.left, clientY-rect.top, true);
+      tile.classList.add('touched');
+    }
+    function handleMove(clientX, clientY){
+      const now = performance.now();
+      if(now - lastMove < 260) return;
+      lastMove = now;
+      const rect = tile.getBoundingClientRect();
+      spawnRipple(clientX-rect.left, clientY-rect.top, false);
+      tile.classList.add('touched');
+    }
+
+    tile.addEventListener('click', (e) => handleClick(e.clientX, e.clientY));
+    tile.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY));
+    tile.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      handleClick(t.clientX, t.clientY);
+    }, { passive:true });
+  }
+
+  document.querySelectorAll('[data-water]').forEach(initWaterTile);
+
+  // ---- floating depth parallax + click-to-rise ----
+  const fondale = document.getElementById('fondaleGrid');
+  if(fondale && !prefersReduced){
+    fondale.addEventListener('mousemove', (e) => {
+      const rect = fondale.getBoundingClientRect();
+      const cx = rect.left + rect.width/2;
+      const cy = rect.top + rect.height/2;
+      const dx = e.clientX - cx, dy = e.clientY - cy;
+      fondale.querySelectorAll('.depth-item').forEach(item => {
+        const depth = parseFloat(item.dataset.depth || '0.03');
+        item.style.transform = `translate(${dx*depth}px, ${dy*depth}px)`;
+      });
+    });
+    fondale.addEventListener('mouseleave', () => {
+      fondale.querySelectorAll('.depth-item').forEach(item => { item.style.transform = ''; });
+    });
+  }
+
+  document.querySelectorAll('.depth-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      if(e.target.closest('canvas')) return; // let the water ripple handle its own click
+      const wasRisen = item.classList.contains('risen');
+      document.querySelectorAll('.depth-item.risen').forEach(d => d.classList.remove('risen'));
+      if(!wasRisen) item.classList.add('risen');
+    });
+  });
+
+  // ---- fake form submit ----
+  document.getElementById('mareaForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    document.getElementById('formStatus').style.display = 'block';
+    this.reset();
+  });
+</script>
+
+</body>
+</html>

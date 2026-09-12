@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clinica dell'Inchiostro — Cartella Clinica &amp; Raggi X</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0a0b0d;
+    --panel:#111317;
+    --panel-2:#15181d;
+    --line:#262b31;
+    --line-soft:#1a1d22;
+    --blue:#49d6ff;
+    --blue-dim:#1d4a57;
+    --blue-glow: rgba(73,214,255,.35);
+    --red:#ff3b30;
+    --text:#e7ebee;
+    --muted:#7c868f;
+    --muted-2:#4c545c;
+    --radius:2px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--void);
+    color:var(--text);
+    font-family:'JetBrains Mono', ui-monospace, monospace;
+    font-weight:400;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size: 42px 42px;
+  }
+  a{color:inherit; text-decoration:none;}
+  ::selection{ background:var(--blue); color:#04141a;}
+  img{max-width:100%; display:block;}
+
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 28px;}
+
+  /* ---------- corner tick mixin (used via class) ---------- */
+  .plate{
+    position:relative;
+    border:1px solid var(--line);
+    background:var(--panel);
+  }
+  .plate::before, .plate::after{
+    content:"";
+    position:absolute; width:10px; height:10px;
+    border:1px solid var(--muted-2);
+  }
+  .plate::before{ top:-1px; left:-1px; border-right:none; border-bottom:none;}
+  .plate::after{ bottom:-1px; right:-1px; border-left:none; border-top:none;}
+
+  .tag{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:11px; letter-spacing:.04em; color:var(--blue);
+    border:1px solid var(--blue-dim); padding:4px 10px;
+    background:rgba(73,214,255,.05);
+  }
+  .tag::before{ content:""; width:5px; height:5px; background:var(--blue); box-shadow:0 0 6px var(--blue);}
+
+  /* ---------------- HEADER ---------------- */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(10,11,13,.86);
+    backdrop-filter: blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 28px;
+    max-width:1180px; margin:0 auto;
+  }
+  .brand{ display:flex; flex-direction:column; line-height:1.2;}
+  .brand .id{ font-size:10px; color:var(--muted-2); letter-spacing:.06em;}
+  .brand .name{ font-size:15px; font-weight:700; letter-spacing:.01em;}
+  .brand .name span{ color:var(--blue);}
+  nav ul{ list-style:none; display:flex; gap:2px;}
+  nav ul li a{
+    display:block; font-size:12px; color:var(--muted); padding:8px 14px;
+    border-left:1px solid transparent;
+    transition:color .15s ease, border-color .15s ease;
+  }
+  nav ul li a:hover{ color:var(--text); border-left-color:var(--blue);}
+  .nav-cta{
+    font-size:12px; color:var(--void); background:var(--blue);
+    padding:9px 16px; font-weight:600; letter-spacing:.01em;
+  }
+  .nav-cta:hover{ background:#7de4ff;}
+  .burger{ display:none; flex-direction:column; gap:4px; background:none; border:none; cursor:pointer;}
+  .burger span{ width:22px; height:2px; background:var(--text);}
+
+  /* ---------------- HERO ---------------- */
+  .hero{
+    padding:150px 0 90px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-grid{
+    display:grid; grid-template-columns: 1.1fr .9fr; gap:60px; align-items:center;
+  }
+  .record-line{
+    display:flex; gap:18px; align-items:center; margin-bottom:26px;
+    font-size:11px; color:var(--muted); letter-spacing:.04em;
+  }
+  .record-line .dash{ flex:1; height:1px; background:var(--line);}
+  h1.stamp{
+    font-size:clamp(34px, 5vw, 58px);
+    font-weight:800;
+    line-height:1.05;
+    letter-spacing:-.01em;
+    margin-bottom:22px;
+  }
+  h1.stamp em{ font-style:normal; color:var(--blue);}
+  .hero-desc{
+    color:var(--muted); font-size:14.5px; max-width:46ch; margin-bottom:34px;
+  }
+  .hero-actions{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:44px;}
+  .btn{
+    display:inline-flex; align-items:center; gap:10px;
+    font-size:12.5px; font-weight:600; letter-spacing:.02em;
+    padding:13px 22px; border:1px solid var(--line); cursor:pointer;
+    background:transparent; color:var(--text);
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .btn:hover{ border-color:var(--blue); color:var(--blue);}
+  .btn.primary{ background:var(--blue); color:var(--void); border-color:var(--blue);}
+  .btn.primary:hover{ background:#7de4ff; color:var(--void);}
+
+  .hero-stats{ display:flex; gap:0; border-top:1px solid var(--line);}
+  .hero-stats div{ flex:1; padding:16px 18px 0; border-right:1px solid var(--line);}
+  .hero-stats div:last-child{ border-right:none;}
+  .hero-stats .num{ font-size:22px; font-weight:700; color:var(--blue);}
+  .hero-stats .lbl{ font-size:10.5px; color:var(--muted); letter-spacing:.03em; margin-top:4px;}
+
+  /* --------- interactive scan panel --------- */
+  .scan-panel{
+    position:relative; aspect-ratio: 3/4; border:1px solid var(--line);
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(73,214,255,.06), transparent 60%),
+      var(--panel);
+    overflow:hidden;
+    cursor:none;
+  }
+  .scan-panel::before, .scan-panel::after{
+    content:""; position:absolute; width:14px; height:14px; border:1px solid var(--muted-2); z-index:5;
+  }
+  .scan-panel::before{ top:10px; left:10px; border-right:none; border-bottom:none;}
+  .scan-panel::after{ bottom:10px; right:10px; border-left:none; border-top:none;}
+  .scan-header{
+    position:absolute; top:10px; right:10px; left:34px; z-index:5;
+    display:flex; justify-content:space-between;
+    font-size:9.5px; color:var(--muted-2); letter-spacing:.05em;
+  }
+  .scan-layers{ position:absolute; inset:0;}
+  .layer{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;}
+  .layer svg{ width:78%; height:auto;}
+  .layer-skin{ z-index:2;}
+  .layer-scan{ z-index:1;}
+  .scan-caption{
+    position:absolute; bottom:10px; left:10px; z-index:5;
+    font-size:9.5px; color:var(--muted); letter-spacing:.04em;
+    max-width:70%;
+  }
+  .crosshair{
+    position:absolute; width:120px; height:120px; margin:-60px 0 0 -60px;
+    border-radius:50%; border:1px solid rgba(73,214,255,.55);
+    pointer-events:none; z-index:6; opacity:0;
+    transition:opacity .2s ease;
+    box-shadow:0 0 24px rgba(73,214,255,.25), inset 0 0 24px rgba(73,214,255,.15);
+  }
+  .crosshair::before, .crosshair::after{
+    content:""; position:absolute; background:rgba(73,214,255,.6);
+  }
+  .crosshair::before{ left:50%; top:6px; bottom:6px; width:1px; transform:translateX(-50%);}
+  .crosshair::after{ top:50%; left:6px; right:6px; height:1px; transform:translateY(-50%);}
+  .scan-panel:hover .crosshair{ opacity:1;}
+  .coord-readout{
+    position:absolute; z-index:6; font-size:9px; color:var(--blue);
+    background:rgba(4,20,26,.7); padding:2px 5px; pointer-events:none;
+    opacity:0; transition:opacity .2s ease; white-space:nowrap;
+  }
+  .scan-panel:hover .coord-readout{ opacity:1;}
+
+  /* ---------------- SECTION SHELL ---------------- */
+  section{ padding:100px 0;}
+  .sec-head{
+    display:flex; align-items:baseline; gap:18px; margin-bottom:52px;
+  }
+  .sec-head .rec{ font-size:11px; color:var(--muted-2); letter-spacing:.04em; white-space:nowrap;}
+  .sec-head .rule{ flex:1; height:1px; background:var(--line);}
+  .sec-head h2{ font-size:clamp(22px,3vw,30px); font-weight:700; letter-spacing:-.01em;}
+  .sec-sub{ color:var(--muted); font-size:13.5px; max-width:60ch; margin-bottom:44px; margin-top:-26px;}
+
+  /* ---------------- ANAMNESI ---------------- */
+  .anamnesi{
+    display:grid; grid-template-columns: .8fr 1.2fr; gap:60px;
+  }
+  .an-photo{
+    aspect-ratio:4/5;
+    padding:18px;
+    display:flex; flex-direction:column; justify-content:space-between;
+    background:
+      repeating-linear-gradient(180deg, rgba(73,214,255,.05) 0 1px, transparent 1px 26px),
+      var(--panel);
+  }
+  .an-photo .row{ display:flex; justify-content:space-between; font-size:10px; color:var(--muted-2);}
+  .an-photo .center-mark{ align-self:center; text-align:center; color:var(--muted-2); font-size:11px; letter-spacing:.05em;}
+  .an-photo .center-mark .big{ font-size:34px; color:var(--blue-dim); font-weight:800; display:block; margin-bottom:6px;}
+  .an-body p{ color:var(--muted); font-size:14.5px; margin-bottom:18px; max-width:62ch;}
+  .an-body p strong{ color:var(--text); font-weight:600;}
+  .field-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--line); margin-top:30px; border:1px solid var(--line);}
+  .field{ background:var(--void); padding:16px 18px;}
+  .field .k{ font-size:10px; color:var(--muted-2); letter-spacing:.05em; margin-bottom:6px;}
+  .field .v{ font-size:13.5px; color:var(--text);}
+
+  /* ---------------- DIAGNOSI / STYLES ---------------- */
+  .diag-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
+  .diag-card{ background:var(--void); padding:26px 22px; min-height:230px; display:flex; flex-direction:column;}
+  .diag-card .icon{ width:34px; height:34px; margin-bottom:22px; color:var(--blue);}
+  .diag-card .code{ font-size:10px; color:var(--muted-2); margin-bottom:8px; letter-spacing:.05em;}
+  .diag-card h3{ font-size:15.5px; font-weight:700; margin-bottom:10px;}
+  .diag-card p{ font-size:12.5px; color:var(--muted); flex:1;}
+  .diag-card .bar{ height:2px; background:var(--line-soft); margin-top:18px; position:relative;}
+  .diag-card .bar i{ position:absolute; left:0; top:0; bottom:0; background:var(--blue);}
+
+  /* ---------------- CARTELLE / PORTFOLIO ---------------- */
+  .port-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px;}
+  .port-card{ overflow:hidden; }
+  .port-visual{
+    position:relative; aspect-ratio:1/1; overflow:hidden; border-bottom:1px solid var(--line);
+  }
+  .port-visual svg{ position:absolute; inset:0; width:100%; height:100%;}
+  .port-visual .sweep{
+    position:absolute; top:0; bottom:0; width:40%;
+    background:linear-gradient(90deg, transparent, rgba(73,214,255,.16), transparent);
+    left:-50%;
+    transition:left .7s ease;
+  }
+  .port-card:hover .sweep{ left:110%;}
+  .port-visual .plate-id{
+    position:absolute; top:10px; left:10px; font-size:9.5px; color:var(--blue);
+    background:rgba(4,20,26,.6); padding:2px 6px; letter-spacing:.04em;
+  }
+  .port-info{ padding:18px 18px 20px;}
+  .port-info h4{ font-size:14px; font-weight:700; margin-bottom:10px;}
+  .port-meta{ display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;}
+  .port-meta div{ font-size:10.5px; color:var(--muted-2);}
+  .port-meta div b{ color:var(--muted); font-weight:500; display:block; font-size:11.5px; margin-top:2px;}
+
+  /* ---------------- PERCORSO ---------------- */
+  .steps{ display:flex; flex-direction:column;}
+  .step{ display:grid; grid-template-columns:90px 1fr; gap:28px; padding:28px 0; border-top:1px solid var(--line);}
+  .steps .step:last-child{ border-bottom:1px solid var(--line);}
+  .step .snum{ font-size:22px; font-weight:800; color:var(--blue-dim);}
+  .step-body h4{ font-size:16px; font-weight:700; margin-bottom:8px;}
+  .step-body p{ font-size:13.5px; color:var(--muted); max-width:60ch;}
+
+  /* ---------------- REFERTI / TESTIMONIALS ---------------- */
+  .ref-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
+  .ref-card{ background:var(--void); padding:26px 24px;}
+  .ref-card .q{ font-size:13.5px; color:var(--text); margin-bottom:22px;}
+  .ref-card .who{ display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--muted-2); border-top:1px solid var(--line-soft); padding-top:14px;}
+  .ref-card .who b{ color:var(--muted); font-weight:600;}
+
+  /* ---------------- CONTATTI ---------------- */
+  .contact-grid{ display:grid; grid-template-columns:1fr 1fr; gap:60px;}
+  .form-row{ display:flex; flex-direction:column; gap:6px; margin-bottom:20px;}
+  .form-row label{ font-size:10.5px; color:var(--muted-2); letter-spacing:.05em;}
+  .form-row input, .form-row select, .form-row textarea{
+    background:var(--panel); border:1px solid var(--line); color:var(--text);
+    font-family:inherit; font-size:13.5px; padding:12px 14px;
+  }
+  .form-row input:focus, .form-row select:focus, .form-row textarea:focus{
+    outline:none; border-color:var(--blue);
+  }
+  .form-two{ display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .form-note{ font-size:11px; color:var(--muted-2); margin-top:8px;}
+  .form-status{ font-size:12px; color:var(--blue); margin-top:14px; display:none;}
+
+  .info-block{ padding:26px 24px;}
+  .info-block .k{ font-size:10px; color:var(--muted-2); letter-spacing:.05em; margin-bottom:6px; margin-top:22px;}
+  .info-block .k:first-child{ margin-top:0;}
+  .info-block .v{ font-size:14px; color:var(--text);}
+  .info-block .v.muted{ color:var(--muted);}
+  .socials{ display:flex; gap:10px; margin-top:22px;}
+  .socials a{ font-size:11px; border:1px solid var(--line); padding:8px 12px; color:var(--muted);}
+  .socials a:hover{ color:var(--blue); border-color:var(--blue-dim);}
+
+  /* ---------------- FOOTER ---------------- */
+  footer{ border-top:1px solid var(--line); padding:34px 0;}
+  .foot-row{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;}
+  .foot-row .l{ font-size:11px; color:var(--muted-2);}
+  .foot-row .sig{ font-size:12px; color:var(--muted); font-style:normal;}
+
+  /* ---------------- RESPONSIVE ---------------- */
+  @media (max-width:920px){
+    nav ul{ display:none;}
+    .burger{ display:flex;}
+    .hero-grid{ grid-template-columns:1fr; gap:44px;}
+    .anamnesi{ grid-template-columns:1fr;}
+    .diag-grid{ grid-template-columns:repeat(2,1fr);}
+    .port-grid{ grid-template-columns:repeat(2,1fr);}
+    .ref-grid{ grid-template-columns:1fr;}
+    .contact-grid{ grid-template-columns:1fr;}
+  }
+  @media (max-width:600px){
+    .diag-grid{ grid-template-columns:1fr;}
+    .port-grid{ grid-template-columns:1fr;}
+    .field-grid{ grid-template-columns:1fr;}
+    .hero-stats{ flex-wrap:wrap;}
+    .hero-stats div{ flex:1 1 50%; margin-bottom:14px;}
+    .form-two{ grid-template-columns:1fr;}
+    .step{ grid-template-columns:1fr; gap:10px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto;}
+    *{ transition:none !important; animation:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="brand">
+      <span class="id">CI-004734 / REPARTO TATUAGGI</span>
+      <span class="name">CLINICA <span>DELL'INCHIOSTRO</span></span>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="#anamnesi">Anamnesi</a></li>
+        <li><a href="#diagnosi">Diagnosi</a></li>
+        <li><a href="#cartelle">Cartelle</a></li>
+        <li><a href="#percorso">Percorso</a></li>
+        <li><a href="#referti">Referti</a></li>
+      </ul>
+    </nav>
+    <a href="#contatti" class="nav-cta">Prenota visita</a>
+    <button class="burger" aria-label="menu" onclick="document.querySelector('nav ul').classList.toggle('open')"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="record-line">
+          <span>REFERTO N.004734</span>
+          <span class="dash"></span>
+          <span>APERTO 09.2026</span>
+        </div>
+        <h1 class="stamp">Cartella clinica<br>per pelle <em>biomeccanica.</em></h1>
+        <p class="hero-desc">Diagnostica per immagini del corpo tatuato. Ogni progetto viene trattato come un caso clinico: analisi della struttura, scansione dell'anatomia, esecuzione a precisione chirurgica.</p>
+        <div class="hero-actions">
+          <a href="#contatti" class="btn primary">Richiedi diagnosi</a>
+          <a href="#cartelle" class="btn">Consulta le cartelle</a>
+        </div>
+        <div class="hero-stats">
+          <div><div class="num">312</div><div class="lbl">CARTELLE ARCHIVIATE</div></div>
+          <div><div class="num">0.12mm</div><div class="lbl">PRECISIONE AGO</div></div>
+          <div><div class="num">9 ANNI</div><div class="lbl">SPECIALIZZAZIONE</div></div>
+        </div>
+      </div>
+
+      <div class="scan-panel" id="scanPanel">
+        <div class="scan-header">
+          <span>PLACCA 01 / TORACE-SPALLA</span>
+          <span>MUOVI IL CURSORE</span>
+        </div>
+        <div class="scan-layers">
+          <div class="layer layer-scan">
+            <!-- underlying mechanical / bone-circuit structure -->
+            <svg viewBox="0 0 300 380" fill="none">
+              <ellipse cx="150" cy="55" rx="34" ry="40" stroke="#49d6ff" stroke-width="1" opacity=".55"/>
+              <line x1="150" y1="95" x2="150" y2="150" stroke="#49d6ff" stroke-width="1.4" opacity=".6"/>
+              <path d="M60 150 Q150 110 240 150 L232 190 Q150 160 68 190 Z" stroke="#49d6ff" stroke-width="1" opacity=".55"/>
+              <path d="M70 190 C60 230 62 280 78 330" stroke="#49d6ff" stroke-width="1" opacity=".45"/>
+              <path d="M230 190 C240 230 238 280 222 330" stroke="#49d6ff" stroke-width="1" opacity=".45"/>
+              <g opacity=".5" stroke="#49d6ff" stroke-width="1">
+                <line x1="118" y1="160" x2="118" y2="290"/>
+                <line x1="150" y1="155" x2="150" y2="300"/>
+                <line x1="182" y1="160" x2="182" y2="290"/>
+                <line x1="100" y1="180" x2="200" y2="180"/>
+                <line x1="98" y1="210" x2="202" y2="210"/>
+                <line x1="98" y1="240" x2="202" y2="240"/>
+                <line x1="100" y1="270" x2="200" y2="270"/>
+              </g>
+              <circle cx="150" cy="150" r="5" fill="#ff3b30"/>
+              <circle cx="70" cy="185" r="4" fill="#ff3b30" opacity=".85"/>
+              <circle cx="230" cy="185" r="4" fill="#ff3b30" opacity=".85"/>
+              <circle cx="150" cy="300" r="4" fill="#49d6ff"/>
+              <g opacity=".35" stroke="#49d6ff" stroke-width=".6">
+                <path d="M20 60 h30 M20 60 v20"/>
+                <path d="M280 60 h-30 M280 60 v20"/>
+                <path d="M20 340 h30 M20 340 v-20"/>
+                <path d="M280 340 h-30 M280 340 v-20"/>
+              </g>
+            </svg>
+          </div>
+          <div class="layer layer-skin" id="skinLayer">
+            <!-- surface / tattooed skin -->
+            <svg viewBox="0 0 300 380" fill="none">
+              <path d="M116 30 Q150 8 184 30 Q198 55 190 90 Q184 110 150 118 Q116 110 110 90 Q102 55 116 30 Z" fill="#171a1f" stroke="#3a4148" stroke-width="1"/>
+              <path d="M55 155 Q150 100 245 155 L252 220 Q245 300 235 340 L210 336 Q205 270 200 235 Q150 250 100 235 Q95 270 90 336 L65 340 Q55 300 48 220 Z" fill="#14171b" stroke="#3a4148" stroke-width="1.2"/>
+              <g stroke="#49d6ff" stroke-width="1" opacity=".8" fill="none">
+                <path d="M90 175 L120 175 L120 195 L145 195 L145 165 L175 165 L175 200 L205 200"/>
+                <circle cx="90" cy="175" r="3"/>
+                <circle cx="205" cy="200" r="3"/>
+                <path d="M100 230 L100 260 L130 260 L130 285"/>
+                <path d="M200 230 L200 260 L170 260 L170 285"/>
+                <circle cx="130" cy="285" r="3"/>
+                <circle cx="170" cy="285" r="3"/>
+                <path d="M150 155 L150 320" stroke-dasharray="3 5" opacity=".5"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="crosshair" id="crosshair"></div>
+        <div class="coord-readout" id="coordReadout">X 000 / Y 000</div>
+        <div class="scan-caption">Scansiona per rivelare la struttura sotto la pelle</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ANAMNESI ============ -->
+  <section id="anamnesi">
+    <div class="wrap">
+      <div class="sec-head"><span class="rec">REC.01</span><h2>Anamnesi</h2><span class="rule"></span></div>
+      <div class="anamnesi">
+        <div class="an-photo plate">
+          <div class="row"><span>OPERATORE</span><span>SALA 02</span></div>
+          <div class="center-mark"><span class="big">M.R.</span>ritratto in archivio</div>
+          <div class="row"><span>DAL 2017</span><span>TORINO</span></div>
+        </div>
+        <div class="an-body">
+          <p><strong>Marta Ravelli</strong> — tatuatrice specializzata in composizioni biomeccaniche e cyber-sigillismo. Formazione in illustrazione tecnica prima di dedicarsi interamente all'ago; l'approccio resta lo stesso: ogni pezzo nasce da uno studio anatomico del corpo che lo ospiterà, non da un disegno calato sopra.</p>
+          <p>Lo studio accoglie un numero ridotto di clienti al mese per garantire tempo di progettazione reale: nessun flash da catalogo, ogni cartella clinica viene aperta e chiusa con la stessa persona.</p>
+          <div class="field-grid">
+            <div class="field"><div class="k">SPECIALIZZAZIONE</div><div class="v">Biomeccanico / Cyberpunk</div></div>
+            <div class="field"><div class="k">TECNICA</div><div class="v">Linework + ombreggiatura a scansione</div></div>
+            <div class="field"><div class="k">SEDUTE / MESE</div><div class="v">Max. 14, su appuntamento</div></div>
+            <div class="field"><div class="k">MATERIALI</div><div class="v">Aghi monouso, inchiostri certificati</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DIAGNOSI / STILI ============ -->
+  <section id="diagnosi">
+    <div class="wrap">
+      <div class="sec-head"><span class="rec">REC.02</span><h2>Diagnosi &amp; specializzazioni</h2><span class="rule"></span></div>
+      <p class="sec-sub">Quattro protocolli su cui lo studio lavora in profondità, ciascuno con un proprio linguaggio tecnico.</p>
+      <div class="diag-grid">
+        <div class="diag-card">
+          <svg class="icon" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="17" cy="17" r="4"/><path d="M17 3v6M17 25v6M3 17h6M25 17h6M8 8l4 4M22 22l4 4M26 8l-4 4M12 22l-4 4"/></svg>
+          <div class="code">DGN.01</div>
+          <h3>Biomeccanico</h3>
+          <p>Strutture meccaniche integrate nell'anatomia: pistoni, ingranaggi e placche che sembrano emergere da sotto la pelle.</p>
+          <div class="bar"><i style="width:88%"></i></div>
+        </div>
+        <div class="diag-card">
+          <svg class="icon" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="9" y="9" width="16" height="16" rx="1"/><path d="M13 9V4M21 9V4M13 30v-5M21 30v-5M9 13H4M9 21H4M30 13h-5M30 21h-5"/></svg>
+          <div class="code">DGN.02</div>
+          <h3>Cyberpunk</h3>
+          <p>Circuiti, interfacce e codice come ornamento: un'estetica da terminale trasferita sulla pelle.</p>
+          <div class="bar"><i style="width:76%"></i></div>
+        </div>
+        <div class="diag-card">
+          <svg class="icon" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M17 4c6 4 10 9 10 15a10 10 0 0 1-20 0c0-6 4-11 10-15Z"/><path d="M17 12v14M12 20l5-4 5 4"/></svg>
+          <div class="code">DGN.03</div>
+          <h3>Tribal 3D</h3>
+          <p>Volumi scultorei costruiti con ombre profonde, pensati per seguire la curvatura del corpo.</p>
+          <div class="bar"><i style="width:64%"></i></div>
+        </div>
+        <div class="diag-card">
+          <svg class="icon" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 17c4-7 10-10 13-10s9 3 13 10c-4 7-10 10-13 10S8 24 4 17Z"/><circle cx="17" cy="17" r="3.5"/></svg>
+          <div class="code">DGN.04</div>
+          <h3>Realismo</h3>
+          <p>Ritratti e superfici organiche trattate con rigore fotografico: luce, grana e profondità del nero.</p>
+          <div class="bar"><i style="width:92%"></i></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CARTELLE / PORTFOLIO ============ -->
+  <section id="cartelle">
+    <div class="wrap">
+      <div class="sec-head"><span class="rec">REC.03</span><h2>Cartelle cliniche</h2><span class="rule"></span></div>
+      <p class="sec-sub">Ogni progetto è archiviato come una lastra: coordinate anatomiche, profondità in micron, saturazione del nero.</p>
+      <div class="port-grid">
+
+        <div class="port-card plate">
+          <div class="port-visual" style="background:#12151a">
+            <svg viewBox="0 0 300 300"><g stroke="#49d6ff" stroke-width="1" opacity=".7" fill="none">
+              <path d="M60 40 L140 40 L140 100 L220 100 L220 160 L150 160 L150 230 L90 230 L90 270"/>
+              <circle cx="60" cy="40" r="4" fill="#ff3b30" stroke="none"/>
+              <circle cx="220" cy="100" r="4"/>
+              <circle cx="90" cy="270" r="4"/>
+              <path d="M40 200 q40 -20 60 10" opacity=".4"/>
+            </g></svg>
+            <div class="sweep"></div>
+            <div class="plate-id">LASTRA 04-A</div>
+          </div>
+          <div class="port-info">
+            <h4>Avambraccio — placche meccaniche</h4>
+            <div class="port-meta">
+              <div>ZONA<b>Avambraccio dx</b></div>
+              <div>STILE<b>Biomeccanico</b></div>
+              <div>PROFONDITÀ<b>2.1mm</b></div>
+              <div>SATURAZIONE<b>Nero pieno</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="port-card plate">
+          <div class="port-visual" style="background:#12151a">
+            <svg viewBox="0 0 300 300"><g stroke="#49d6ff" stroke-width="1" opacity=".7" fill="none">
+              <rect x="70" y="70" width="160" height="160" rx="2"/>
+              <line x1="70" y1="120" x2="230" y2="120"/>
+              <line x1="70" y1="180" x2="230" y2="180"/>
+              <line x1="130" y1="70" x2="130" y2="230"/>
+              <line x1="180" y1="70" x2="180" y2="230"/>
+              <circle cx="130" cy="120" r="4" fill="#ff3b30" stroke="none"/>
+              <circle cx="180" cy="180" r="4" fill="#ff3b30" stroke="none"/>
+            </g></svg>
+            <div class="sweep"></div>
+            <div class="plate-id">LASTRA 07-C</div>
+          </div>
+          <div class="port-info">
+            <h4>Scapola — pannello circuito</h4>
+            <div class="port-meta">
+              <div>ZONA<b>Scapola sx</b></div>
+              <div>STILE<b>Cyberpunk</b></div>
+              <div>PROFONDITÀ<b>1.8mm</b></div>
+              <div>SATURAZIONE<b>Grigio/nero</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="port-card plate">
+          <div class="port-visual" style="background:#12151a">
+            <svg viewBox="0 0 300 300"><g stroke="#49d6ff" stroke-width="1" opacity=".7" fill="none">
+              <path d="M150 40 C100 80 90 150 150 260 C210 150 200 80 150 40 Z"/>
+              <path d="M150 70 C120 100 115 150 150 220 C185 150 180 100 150 70 Z" opacity=".5"/>
+              <circle cx="150" cy="150" r="4" fill="#ff3b30" stroke="none"/>
+            </g></svg>
+            <div class="sweep"></div>
+            <div class="plate-id">LASTRA 11-B</div>
+          </div>
+          <div class="port-info">
+            <h4>Colonna — struttura tribale</h4>
+            <div class="port-meta">
+              <div>ZONA<b>Dorso, colonna</b></div>
+              <div>STILE<b>Tribal 3D</b></div>
+              <div>PROFONDITÀ<b>2.4mm</b></div>
+              <div>SATURAZIONE<b>Nero pieno</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="port-card plate">
+          <div class="port-visual" style="background:#12151a">
+            <svg viewBox="0 0 300 300"><g stroke="#49d6ff" stroke-width="1" opacity=".7" fill="none">
+              <ellipse cx="150" cy="140" rx="70" ry="90"/>
+              <path d="M110 110 q40 -20 80 0" opacity=".5"/>
+              <path d="M105 160 q45 30 90 0" opacity=".5"/>
+              <circle cx="150" cy="140" r="4" fill="#ff3b30" stroke="none"/>
+            </g></svg>
+            <div class="sweep"></div>
+            <div class="plate-id">LASTRA 14-A</div>
+          </div>
+          <div class="port-info">
+            <h4>Ritratto — micro-realismo</h4>
+            <div class="port-meta">
+              <div>ZONA<b>Polpaccio</b></div>
+              <div>STILE<b>Realismo</b></div>
+              <div>PROFONDITÀ<b>1.6mm</b></div>
+              <div>SATURAZIONE<b>Scala di grigi</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="port-card plate">
+          <div class="port-visual" style="background:#12151a">
+            <svg viewBox="0 0 300 300"><g stroke="#49d6ff" stroke-width="1" opacity=".7" fill="none">
+              <path d="M60 150 L120 150 L120 90 L180 90 L180 150 L240 150"/>
+              <path d="M120 150 L120 210 L180 210 L180 150"/>
+              <circle cx="120" cy="150" r="4" fill="#ff3b30" stroke="none"/>
+              <circle cx="180" cy="150" r="4" fill="#ff3b30" stroke="none"/>
+            </g></svg>
+            <div class="sweep"></div>
+            <div class="plate-id">LASTRA 18-D</div>
+          </div>
+          <div class="port-info">
+            <h4>Sterno — nodo di connessione</h4>
+            <div class="port-meta">
+              <div>ZONA<b>Sterno</b></div>
+              <div>STILE<b>Biomeccanico</b></div>
+              <div>PROFONDITÀ<b>2.0mm</b></div>
+              <div>SATURAZIONE<b>Nero pieno</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="port-card plate">
+          <div class="port-visual" style="background:#12151a">
+            <svg viewBox="0 0 300 300"><g stroke="#49d6ff" stroke-width="1" opacity=".7" fill="none">
+              <circle cx="150" cy="150" r="70"/>
+              <circle cx="150" cy="150" r="45"/>
+              <line x1="150" y1="80" x2="150" y2="220"/>
+              <line x1="80" y1="150" x2="220" y2="150"/>
+              <circle cx="150" cy="150" r="4" fill="#ff3b30" stroke="none"/>
+            </g></svg>
+            <div class="sweep"></div>
+            <div class="plate-id">LASTRA 22-A</div>
+          </div>
+          <div class="port-info">
+            <h4>Nuca — sigillo cyber</h4>
+            <div class="port-meta">
+              <div>ZONA<b>Nuca</b></div>
+              <div>STILE<b>Cyberpunk</b></div>
+              <div>PROFONDITÀ<b>1.4mm</b></div>
+              <div>SATURAZIONE<b>Blu/nero</b></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PERCORSO ============ -->
+  <section id="percorso">
+    <div class="wrap">
+      <div class="sec-head"><span class="rec">REC.04</span><h2>Percorso clinico</h2><span class="rule"></span></div>
+      <div class="steps">
+        <div class="step">
+          <div class="snum">0.1</div>
+          <div class="step-body"><h4>Consulto</h4><p>Analisi della zona del corpo, della pelle e dell'idea di partenza. Si stabilisce lo stile e una prima ipotesi di composizione.</p></div>
+        </div>
+        <div class="step">
+          <div class="snum">0.2</div>
+          <div class="step-body"><h4>Progetto</h4><p>Disegno tecnico su misura per la curvatura anatomica scelta, con revisione prima della seduta.</p></div>
+        </div>
+        <div class="step">
+          <div class="snum">0.3</div>
+          <div class="step-body"><h4>Seduta</h4><p>Esecuzione a sessioni programmate, con pause calcolate in base all'estensione dell'area trattata.</p></div>
+        </div>
+        <div class="step">
+          <div class="snum">0.4</div>
+          <div class="step-body"><h4>Follow-up</h4><p>Controllo della guarigione e ritocco incluso, con indicazioni scritte per la cura del tatuaggio.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ REFERTI ============ -->
+  <section id="referti">
+    <div class="wrap">
+      <div class="sec-head"><span class="rec">REC.05</span><h2>Referti</h2><span class="rule"></span></div>
+      <div class="ref-grid">
+        <div class="ref-card">
+          <p class="q">"Non ho portato un disegno: ho portato un'idea confusa, ed è uscita una struttura che sembra parte del mio corpo da sempre."</p>
+          <div class="who"><span>Cartella 289</span><b>D. Fontana</b></div>
+        </div>
+        <div class="ref-card">
+          <p class="q">"Il livello di dettaglio tecnico nella fase di progetto è quello che ti aspetteresti da uno studio di ingegneria, non da un tatuatore."</p>
+          <div class="who"><span>Cartella 301</span><b>L. Sereni</b></div>
+        </div>
+        <div class="ref-card">
+          <p class="q">"Tre sedute pianificate al millimetro, zero sorprese sui tempi di guarigione. Approccio serio, risultato all'altezza."</p>
+          <div class="who"><span>Cartella 276</span><b>A. Bianchi</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTATTI ============ -->
+  <section id="contatti">
+    <div class="wrap">
+      <div class="sec-head"><span class="rec">REC.06</span><h2>Modulo di ammissione</h2><span class="rule"></span></div>
+      <div class="contact-grid">
+        <form id="intakeForm">
+          <div class="form-two">
+            <div class="form-row"><label for="fname">Nome e cognome</label><input id="fname" type="text" required placeholder="Es. Giulia Conti"></div>
+            <div class="form-row"><label for="femail">Email</label><input id="femail" type="email" required placeholder="tuo@indirizzo.it"></div>
+          </div>
+          <div class="form-two">
+            <div class="form-row">
+              <label for="fstyle">Stile richiesto</label>
+              <select id="fstyle">
+                <option>Biomeccanico</option>
+                <option>Cyberpunk</option>
+                <option>Tribal 3D</option>
+                <option>Realismo</option>
+                <option>Non so ancora</option>
+              </select>
+            </div>
+            <div class="form-row"><label for="fzone">Zona del corpo</label><input id="fzone" type="text" placeholder="Es. avambraccio, scapola…"></div>
+          </div>
+          <div class="form-row">
+            <label for="fmsg">Descrizione del caso</label>
+            <textarea id="fmsg" rows="5" placeholder="Racconta l'idea, riferimenti, dimensioni indicative…"></textarea>
+          </div>
+          <button type="submit" class="btn primary">Invia richiesta</button>
+          <p class="form-note">Risposta entro 3 giorni lavorativi con esito della diagnosi preliminare.</p>
+          <p class="form-status" id="formStatus">Richiesta archiviata — cartella in fase di apertura.</p>
+        </form>
+
+        <div class="info-block plate">
+          <div class="k">SEDE</div>
+          <div class="v">Via dell'Officina 14, piano -1</div>
+          <div class="v muted">Ingresso su appuntamento</div>
+
+          <div class="k">ORARIO DI CONSULTO</div>
+          <div class="v">Mar–Sab, 11:00–19:00</div>
+
+          <div class="k">CONTATTO DIRETTO</div>
+          <div class="v">studio@clinicadellinchiostro.it</div>
+
+          <div class="socials">
+            <a href="#">Instagram</a>
+            <a href="#">Pinterest</a>
+            <a href="#">Archivio</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-row">
+    <span class="l">© 2026 Clinica dell'Inchiostro — CI-004734</span>
+    <span class="sig">Firmato, Reparto Tatuaggi</span>
+  </div>
+</footer>
+
+<script>
+  // ---- Hero scan-reveal: punches a hole in the skin layer following the cursor ----
+  const panel = document.getElementById('scanPanel');
+  const skin = document.getElementById('skinLayer');
+  const crosshair = document.getElementById('crosshair');
+  const readout = document.getElementById('coordReadout');
+
+  function resetMask(){
+    skin.style.webkitMaskImage = 'none';
+    skin.style.maskImage = 'none';
+  }
+  resetMask();
+
+  panel.addEventListener('mousemove', (e) => {
+    const rect = panel.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const mask = `radial-gradient(circle 90px at ${x}px ${y}px, transparent 0%, transparent 55%, black 100%)`;
+    skin.style.webkitMaskImage = mask;
+    skin.style.maskImage = mask;
+    crosshair.style.left = x + 'px';
+    crosshair.style.top = y + 'px';
+    readout.style.left = (x + 16) + 'px';
+    readout.style.top = (y - 22) + 'px';
+    readout.textContent = `X ${String(Math.round(x)).padStart(3,'0')} / Y ${String(Math.round(y)).padStart(3,'0')}`;
+  });
+  panel.addEventListener('mouseleave', resetMask);
+
+  // touch support: reveal on tap/drag
+  panel.addEventListener('touchmove', (e) => {
+    const t = e.touches[0];
+    const rect = panel.getBoundingClientRect();
+    const x = t.clientX - rect.left;
+    const y = t.clientY - rect.top;
+    const mask = `radial-gradient(circle 80px at ${x}px ${y}px, transparent 0%, transparent 55%, black 100%)`;
+    skin.style.webkitMaskImage = mask;
+    skin.style.maskImage = mask;
+  }, {passive:true});
+  panel.addEventListener('touchend', resetMask);
+
+  // ---- mobile nav toggle style injection ----
+  const style = document.createElement('style');
+  style.textContent = `
+    @media (max-width:920px){
+      nav ul.open{
+        display:flex; flex-direction:column; position:fixed; top:64px; left:0; right:0;
+        background:#0a0b0d; border-bottom:1px solid #262b31; padding:8px 0;
+      }
+      nav ul.open li a{ padding:14px 28px; border-left:none; border-top:1px solid #1a1d22; }
+    }`;
+  document.head.appendChild(style);
+
+  // ---- fake form submit ----
+  document.getElementById('intakeForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    document.getElementById('formStatus').style.display = 'block';
+    this.reset();
+  });
+</script>
+
+</body>
+</html>

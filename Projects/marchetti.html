@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marchetti — Maison de Tatouage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --nero: #030302;
+    --nero-card: #0e0d0b;
+    --oro: #c9a86a;
+    --oro-vivo: #d9c090;
+    --avorio: #efe9dd;
+    --avorio-soft: #b8b0a0;
+    --linea: #221f1a;
+  }
+
+  *{margin:0; padding:0; box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--nero);
+    color:var(--avorio);
+    font-family:'Inter', sans-serif;
+    font-weight:300;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  h1,h2,h3, .serif{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:500;
+    letter-spacing:0.01em;
+  }
+
+  a{color:inherit; text-decoration:none;}
+
+  ::selection{background:var(--oro); color:var(--nero);}
+
+  /* ---------- NAV ---------- */
+  header{
+    position:fixed; top:0; left:0; right:0;
+    z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:28px 48px;
+    background:linear-gradient(to bottom, rgba(10,10,10,0.95), transparent);
+  }
+  .logo{
+    font-family:'Cormorant Garamond', serif;
+    font-size:22px;
+    font-weight:500;
+    letter-spacing:0.08em;
+  }
+  .logo span{color:var(--oro);}
+  nav ul{
+    display:flex; gap:40px;
+    list-style:none;
+  }
+  nav a{
+    font-size:13px;
+    color:var(--avorio-soft);
+    transition:color 0.3s ease;
+    position:relative;
+  }
+  nav a:hover{color:var(--avorio);}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:0 24px;
+    position:relative;
+    border-bottom:1px solid var(--linea);
+  }
+  .hero::before{
+    content:"";
+    position:absolute;
+    top:0; left:0; right:0; bottom:0;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(201,168,106,0.06), transparent 60%);
+    pointer-events:none;
+  }
+  .hero-eyebrow{
+    font-size:13px;
+    letter-spacing:0.2em;
+    color:var(--oro);
+    margin-bottom:28px;
+    opacity:0;
+    animation:fadeUp 1s ease 0.2s forwards;
+  }
+  .hero h1{
+    font-size:clamp(48px, 8vw, 108px);
+    line-height:1.02;
+    max-width:1000px;
+    opacity:0;
+    animation:fadeUp 1.1s ease 0.4s forwards;
+  }
+  .hero h1 em{
+    font-style:italic;
+    color:var(--oro-vivo);
+  }
+  .hero p{
+    max-width:480px;
+    margin-top:28px;
+    color:var(--avorio-soft);
+    font-size:16px;
+    opacity:0;
+    animation:fadeUp 1.1s ease 0.6s forwards;
+  }
+  .hero-cta{
+    margin-top:44px;
+    opacity:0;
+    animation:fadeUp 1.1s ease 0.8s forwards;
+  }
+
+  @keyframes fadeUp{
+    from{opacity:0; transform:translateY(18px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  .btn{
+    display:inline-block;
+    padding:16px 40px;
+    border:1px solid var(--oro);
+    color:var(--oro-vivo);
+    font-size:13px;
+    letter-spacing:0.1em;
+    transition:all 0.4s ease;
+  }
+  .btn:hover{
+    background:var(--oro);
+    color:var(--nero);
+  }
+
+  .scroll-hint{
+    position:absolute;
+    bottom:40px;
+    font-size:11px;
+    letter-spacing:0.15em;
+    color:var(--avorio-soft);
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+  }
+  .scroll-line{
+    width:1px; height:36px;
+    background:linear-gradient(to bottom, var(--oro), transparent);
+  }
+
+  /* ---------- SECTION HEADERS ---------- */
+  .section{
+    padding:140px 48px;
+    max-width:1400px;
+    margin:0 auto;
+  }
+  .section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-bottom:80px;
+    border-bottom:1px solid var(--linea);
+    padding-bottom:32px;
+    gap:40px;
+    flex-wrap:wrap;
+  }
+  .section-head h2{
+    font-size:clamp(32px, 4vw, 52px);
+  }
+  .section-head p{
+    max-width:340px;
+    color:var(--avorio-soft);
+    font-size:14px;
+    text-align:right;
+  }
+
+  /* ---------- CATALOGO / LOTTI ---------- */
+  .catalogo{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:1px;
+    background:var(--linea);
+    border:1px solid var(--linea);
+  }
+  .lotto{
+    background:var(--nero);
+    padding:56px;
+    position:relative;
+    transition:background 0.5s ease;
+  }
+  .lotto:hover{background:var(--nero-card);}
+  .lotto-numero{
+    font-family:'Cormorant Garamond', serif;
+    font-size:15px;
+    color:var(--oro);
+    letter-spacing:0.05em;
+    margin-bottom:24px;
+    display:block;
+  }
+  .lotto-img{
+    width:100%;
+    aspect-ratio:4/5;
+    background:
+      radial-gradient(ellipse at 50% 40%, #100f0c 0%, #050504 75%);
+    margin-bottom:32px;
+    position:relative;
+    overflow:hidden;
+    border:1px solid var(--linea);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .lotto-img svg{
+    width:62%;
+    height:62%;
+    opacity:0.92;
+  }
+  .lotto h3{
+    font-size:28px;
+    margin-bottom:8px;
+  }
+  .lotto-artista{
+    font-size:13px;
+    color:var(--avorio-soft);
+    margin-bottom:28px;
+    font-style:italic;
+  }
+  .scheda-tecnica{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px 24px;
+    padding-top:24px;
+    border-top:1px solid var(--linea);
+  }
+  .scheda-tecnica div{
+    font-size:12px;
+  }
+  .scheda-tecnica dt{
+    color:var(--avorio-soft);
+    margin-bottom:4px;
+    letter-spacing:0.03em;
+  }
+  .scheda-tecnica dd{
+    color:var(--avorio);
+    font-size:13px;
+  }
+
+  /* ---------- PROCESSO ---------- */
+  .processo{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:64px;
+  }
+  .tappa{
+    border-top:1px solid var(--oro);
+    padding-top:24px;
+  }
+  .tappa .num{
+    font-family:'Cormorant Garamond', serif;
+    font-size:56px;
+    color:var(--oro);
+    display:block;
+    line-height:1;
+    margin-bottom:20px;
+  }
+  .tappa h3{
+    font-size:22px;
+    margin-bottom:14px;
+  }
+  .tappa p{
+    font-size:14px;
+    color:var(--avorio-soft);
+  }
+
+  /* ---------- ARTISTA ---------- */
+  .artista-wrap{
+    display:grid;
+    grid-template-columns:0.9fr 1.1fr;
+    gap:80px;
+    align-items:center;
+  }
+  .artista-img{
+    aspect-ratio:3/4;
+    background:radial-gradient(ellipse at 50% 30%, #110f0c, #050504 80%);
+    border:1px solid var(--linea);
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .artista-img svg{
+    width:46%;
+    opacity:0.9;
+  }
+  .artista-testo .kicker{
+    color:var(--oro);
+    font-size:13px;
+    letter-spacing:0.15em;
+    margin-bottom:20px;
+    display:block;
+  }
+  .artista-testo h2{
+    font-size:clamp(30px,4vw,48px);
+    margin-bottom:28px;
+  }
+  .artista-testo p{
+    color:var(--avorio-soft);
+    font-size:15px;
+    margin-bottom:20px;
+    max-width:520px;
+  }
+  .stat-row{
+    display:flex;
+    gap:56px;
+    margin-top:40px;
+  }
+  .stat-row div{
+    border-top:1px solid var(--linea);
+    padding-top:16px;
+  }
+  .stat-num{
+    font-family:'Cormorant Garamond', serif;
+    font-size:34px;
+    color:var(--oro-vivo);
+    display:block;
+  }
+  .stat-label{
+    font-size:12px;
+    color:var(--avorio-soft);
+  }
+
+  /* ---------- COMMISSIONE / CTA ---------- */
+  .commissione{
+    text-align:center;
+    border-top:1px solid var(--linea);
+    border-bottom:1px solid var(--linea);
+  }
+  .commissione h2{
+    font-size:clamp(34px,5vw,64px);
+    max-width:760px;
+    margin:0 auto 28px;
+  }
+  .commissione p{
+    color:var(--avorio-soft);
+    max-width:460px;
+    margin:0 auto 48px;
+    font-size:15px;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    padding:64px 48px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:24px;
+    font-size:12px;
+    color:var(--avorio-soft);
+  }
+  footer .logo{font-size:18px;}
+  .footer-links{display:flex; gap:32px;}
+  .footer-links a:hover{color:var(--oro);}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 860px){
+    header{padding:20px 24px;}
+    nav ul{gap:20px;}
+    nav a{font-size:12px;}
+    .section{padding:90px 24px;}
+    .section-head{flex-direction:column; align-items:flex-start;}
+    .section-head p{text-align:left;}
+    .catalogo{grid-template-columns:1fr;}
+    .processo{grid-template-columns:1fr; gap:40px;}
+    .artista-wrap{grid-template-columns:1fr; gap:40px;}
+    .stat-row{gap:32px; flex-wrap:wrap;}
+    footer{flex-direction:column; text-align:center;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important;}
+    html{scroll-behavior:auto;}
+  }
+
+  a:focus-visible, button:focus-visible{
+    outline:1px solid var(--oro);
+    outline-offset:4px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">MARCHETTI<span>.</span></div>
+  <nav>
+    <ul>
+      <li><a href="#catalogo">Catalogo</a></li>
+      <li><a href="#processo">Processo</a></li>
+      <li><a href="#artista">Artista</a></li>
+      <li><a href="#commissione">Commissione</a></li>
+    </ul>
+  </nav>
+</header>
+
+<section class="hero">
+  <span class="hero-eyebrow">STUDIO PRIVATO — SOLO SU APPUNTAMENTO</span>
+  <h1>L'arte non si <em>disegna</em>.<br>Si acquisisce.</h1>
+  <p>Ogni tatuaggio è un pezzo unico, numerato e catalogato. Un'opera che porterai per sempre, pensata con la cura di una collezione privata.</p>
+  <div class="hero-cta">
+    <a href="#commissione" class="btn">RICHIEDI COMMISSIONE</a>
+  </div>
+  <div class="scroll-hint">
+    <span>CATALOGO</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<section class="section" id="catalogo">
+  <div class="section-head">
+    <h2>Catalogo delle opere</h2>
+    <p>Una selezione di pezzi realizzati negli ultimi dodici mesi, ognuno documentato con la propria scheda tecnica.</p>
+  </div>
+
+  <div class="catalogo">
+    <article class="lotto">
+      <span class="lotto-numero">Pezzo N° 042</span>
+      <div class="lotto-img">
+        <svg viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#c9a86a" stroke-linecap="round">
+          <!-- rosa: petali esterni -->
+          <path d="M100 42 C78 42, 62 58, 62 78 C62 96, 74 108, 88 112" stroke-width="1.1"/>
+          <path d="M100 42 C122 42, 138 58, 138 78 C138 96, 126 108, 112 112" stroke-width="1.1"/>
+          <path d="M62 78 C50 86, 46 100, 52 114 C58 126, 72 132, 84 128" stroke-width="1"/>
+          <path d="M138 78 C150 86, 154 100, 148 114 C142 126, 128 132, 116 128" stroke-width="1"/>
+          <!-- petali interni -->
+          <path d="M100 55 C88 55, 80 64, 80 76 C80 88, 90 96, 100 98" stroke-width="0.9"/>
+          <path d="M100 55 C112 55, 120 64, 120 76 C120 88, 110 96, 100 98" stroke-width="0.9"/>
+          <path d="M100 70 C94 70, 90 76, 92 84" stroke-width="0.7"/>
+          <path d="M100 70 C106 70, 110 76, 108 84" stroke-width="0.7"/>
+          <!-- centro -->
+          <circle cx="100" cy="90" r="6" stroke-width="0.8"/>
+          <path d="M96 88 C98 92, 102 92, 104 88" stroke-width="0.6"/>
+          <!-- gambo e spine -->
+          <path d="M100 112 C98 140, 102 160, 96 182" stroke-width="1.1"/>
+          <path d="M97 130 C90 128, 84 132, 80 140" stroke-width="0.9"/>
+          <path d="M98 155 C106 153, 112 157, 116 165" stroke-width="0.9"/>
+          <path d="M96 140 L88 134 M96 145 L88 148" stroke-width="0.6"/>
+          <!-- foglia -->
+          <path d="M98 148 C80 146, 68 156, 64 172 C80 174, 94 166, 98 148Z" stroke-width="0.9"/>
+          <path d="M76 156 C80 162, 86 166, 92 168" stroke-width="0.6"/>
+          <!-- tratteggio ombra -->
+          <path d="M104 60 L110 66 M106 66 L112 72 M108 72 L114 78" stroke-width="0.5" opacity="0.7"/>
+        </svg>
+      </div>
+      <h3>Studio in Bianco e Nero</h3>
+      <div class="lotto-artista">Realizzato da L. Marchetti</div>
+      <dl class="scheda-tecnica">
+        <div><dt>Durata</dt><dd>6 ore, 2 sedute</dd></div>
+        <div><dt>Aghi</dt><dd>RL 0.30mm, Magnum 15</dd></div>
+        <div><dt>Pigmenti</dt><dd>Eternal Ink, nero puro</dd></div>
+        <div><dt>Superficie</dt><dd>Avambraccio, 22cm</dd></div>
+      </dl>
+    </article>
+
+    <article class="lotto">
+      <span class="lotto-numero">Pezzo N° 041</span>
+      <div class="lotto-img">
+        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#c9a86a" stroke-linecap="round">
+          <!-- mandala floreale multilivello -->
+          <circle cx="100" cy="100" r="82" stroke-width="0.7"/>
+          <circle cx="100" cy="100" r="68" stroke-width="1"/>
+          <!-- petali principali x8 -->
+          <g stroke-width="0.9">
+            <path d="M100 32 C112 50, 112 66, 100 78 C88 66, 88 50, 100 32Z"/>
+            <path d="M100 168 C112 150, 112 134, 100 122 C88 134, 88 150, 100 168Z"/>
+            <path d="M32 100 C50 88, 66 88, 78 100 C66 112, 50 112, 32 100Z"/>
+            <path d="M168 100 C150 88, 134 88, 122 100 C134 112, 150 112, 168 100Z"/>
+            <path d="M52 52 C68 58, 78 68, 78 80 C66 78, 56 68, 52 52Z"/>
+            <path d="M148 148 C132 142, 122 132, 122 120 C134 122, 144 132, 148 148Z"/>
+            <path d="M52 148 C68 142, 78 132, 78 120 C66 122, 56 132, 52 148Z"/>
+            <path d="M148 52 C132 58, 122 68, 122 80 C134 78, 144 68, 148 52Z"/>
+          </g>
+          <!-- petali interni x8 sfalsati -->
+          <g stroke-width="0.7" opacity="0.9">
+            <path d="M100 55 C106 63, 106 70, 100 76 C94 70, 94 63, 100 55Z"/>
+            <path d="M100 145 C106 137, 106 130, 100 124 C94 130, 94 137, 100 145Z"/>
+            <path d="M55 100 C63 94, 70 94, 76 100 C70 106, 63 106, 55 100Z"/>
+            <path d="M145 100 C137 94, 130 94, 124 100 C130 106, 137 106, 145 100Z"/>
+          </g>
+          <!-- centro -->
+          <circle cx="100" cy="100" r="14" stroke-width="1"/>
+          <circle cx="100" cy="100" r="6" stroke-width="0.7"/>
+          <path d="M100 86 L100 94 M100 106 L100 114 M86 100 L94 100 M106 100 L114 100" stroke-width="0.6"/>
+        </svg>
+      </div>
+      <h3>Composizione Florale</h3>
+      <div class="lotto-artista">Realizzato da L. Marchetti</div>
+      <dl class="scheda-tecnica">
+        <div><dt>Durata</dt><dd>9 ore, 3 sedute</dd></div>
+        <div><dt>Aghi</dt><dd>RL 0.25mm, Curved Magnum</dd></div>
+        <div><dt>Pigmenti</dt><dd>Dynamic, palette naturale</dd></div>
+        <div><dt>Superficie</dt><dd>Costato, 30cm</dd></div>
+      </dl>
+    </article>
+
+    <article class="lotto">
+      <span class="lotto-numero">Pezzo N° 040</span>
+      <div class="lotto-img">
+        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#c9a86a" stroke-linecap="round">
+          <!-- fiore della vita semplificato + triangoli intrecciati -->
+          <circle cx="100" cy="100" r="78" stroke-width="0.7"/>
+          <circle cx="100" cy="100" r="26" stroke-width="0.7"/>
+          <circle cx="100" cy="74" r="26" stroke-width="0.6" opacity="0.85"/>
+          <circle cx="100" cy="126" r="26" stroke-width="0.6" opacity="0.85"/>
+          <circle cx="77" cy="87" r="26" stroke-width="0.6" opacity="0.85"/>
+          <circle cx="123" cy="87" r="26" stroke-width="0.6" opacity="0.85"/>
+          <circle cx="77" cy="113" r="26" stroke-width="0.6" opacity="0.85"/>
+          <circle cx="123" cy="113" r="26" stroke-width="0.6" opacity="0.85"/>
+          <polygon points="100,32 156,132 44,132" stroke-width="1.1"/>
+          <polygon points="100,168 44,68 156,68" stroke-width="1.1"/>
+          <circle cx="100" cy="100" r="6" stroke-width="0.8"/>
+        </svg>
+      </div>
+      <h3>Geometria Sacra</h3>
+      <div class="lotto-artista">Realizzato da L. Marchetti</div>
+      <dl class="scheda-tecnica">
+        <div><dt>Durata</dt><dd>5 ore, 1 seduta</dd></div>
+        <div><dt>Aghi</dt><dd>RL 0.30mm</dd></div>
+        <div><dt>Pigmenti</dt><dd>Eternal Ink, nero puro</dd></div>
+        <div><dt>Superficie</dt><dd>Scapola, 18cm</dd></div>
+      </dl>
+    </article>
+
+    <article class="lotto">
+      <span class="lotto-numero">Pezzo N° 039</span>
+      <div class="lotto-img">
+        <svg viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#c9a86a" stroke-linecap="round">
+          <!-- profilo volto stilizzato in stile incisione -->
+          <path d="M78 42 C72 50, 68 62, 70 76 C64 80, 62 90, 66 98 C68 112, 76 124, 88 130" stroke-width="1"/>
+          <path d="M78 42 C92 30, 116 30, 128 46 C138 58, 138 78, 132 96 C128 110, 118 122, 104 128" stroke-width="1"/>
+          <path d="M132 96 C138 98, 142 94, 140 88" stroke-width="0.7"/>
+          <!-- occhio -->
+          <path d="M90 76 C96 71, 106 71, 112 76 C106 81, 96 81, 90 76Z" stroke-width="0.9"/>
+          <circle cx="101" cy="76" r="3.2" stroke-width="0.7"/>
+          <path d="M88 73 C94 68, 108 68, 114 73" stroke-width="0.6"/>
+          <!-- naso e bocca -->
+          <path d="M116 80 C120 88, 120 96, 114 100" stroke-width="0.7"/>
+          <path d="M96 112 C102 116, 112 116, 118 110" stroke-width="0.8"/>
+          <!-- tratteggio ombra guancia -->
+          <path d="M96 90 L104 94 M94 98 L102 102 M92 106 L99 110" stroke-width="0.5" opacity="0.75"/>
+          <!-- collo e spalla -->
+          <path d="M88 130 C86 142, 84 150, 80 158" stroke-width="1"/>
+          <path d="M104 128 C108 140, 112 148, 118 156" stroke-width="1"/>
+          <path d="M60 190 C68 168, 80 158, 80 158" stroke-width="1"/>
+          <path d="M140 190 C132 168, 118 156, 118 156" stroke-width="1"/>
+        </svg>
+      </div>
+      <h3>Ritratto Realista</h3>
+      <div class="lotto-artista">Realizzato da L. Marchetti</div>
+      <dl class="scheda-tecnica">
+        <div><dt>Durata</dt><dd>14 ore, 4 sedute</dd></div>
+        <div><dt>Aghi</dt><dd>RL 0.20mm, Round Shader</dd></div>
+        <div><dt>Pigmenti</dt><dd>Dynamic, scala di grigi</dd></div>
+        <div><dt>Superficie</dt><dd>Braccio intero</dd></div>
+      </dl>
+    </article>
+  </div>
+</section>
+
+<section class="section" id="processo">
+  <div class="section-head">
+    <h2>Il processo</h2>
+    <p>Ogni commissione segue lo stesso rigore, dalla consulenza alla consegna dell'opera finita.</p>
+  </div>
+  <div class="processo">
+    <div class="tappa">
+      <span class="num">01</span>
+      <h3>Consulenza privata</h3>
+      <p>Un incontro dedicato per definire soggetto, superficie e intenzione dell'opera, senza fretta.</p>
+    </div>
+    <div class="tappa">
+      <span class="num">02</span>
+      <h3>Progetto su misura</h3>
+      <p>Ogni disegno viene sviluppato in esclusiva per la sessione, mai riutilizzato o replicato.</p>
+    </div>
+    <div class="tappa">
+      <span class="num">03</span>
+      <h3>Esecuzione e certificato</h3>
+      <p>Al termine, l'opera viene numerata e archiviata nel catalogo personale del cliente.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="artista">
+  <div class="artista-wrap">
+    <div class="artista-img">
+      <svg viewBox="0 0 200 260" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#c9a86a" stroke-linecap="round">
+        <!-- volto -->
+        <path d="M100 34 C68 34, 52 62, 56 92 C46 96, 45 116, 56 122 C60 150, 78 172, 100 172 C122 172, 140 150, 144 122 C155 116, 154 96, 144 92 C148 62, 132 34, 100 34Z" stroke-width="1"/>
+        <!-- capelli -->
+        <path d="M56 92 C54 70, 64 46, 84 40 M144 92 C146 70, 136 46, 116 40" stroke-width="0.8"/>
+        <path d="M62 60 C74 48, 92 44, 100 46 M100 46 C110 44, 128 48, 138 60" stroke-width="0.6" opacity="0.8"/>
+        <!-- occhi -->
+        <path d="M72 96 C78 90, 90 90, 96 96 C90 102, 78 102, 72 96Z" stroke-width="0.9"/>
+        <path d="M104 96 C110 90, 122 90, 128 96 C122 102, 110 102, 104 96Z" stroke-width="0.9"/>
+        <circle cx="84" cy="96" r="3" stroke-width="0.6"/>
+        <circle cx="116" cy="96" r="3" stroke-width="0.6"/>
+        <path d="M70 92 C78 86, 90 86, 98 92 M102 92 C110 86, 122 86, 130 92" stroke-width="0.6"/>
+        <!-- naso -->
+        <path d="M100 100 C98 110, 96 118, 92 122 C96 126, 104 126, 108 122" stroke-width="0.7"/>
+        <!-- bocca e barba leggera -->
+        <path d="M84 138 C92 143, 108 143, 116 138" stroke-width="0.9"/>
+        <path d="M70 130 C74 148, 86 162, 100 164 C114 162, 126 148, 130 130" stroke-width="0.5" opacity="0.7"/>
+        <!-- tratteggio ombra -->
+        <path d="M78 108 L86 112 M76 116 L84 120 M118 108 L110 112 M120 116 L112 120" stroke-width="0.45" opacity="0.7"/>
+        <!-- collo e spalle -->
+        <path d="M100 172 L100 196 M56 240 C64 210, 84 196, 100 196 C116 196, 136 210, 144 240" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="artista-testo">
+      <span class="kicker">L'ARTISTA</span>
+      <h2>Lorenzo Marchetti</h2>
+      <p>Formatosi tra Milano e Osaka, Lorenzo lavora esclusivamente su appuntamento da oltre dodici anni. Il suo tratto unisce il rigore del disegno accademico alla libertà del segno contemporaneo.</p>
+      <p>Ogni opera nasce da un dialogo diretto con il cliente e viene realizzata una sola volta: nessun disegno lascia mai lo studio due volte.</p>
+      <div class="stat-row">
+        <div>
+          <span class="stat-num">312</span>
+          <span class="stat-label">Opere catalogate</span>
+        </div>
+        <div>
+          <span class="stat-num">12</span>
+          <span class="stat-label">Anni di attività</span>
+        </div>
+        <div>
+          <span class="stat-num">6</span>
+          <span class="stat-label">Mesi di lista d'attesa</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section commissione" id="commissione">
+  <h2>Richiedi la tua commissione</h2>
+  <p>I posti disponibili sono limitati. Ogni richiesta viene valutata personalmente prima di fissare la consulenza.</p>
+  <a href="mailto:studio@marchetti-tattoo.it" class="btn">SCRIVI ALLO STUDIO</a>
+</section>
+
+<footer>
+  <div class="logo">MARCHETTI<span>.</span></div>
+  <div class="footer-links">
+    <a href="#">Instagram</a>
+    <a href="#">Milano, Via Brera 14</a>
+    <a href="#">© 2026</a>
+  </div>
+</footer>
+
+</body>
+</html>
