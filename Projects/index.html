@@ -3,277 +3,1168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATELIER • Tattoo Template Collection</title>
+    <title>ATELIER • Tattoo Experience Showcase</title>
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Syne:wght@500;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Syne:wght@500;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-dark: #050507;
+            --bg-dark: #060609;
             --accent-gold: #d4af37;
-            --gold-gradient: linear-gradient(135deg, #ffffff 20%, #d4af37 80%, #aa820a 100%);
-            --card-glass: rgba(18, 18, 24, 0.65);
-            --card-border: rgba(212, 175, 55, 0.18);
-            --border-hover: rgba(212, 175, 55, 0.75);
-            --glow-color: rgba(212, 175, 55, 0.15);
+            --accent-gold-light: #f3e5ab;
+            --accent-glow: rgba(212, 175, 55, 0.35);
+            --gold-gradient: linear-gradient(135deg, #ffffff 10%, #f3e5ab 35%, #d4af37 75%, #aa820a 100%);
+            --card-glass: rgba(18, 18, 26, 0.7);
+            --card-border: rgba(212, 175, 55, 0.22);
+            --border-hover: rgba(212, 175, 55, 0.9);
             --text-primary: #f8f8fa;
-            --text-secondary: #9292a0;
-            --text-muted: #575766;
+            --text-secondary: #a0a0b2;
+            --text-muted: #575768;
+            --radius-main: 20px;
+            --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            cursor: none; /* Custom Cursor */
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(circle at 15% 15%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 85% 85%, rgba(138, 43, 226, 0.06) 0%, transparent 45%);
-            background-attachment: fixed;
             color: var(--text-primary);
             min-height: 100vh;
-            padding: 90px 24px 120px;
+            overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
-        }
-
-        header {
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto 80px auto;
             position: relative;
         }
 
-        .category-tag {
-            font-family: 'Syne', sans-serif;
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            color: var(--accent-gold);
-            margin-bottom: 24px;
-            display: inline-block;
-            font-weight: 700;
-            padding: 6px 18px;
-            background: rgba(212, 175, 55, 0.05);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 50px;
-            backdrop-filter: blur(10px);
+        /* Ambient Fluid Background Canvas */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
         }
 
-        h1 {
+        /* Custom Dynamic Cursor */
+        #custom-cursor {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.05s ease-out, background-color 0.3s;
+            box-shadow: 0 0 12px var(--accent-gold);
+        }
+
+        #cursor-follower {
+            position: fixed;
+            width: 38px;
+            height: 38px;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: transform 0.18s ease-out, border-color 0.3s, width 0.3s, height 0.3s;
+        }
+
+        body:hover #cursor-follower { opacity: 1; }
+
+        .cursor-hover #custom-cursor {
+            transform: translate(-50%, -50%) scale(1.8);
+            background: #fff;
+            box-shadow: 0 0 20px #fff;
+        }
+
+        .cursor-hover #cursor-follower {
+            transform: translate(-50%, -50%) scale(1.5);
+            border-color: var(--accent-gold);
+            background: rgba(212, 175, 55, 0.08);
+        }
+
+        /* Main Container Wrap */
+        .app-wrapper {
+            position: relative;
+            z-index: 1;
+            padding: 30px 24px 120px;
+            max-width: 1380px;
+            margin: 0 auto;
+        }
+
+        /* Header Bar */
+        header {
+            margin-bottom: 40px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             font-family: 'Cinzel', serif;
-            font-size: clamp(2.5rem, 6vw, 4rem);
-            font-weight: 700;
-            letter-spacing: 8px;
+            font-weight: 900;
+            font-size: 1.1rem;
+            letter-spacing: 4px;
+            color: var(--text-primary);
+        }
+
+        .brand-logo i {
+            color: var(--accent-gold);
+            font-size: 1.4rem;
+            filter: drop-shadow(0 0 8px var(--accent-gold));
+        }
+
+        .status-badge {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 3.5px;
+            color: var(--accent-gold);
+            padding: 6px 16px;
+            background: rgba(212, 175, 55, 0.08);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 50px;
+            backdrop-filter: blur(12px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent-gold);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-gold);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            color: var(--text-primary);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+            box-shadow: 0 0 18px rgba(212, 175, 55, 0.3);
+        }
+
+        .badge-counter {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--accent-gold);
+            color: #000;
+            font-size: 0.65rem;
+            font-weight: 800;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Hero Text */
+        .hero-title-wrap {
+            text-align: center;
+            max-width: 850px;
+            margin: 0 auto 50px auto;
+        }
+
+        .hero-title-wrap h1 {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2.8rem, 7vw, 5rem);
+            font-weight: 900;
+            letter-spacing: 12px;
             text-transform: uppercase;
             background: var(--gold-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 20px;
-            line-height: 1.15;
-            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 16px;
+            line-height: 1.1;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.9));
         }
 
-        .subtitle {
-            font-size: 1.05rem;
+        .hero-subtitle {
+            font-size: 1.1rem;
             color: var(--text-secondary);
             font-weight: 300;
-            letter-spacing: 0.8px;
+            letter-spacing: 1px;
             line-height: 1.7;
-            max-width: 620px;
-            margin: 0 auto;
         }
 
-        .container {
-            max-width: 1240px;
-            margin: 0 auto;
+        /* Featured 3D Showcase Carousel Section */
+        .showcase-container {
+            margin-bottom: 70px;
+            position: relative;
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+        .showcase-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 24px;
+            padding: 0 10px;
+        }
+
+        .showcase-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .carousel-track-wrapper {
+            overflow: hidden;
+            position: relative;
+            padding: 30px 10px;
+        }
+
+        .carousel-track {
+            display: flex;
             gap: 28px;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @media (max-width: 1024px) {
-            .grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 640px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .card {
-            background: var(--card-glass);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+        .featured-card {
+            min-width: 340px;
+            height: 420px;
+            background: linear-gradient(145deg, rgba(25, 25, 36, 0.8), rgba(12, 12, 18, 0.9));
             border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 34px 30px 28px;
+            border-radius: 24px;
+            padding: 28px;
+            position: relative;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 185px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            text-decoration: none;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            transition: var(--transition-smooth);
             overflow: hidden;
         }
 
-        .card::before {
+        .featured-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 100%;
-            background: radial-gradient(circle at 50% 0%, var(--glow-color), transparent 70%);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at var(--fx-x, 50%) var(--fx-y, 50%), rgba(212, 175, 55, 0.25), transparent 60%);
             opacity: 0;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.3s ease;
             pointer-events: none;
         }
 
-        .card:hover {
+        .featured-card:hover::before { opacity: 1; }
+
+        .featured-card:hover {
+            border-color: var(--accent-gold);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 35px rgba(212, 175, 55, 0.3);
+            transform: translateY(-10px);
+        }
+
+        .featured-art-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            color: var(--accent-gold);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.15);
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: var(--accent-gold);
+            color: #000;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 50px;
+        }
+
+        .featured-body h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            color: #fff;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .featured-body p {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        .carousel-nav-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .carousel-nav-btn {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(212,175,55,0.25);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+        }
+
+        .carousel-nav-btn:hover {
+            background: var(--accent-gold);
+            color: #000;
+        }
+
+        /* Control Bar (Search, Filters, View Modes) */
+        .control-bar {
+            background: rgba(15, 15, 22, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 24px;
+            padding: 16px 24px;
+            margin-bottom: 50px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .search-field {
+            position: relative;
+            flex: 1;
+            min-width: 260px;
+        }
+
+        .search-field i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-gold);
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 12px 20px 12px 48px;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .filter-pills {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 2px;
+        }
+
+        .filter-pills::-webkit-scrollbar { display: none; }
+
+        .pill-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-secondary);
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 0.78rem;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            transition: var(--transition-smooth);
+        }
+
+        .pill-btn:hover, .pill-btn.active {
+            background: rgba(212, 175, 55, 0.18);
+            border-color: var(--accent-gold);
+            color: var(--accent-gold-light);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+        }
+
+        /* Card Grid Layout */
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            perspective: 1200px;
+        }
+
+        @media (max-width: 1080px) { .templates-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 680px) { .templates-grid { grid-template-columns: 1fr; } }
+
+        /* Enhanced Card Design */
+        .tattoo-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-main);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 250px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.15s ease-out, border-color 0.4s ease, box-shadow 0.4s ease;
+            overflow: hidden;
+        }
+
+        /* Visual Graphic Background Pattern on Card */
+        .card-bg-glow {
+            position: absolute;
+            top: -40%;
+            right: -40%;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transition: transform 0.6s ease;
+        }
+
+        .tattoo-card:hover .card-bg-glow {
+            transform: scale(1.6);
+        }
+
+        .tattoo-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(212, 175, 55, 0.22), transparent 55%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .tattoo-card:hover {
             border-color: var(--border-hover);
-            transform: translateY(-8px) scale(1.01);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(212, 175, 55, 0.2);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.2);
         }
 
-        .card:hover::before {
-            opacity: 1;
-        }
+        .tattoo-card:hover::after { opacity: 1; }
 
-        .card-top {
+        .card-header-row {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             position: relative;
-            z-index: 1;
+            z-index: 2;
         }
 
-        .card-num {
+        .card-num-pill {
             font-family: 'Syne', sans-serif;
-            font-size: 0.8rem;
-            font-weight: 700;
+            font-size: 0.72rem;
+            font-weight: 800;
             color: var(--accent-gold);
-            opacity: 0.8;
             letter-spacing: 2px;
-            background: rgba(212, 175, 55, 0.08);
-            padding: 4px 10px;
+            background: rgba(212, 175, 55, 0.12);
+            padding: 4px 12px;
             border-radius: 8px;
-            border: 1px solid rgba(212, 175, 55, 0.2);
+            border: 1px solid rgba(212, 175, 55, 0.3);
         }
 
-        .card h3 {
+        .fav-heart-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            transition: var(--transition-smooth);
+        }
+
+        .fav-heart-btn:hover, .fav-heart-btn.active {
+            color: #ff4757;
+            transform: scale(1.25);
+        }
+
+        .card-main-content {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 20px;
+        }
+
+        .tattoo-card h3 {
             font-family: 'Syne', sans-serif;
-            font-size: 1.25rem;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            color: var(--text-primary);
+            font-size: 1.45rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #fff;
             text-transform: uppercase;
-            transition: all 0.3s ease;
+            margin-bottom: 6px;
+            transition: color 0.3s ease;
         }
 
-        .card:hover h3 {
-            color: #ffffff;
-            letter-spacing: 2px;
+        .tattoo-card:hover h3 {
+            color: var(--accent-gold-light);
+            text-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
         }
 
-        .card-footer {
+        .card-cat-label {
+            font-size: 0.75rem;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            font-weight: 700;
+            opacity: 0.85;
+        }
+
+        .card-footer-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding-top: 18px;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
             position: relative;
-            z-index: 1;
+            z-index: 2;
         }
 
-        .link-text {
-            font-size: 0.75rem;
+        .explore-link {
+            font-size: 0.78rem;
             text-transform: uppercase;
             letter-spacing: 2.5px;
             color: var(--text-secondary);
-            font-weight: 600;
-            transition: color 0.3s ease;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-smooth);
         }
 
-        .arrow {
-            font-size: 1.1rem;
-            color: var(--accent-gold);
-            transition: transform 0.3s ease;
-        }
-
-        .card:hover .link-text {
+        .tattoo-card:hover .explore-link {
             color: var(--accent-gold);
         }
 
-        .card:hover .arrow {
+        .tattoo-card:hover .explore-link i {
             transform: translateX(6px);
+        }
+
+        /* Glassmorphism Modal Quick View Overlay */
+        .modal-backdrop {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(3, 3, 6, 0.88);
+            backdrop-filter: blur(25px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            padding: 20px;
+        }
+
+        .modal-backdrop.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-box {
+            background: rgba(18, 18, 26, 0.95);
+            border: 1px solid var(--accent-gold);
+            border-radius: 28px;
+            width: 100%;
+            max-width: 780px;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.95), 0 0 60px rgba(212, 175, 55, 0.25);
+            transform: scale(0.9) translateY(30px);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-backdrop.active .modal-box {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 24px; right: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--transition-smooth);
+        }
+
+        .modal-close-btn:hover {
+            background: var(--accent-gold);
+            color: #000;
+            transform: rotate(90deg);
+        }
+
+        .modal-hero-preview {
+            width: 100%;
+            height: 220px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(10, 10, 15, 0.9));
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 18px;
+            margin: 24px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-hero-preview i {
+            font-size: 4.2rem;
+            color: var(--accent-gold);
+            margin-bottom: 12px;
+            filter: drop-shadow(0 0 20px var(--accent-gold));
+        }
+
+        .btn-launch {
+            display: inline-block;
+            width: 100%;
+            background: var(--gold-gradient);
+            color: #000;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            padding: 18px;
+            border-radius: 50px;
+            text-align: center;
+            text-decoration: none;
+            transition: var(--transition-smooth);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.35);
+        }
+
+        .btn-launch:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.55);
         }
 
         footer {
             text-align: center;
             margin-top: 100px;
-            font-size: 0.75rem;
-            letter-spacing: 3px;
+            font-size: 0.78rem;
+            letter-spacing: 4px;
             text-transform: uppercase;
             color: var(--text-muted);
             font-family: 'Syne', sans-serif;
-            font-weight: 500;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <span class="category-tag">Private Archive</span>
-        <h1>Atelier Tattoo</h1>
-        <p class="subtitle">Collezione curata di layout ed esperienze digitali ad alto profilo per studi d'arte e tatuatori d'élite.</p>
-    </header>
+    <!-- Ambient Dynamic Canvas -->
+    <canvas id="bg-canvas"></canvas>
 
-    <div class="container">
-        <div class="grid">
-            <a href="alchemical.html" target="_blank" class="card"><div class="card-top"><h3>Alchemical</h3><span class="card-num">01</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="alone.html" target="_blank" class="card"><div class="card-top"><h3>Alone</h3><span class="card-num">02</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="archivio.html" target="_blank" class="card"><div class="card-top"><h3>Archivio</h3><span class="card-num">03</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="bottega-inchiostro.html" target="_blank" class="card"><div class="card-top"><h3>Bottega Inchiostro</h3><span class="card-num">04</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="camera-oscura.html" target="_blank" class="card"><div class="card-top"><h3>Camera Oscura</h3><span class="card-num">05</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="cartellaclinica.html" target="_blank" class="card"><div class="card-top"><h3>Cartella Clinica</h3><span class="card-num">06</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="casa-degli-arcani.html" target="_blank" class="card"><div class="card-top"><h3>Casa Degli Arcani</h3><span class="card-num">07</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="dopo-la-pioggia.html" target="_blank" class="card"><div class="card-top"><h3>Dopo La Pioggia</h3><span class="card-num">08</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="erbario-tattoo-template.html" target="_blank" class="card"><div class="card-top"><h3>Erbario Tattoo</h3><span class="card-num">09</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="holographic.html" target="_blank" class="card"><div class="card-top"><h3>Holographic</h3><span class="card-num">10</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="luce-bianca.html" target="_blank" class="card"><div class="card-top"><h3>Luce Bianca</h3><span class="card-num">11</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="manoscritto.html" target="_blank" class="card"><div class="card-top"><h3>Manoscritto</h3><span class="card-num">12</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="mappa-astrale.html" target="_blank" class="card"><div class="card-top"><h3>Mappa Astrale</h3><span class="card-num">13</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="marchetti.html" target="_blank" class="card"><div class="card-top"><h3>Marchetti</h3><span class="card-num">14</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="marea.html" target="_blank" class="card"><div class="card-top"><h3>Marea</h3><span class="card-num">15</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="mirabilia-tattoo-template.html" target="_blank" class="card"><div class="card-top"><h3>Mirabilia Tattoo</h3><span class="card-num">16</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="miraggio.html" target="_blank" class="card"><div class="card-top"><h3>Miraggio</h3><span class="card-num">17</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="nuvole-di-carta.html" target="_blank" class="card"><div class="card-top"><h3>Nuvole Di Carta</h3><span class="card-num">18</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="ordito.html" target="_blank" class="card"><div class="card-top"><h3>Ordito</h3><span class="card-num">19</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="ossidiana-tattoo-template.html" target="_blank" class="card"><div class="card-top"><h3>Ossidiana Tattoo</h3><span class="card-num">20</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="parco-sculture.html" target="_blank" class="card"><div class="card-top"><h3>Parco Sculture</h3><span class="card-num">21</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="pelle-viva-tattoo-template.html" target="_blank" class="card"><div class="card-top"><h3>Pelle Viva Tattoo</h3><span class="card-num">22</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="serra-botanica.html" target="_blank" class="card"><div class="card-top"><h3>Serra Botanica</h3><span class="card-num">23</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="suminagashi.html" target="_blank" class="card"><div class="card-top"><h3>Suminagashi</h3><span class="card-num">24</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
-            <a href="yugen.html" target="_blank" class="card"><div class="card-top"><h3>Yugen</h3><span class="card-num">25</span></div><div class="card-footer"><span class="link-text">Esplora Demo</span><span class="arrow">→</span></div></a>
+    <!-- Custom Glowing Mouse Cursor -->
+    <div id="custom-cursor"></div>
+    <div id="cursor-follower"></div>
+
+    <div class="app-wrapper">
+        <header>
+            <div class="header-top">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-compass-drafting"></i>
+                    <span>ATELIER TATTOO</span>
+                </div>
+                <div class="status-badge">
+                    <span class="pulse-dot"></span> Private Master Archive 2026
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn interactive-el" id="sound-toggle-btn" title="Audio Toggle">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                    <button class="icon-btn interactive-el" id="fav-counter-btn" title="Preferiti">
+                        <i class="fa-solid fa-heart"></i>
+                        <span class="badge-counter" id="fav-count-num">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="hero-title-wrap">
+                <h1>Atelier Tagù</h1>
+                <p class="hero-subtitle">Vetrina sartoriale interattiva d'élite. 25 esperienze digitali ad alto impatto visivo progettate per maestri tatuatori e studi d'arte.</p>
+            </div>
+        </header>
+
+        <!-- Featured 3D Showcase Carousel -->
+        <section class="showcase-container">
+            <div class="showcase-header">
+                <div class="showcase-title">
+                    <i class="fa-solid fa-star"></i> Showcase in Evidenza
+                </div>
+                <div class="carousel-nav-btns">
+                    <button class="carousel-nav-btn interactive-el" id="carousel-prev"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button class="carousel-nav-btn interactive-el" id="carousel-next"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <div class="carousel-track-wrapper">
+                <div class="carousel-track" id="carousel-track">
+                    <!-- Featured dynamic cards injected via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Filter & Search Control Bar -->
+        <div class="control-bar">
+            <div class="search-field">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="search-input" class="search-input interactive-el" placeholder="Cerca layout (es. Alchemical, Marea, Dark)...">
+            </div>
+
+            <div class="filter-pills" id="filter-pills-wrap">
+                <button class="pill-btn active interactive-el" data-filter="all">Tutti (25)</button>
+                <button class="pill-btn interactive-el" data-filter="Esoterico">Esoterico</button>
+                <button class="pill-btn interactive-el" data-filter="Natura">Natura</button>
+                <button class="pill-btn interactive-el" data-filter="Dark">Dark</button>
+                <button class="pill-btn interactive-el" data-filter="Minimal">Minimal</button>
+                <button class="pill-btn interactive-el" data-filter="Astrale">Astrale</button>
+            </div>
+        </div>
+
+        <!-- Main Template Collection Grid -->
+        <div class="templates-grid" id="templates-grid">
+            <!-- Dynamic 25 templates injected via JS -->
+        </div>
+
+        <footer>
+            &copy; ATELIER DIGITAL ASSETS • CONFIDENTIAL PRIVATE SHOWCASE
+        </footer>
+    </div>
+
+    <!-- Quick View Modal Window -->
+    <div class="modal-backdrop" id="modal-backdrop">
+        <div class="modal-box">
+            <button class="modal-close-btn interactive-el" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                <span class="card-num-pill" id="modal-num">01</span>
+                <span style="font-family: 'Syne', sans-serif; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; color: var(--accent-gold);" id="modal-cat">Esoterico</span>
+            </div>
+
+            <h2 style="font-family: 'Cinzel', serif; font-size: 2.2rem; color: #fff; letter-spacing: 3px;" id="modal-title">Template Title</h2>
+
+            <div class="modal-hero-preview">
+                <i class="fa-solid fa-gem" id="modal-icon"></i>
+                <span style="font-family: 'Syne', sans-serif; letter-spacing: 3px; font-weight: 800; color: var(--accent-gold-light);">LIVE INTERACTIVE ENGINE</span>
+            </div>
+
+            <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.7; margin-bottom: 28px;" id="modal-desc">
+                Descrizione dettagliata del layout.
+            </p>
+
+            <a href="#" target="_blank" class="btn-launch interactive-el" id="modal-launch-link">
+                Lancia Demo Live <i class="fa-solid fa-arrow-up-right-from-square" style="margin-left: 8px;"></i>
+            </a>
         </div>
     </div>
 
-    <footer>
-        &copy; Tattoo Studio Digital Assets • Confidential
-    </footer>
+    <script>
+        // Data Source: All 25 Templates
+        const templatesData = [
+            { id: '01', title: 'Alchemical', file: 'alchemical.html', category: 'Esoterico', icon: 'fa-wand-magic-sparkles', desc: 'Layout alchemico basato su geometria sacra, simbolismo classico ed elevato impatto visivo per tatuaggi simbolici ed esoterici.' },
+            { id: '02', title: 'Alone', file: 'alone.html', category: 'Dark', icon: 'fa-moon', desc: 'Design d’atmosfera introspettiva e scura, focalizzato su contrasti netti ed espressività d’autore dark.' },
+            { id: '03', title: 'Archivio', file: 'archivio.html', category: 'Minimal', icon: 'fa-box-archive', desc: 'Struttura a catalogo museale con una spaziatura tipografica di precisione chirurgica.' },
+            { id: '04', title: 'Bottega Inchiostro', file: 'bottega-inchiostro.html', category: 'Esoterico', icon: 'fa-feather-pointed', desc: 'Calore artigianale ed eleganza d’altri tempi fondati sull’arte dell’incisione e dell’inchiostro puro.' },
+            { id: '05', title: 'Camera Oscura', file: 'camera-oscura.html', category: 'Dark', icon: 'fa-camera-retro', desc: 'Ispirato alle pellicole d’epoca con contrasti ad alto impatto per tatuaggi realistic in bianco e nero.' },
+            { id: '06', title: 'Cartella Clinica', file: 'cartellaclinica.html', category: 'Minimal', icon: 'fa-notes-medical', desc: 'Design concettuale e rigoroso per chi predilige la precisione anatomica e schemi grafici puliti.' },
+            { id: '07', title: 'Casa Degli Arcani', file: 'casa-degli-arcani.html', category: 'Esoterico', icon: 'fa-eye', desc: 'Ispirazione ai Tarocchi d’artista con carte interattive per mostrare flash art e bozze uniche.' },
+            { id: '08', title: 'Dopo La Pioggia', file: 'dopo-la-pioggia.html', category: 'Natura', icon: 'fa-cloud-rain', desc: 'Toni organici e freschi per tatuaggi botanici, acquerello e micro-realismo delicato.' },
+            { id: '09', title: 'Erbario Tattoo', file: 'erbario-tattoo-template.html', category: 'Natura', icon: 'fa-leaf', desc: 'Elegante trattato botanico vintage ripensato per illustrazioni floreali e naturali d’alta classe.' },
+            { id: '10', title: 'Holographic', file: 'holographic.html', category: 'Astrale', icon: 'fa-compact-disc', desc: 'Estetica futuristica cangiante con bagliori e riflessi iridescenti per studi all’avanguardia.' },
+            { id: '11', title: 'Luce Bianca', file: 'luce-bianca.html', category: 'Minimal', icon: 'fa-sun', desc: 'Design etereo ad alto contrasto luminoso per una percezione di estrema pulizia ed eleganza.' },
+            { id: '12', title: 'Manoscritto', file: 'manoscritto.html', category: 'Esoterico', icon: 'fa-scroll', desc: 'Tipografia incisa e pergamena digitale pensata per lettering raffinato e disegni storici.' },
+            { id: '13', title: 'Mappa Astrale', file: 'mappa-astrale.html', category: 'Astrale', icon: 'fa-meteor', desc: 'Costellazioni interattive e orbite geometriche per tatuaggi fineline, cosmici e spirituali.' },
+            { id: '14', title: 'Marchetti', file: 'marchetti.html', category: 'Minimal', icon: 'fa-pen-nib', desc: 'Tributo al design editoriale classico con griglie rigide ed una forte personalità artistica.' },
+            { id: '15', title: 'Marea', file: 'marea.html', category: 'Natura', icon: 'fa-water', desc: 'Movimenti fluidi e morbidi ispirati alle profondità oceaniche e al flusso continuo dell’acqua.' },
+            { id: '16', title: 'Mirabilia Tattoo', file: 'mirabilia-tattoo-template.html', category: 'Esoterico', icon: 'fa-dragon', desc: 'Una Wunderkammer digitale (stanza delle meraviglie) dove ogni tatuaggio è un pezzo raro.' },
+            { id: '17', title: 'Miraggio', file: 'miraggio.html', category: 'Astrale', icon: 'fa-compass', desc: 'Sfumature calde del deserto ed effetti ottici di rifrazione per uno stile caldo ed avvolgente.' },
+            { id: '18', title: 'Nuvole Di Carta', file: 'nuvole-di-carta.html', category: 'Minimal', icon: 'fa-cloud', desc: 'Texture morbide e leggerezza visiva per illustrazioni d’autore minimali e tratteggi sottili.' },
+            { id: '19', title: 'Ordito', file: 'ordito.html', category: 'Dark', icon: 'fa-cubes', desc: 'Intrecci complessi e trame geometriche per body-suit e composizioni ornamentali dense.' },
+            { id: '20', title: 'Ossidiana Tattoo', file: 'ossidiana-tattoo-template.html', category: 'Dark', icon: 'fa-gem', desc: 'Profondità vulcanica e riflessi scuri satinati per stili Ornamental Blackwork e Heavy Dark.' },
+            { id: '21', title: 'Parco Sculture', file: 'parco-sculture.html', category: 'Natura', icon: 'fa-landmark', desc: 'Monumentale ed espressivo come le opere d’arte in pietra per tatuaggi 3D e Neoclassici.' },
+            { id: '22', title: 'Pelle Viva Tattoo', file: 'pelle-viva-tattoo-template.html', category: 'Minimal', icon: 'fa-hand-holding-heart', desc: 'Tono visivo caldo e viscerale al contempo, per celebrare il legame profondo tra corpo e inchiostro.' },
+            { id: '23', title: 'Serra Botanica', file: 'serra-botanica.html', category: 'Natura', icon: 'fa-seedling', desc: 'Architettura in vetro ed elementi naturali per tatuatrici e tatuatori specializzati nel floreale.' },
+            { id: '24', title: 'Suminagashi', file: 'suminagashi.html', category: 'Astrale', icon: 'fa-ripple', desc: 'Ispirato all’antica arte giapponese dell’inchiostro fluttuante sull’acqua per forme organiche.' },
+            { id: '25', title: 'Yugen', file: 'yugen.html', category: 'Esoterico', icon: 'fa-yin-yang', desc: 'Parola giapponese per indicare la grazia sottile dell’universo: un layout profondo e poetico.' }
+        ];
 
+        // State variables
+        let favorites = JSON.parse(localStorage.getItem('atelier_favs_v2') || '[]');
+        let soundEnabled = true;
+        let activeFilter = 'all';
+        let searchQuery = '';
+
+        // Web Audio Synthesizer Sound Engine
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTone(freq = 600, type = 'sine', duration = 0.04) {
+            if (!soundEnabled) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        // Custom Cursor Movement
+        const cursor = document.getElementById('custom-cursor');
+        const follower = document.getElementById('cursor-follower');
+
+        window.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            follower.style.left = e.clientX + 'px';
+            follower.style.top = e.clientY + 'px';
+        });
+
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.closest('.interactive-el') || e.target.closest('.tattoo-card') || e.target.closest('.featured-card')) {
+                document.body.classList.add('cursor-hover');
+            } else {
+                document.body.classList.remove('cursor-hover');
+            }
+        });
+
+        // Background Ambient Canvas Particles
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: window.innerWidth/2, y: window.innerHeight/2 };
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.3;
+                this.speedY = (Math.random() - 0.5) * 0.3;
+                this.alpha = Math.random() * 0.4 + 0.1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // Mouse interaction repulsion/attraction
+                const dx = mouse.x - this.x;
+                const dy = mouse.y - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 120) {
+                    this.x -= (dx / dist) * 0.8;
+                    this.y -= (dy / dist) * 0.8;
+                }
+
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+            draw() {
+                ctx.fillStyle = `rgba(212, 175, 55, ${this.alpha})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for(let i = 0; i < 75; i++) particles.push(new Particle());
+
+        function animateBg() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
+
+        // Render Hero Showcase Carousel (First 6 items)
+        const carouselTrack = document.getElementById('carousel-track');
+        let carouselPos = 0;
+
+        function renderShowcase() {
+            carouselTrack.innerHTML = '';
+            const featuredItems = templatesData.slice(0, 8);
+
+            featuredItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'featured-card interactive-el';
+                card.innerHTML = `
+                    <span class="featured-badge">Esclusivo</span>
+                    <div class="featured-art-icon">
+                        <i class="fa-solid ${item.icon}"></i>
+                    </div>
+                    <div class="featured-body">
+                        <h2>${item.title}</h2>
+                        <p>${item.desc}</p>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-family:'Syne',sans-serif; font-size:0.75rem; letter-spacing:2px; color:var(--accent-gold);">${item.category}</span>
+                        <span style="color:#fff; font-size:0.85rem; font-weight:700;">PROVA DEMO <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                `;
+
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    card.style.setProperty('--fx-x', `${x}px`);
+                    card.style.setProperty('--fx-y', `${y}px`);
+                });
+
+                card.addEventListener('click', () => {
+                    playTone(900, 'triangle', 0.08);
+                    openModal(item);
+                });
+
+                carouselTrack.appendChild(card);
+            });
+        }
+
+        document.getElementById('carousel-next').addEventListener('click', () => {
+            playTone(800, 'sine', 0.04);
+            if (carouselPos > -1400) carouselPos -= 360;
+            carouselTrack.style.transform = `translateX(${carouselPos}px)`;
+        });
+
+        document.getElementById('carousel-prev').addEventListener('click', () => {
+            playTone(800, 'sine', 0.04);
+            if (carouselPos < 0) carouselPos += 360;
+            carouselTrack.style.transform = `translateX(${carouselPos}px)`;
+        });
+
+        // Render 25 Main Grid Cards with 3D Tilt Physics
+        const gridEl = document.getElementById('templates-grid');
+
+        function renderGrid() {
+            gridEl.innerHTML = '';
+
+            const filtered = templatesData.filter(item => {
+                const matchesFilter = activeFilter === 'all' || item.category === activeFilter || (activeFilter === 'fav' && favorites.includes(item.id));
+                const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || item.category.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesFilter && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                gridEl.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: var(--text-muted); font-family: 'Syne', sans-serif;">Nessun template trovato con questi filtri.</div>`;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const isFav = favorites.includes(item.id);
+                const card = document.createElement('div');
+                card.className = 'tattoo-card interactive-el';
+                card.dataset.id = item.id;
+
+                card.innerHTML = `
+                    <div class="card-bg-glow"></div>
+                    <div class="card-header-row">
+                        <span class="card-num-pill">${item.id}</span>
+                        <button class="fav-heart-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFav('${item.id}')">
+                            <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="card-main-content">
+                        <h3>${item.title}</h3>
+                        <span class="card-cat-label">${item.category}</span>
+                    </div>
+                    <div class="card-footer-row">
+                        <span class="explore-link">Esplora Layout <i class="fa-solid fa-arrow-right"></i></span>
+                        <i class="fa-solid ${item.icon}" style="color: rgba(212,175,55,0.4); font-size:1.1rem;"></i>
+                    </div>
+                `;
+
+                // 3D Motion Physics
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = ((y - centerY) / centerY) * -12;
+                    const rotateY = ((x - centerX) / centerX) * 12;
+
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
+                    card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
+                    card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)`;
+                });
+
+                card.addEventListener('click', () => {
+                    playTone(1000, 'sine', 0.06);
+                    openModal(item);
+                });
+
+                gridEl.appendChild(card);
+            });
+
+            updateFavCounter();
+        }
+
+        // Favorites Handler
+        window.toggleFav = function(id) {
+            playTone(1100, 'sine', 0.05);
+            if (favorites.includes(id)) {
+                favorites = favorites.filter(f => f !== id);
+            } else {
+                favorites.push(id);
+            }
+            localStorage.setItem('atelier_favs_v2', JSON.stringify(favorites));
+            renderGrid();
+        };
+
+        function updateFavCounter() {
+            document.getElementById('fav-count-num').innerText = favorites.length;
+        }
+
+        // Modal Handler
+        const modal = document.getElementById('modal-backdrop');
+        const modalClose = document.getElementById('modal-close');
+
+        function openModal(item) {
+            document.getElementById('modal-num').innerText = item.id;
+            document.getElementById('modal-cat').innerText = item.category;
+            document.getElementById('modal-title').innerText = item.title;
+            document.getElementById('modal-desc').innerText = item.desc;
+            document.getElementById('modal-icon').className = `fa-solid ${item.icon}`;
+            document.getElementById('modal-launch-link').href = item.file;
+
+            modal.classList.add('active');
+        }
+
+        modalClose.addEventListener('click', () => {
+            playTone(400, 'sine', 0.04);
+            modal.classList.remove('active');
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        });
+
+        // Filter Pills & Search Event Listeners
+        document.getElementById('filter-pills-wrap').addEventListener('click', (e) => {
+            if (e.target.classList.contains('pill-btn')) {
+                playTone(700, 'sine', 0.04);
+                document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                activeFilter = e.target.dataset.filter;
+                renderGrid();
+            }
+        });
+
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderGrid();
+        });
+
+        document.getElementById('fav-counter-btn').addEventListener('click', () => {
+            playTone(850, 'sine', 0.05);
+            activeFilter = 'fav';
+            renderGrid();
+        });
+
+        document.getElementById('sound-toggle-btn').addEventListener('click', function() {
+            soundEnabled = !soundEnabled;
+            this.innerHTML = soundEnabled ? `<i class="fa-solid fa-volume-high"></i>` : `<i class="fa-solid fa-volume-xmark"></i>`;
+            playTone(1200, 'sine', 0.05);
+        });
+
+        // Initialize Boot
+        renderShowcase();
+        renderGrid();
+    </script>
 </body>
 </html>
