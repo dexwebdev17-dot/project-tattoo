@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
 <meta charset="utf-8">
 <title>Bottega Inchiostro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,32 +19,6 @@
     --line:#bcd8e2;
     --shadow:rgba(15,35,44,.18);
     --needle:#0f232c;
-  }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --surface:#0b1a20;
-      --surface-alt:#112530;
-      --surface-raised:#153039;
-      --text:#dcecf3;
-      --text-muted:#9fbac5;
-      --accent:#c39ce8;
-      --accent-soft:#8a63b8;
-      --line:#254352;
-      --shadow:rgba(0,0,0,.5);
-      --needle:#dcecf3;
-    }
-  }
-  :root[data-theme="dark"]{
-    --surface:#0b1a20;
-    --surface-alt:#112530;
-    --surface-raised:#153039;
-    --text:#dcecf3;
-    --text-muted:#9fbac5;
-    --accent:#c39ce8;
-    --accent-soft:#8a63b8;
-    --line:#254352;
-    --shadow:rgba(0,0,0,.5);
-    --needle:#dcecf3;
   }
 
   *{box-sizing:border-box;}
@@ -175,13 +152,18 @@
       radial-gradient(120% 90% at 30% 20%, var(--surface-raised), transparent 60%),
       repeating-linear-gradient(115deg, color-mix(in srgb, var(--text) 5%, transparent) 0 2px, transparent 2px 26px),
       var(--surface-raised);
+    background-size: cover;
+    background-position: center;
     box-shadow:0 30px 60px -30px var(--shadow);
     transform:rotate(-1.5deg);
   }
   .skin::after{
-    content:"SH.00 — RITRATTO";
+    content:attr(data-label);
     position:absolute;bottom:16px;left:16px;
     font-size:.68rem;color:var(--text-muted);
+    background: rgba(0,0,0,0.4);
+    padding: 2px 6px;
+    border-radius: 2px;
   }
   .about-text .lead{font-family:'Fraunces',serif;font-style:italic;font-size:1.45rem;color:var(--text);max-width:32ch;margin-bottom:24px;}
 
@@ -224,10 +206,13 @@
     position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(-3deg);
     width:56px;height:20px;background:color-mix(in srgb, var(--accent) 22%, var(--surface-raised) 78%);
     opacity:.85;
+    z-index: 2;
   }
   .polaroid .ink{
     width:100%;height:100%;
-    background:
+    background-size: cover;
+    background-position: center;
+    background-image: 
       radial-gradient(60% 60% at 40% 35%, color-mix(in srgb, var(--text) 22%, transparent), transparent 70%),
       repeating-radial-gradient(circle at 70% 65%, color-mix(in srgb, var(--text) 14%, transparent) 0 2px, transparent 2px 5px);
   }
@@ -296,7 +281,182 @@
 
   footer{padding:32px 0;font-size:.7rem;color:var(--text-muted);display:flex;justify-content:space-between;}
   @media (max-width:600px){ footer{flex-direction:column;gap:8px;} }
+
+  /* ---------- PANNELLO EDITOR PERSONALIZZABILE ---------- */
+  #edit-toggle-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 10000;
+    background: var(--text);
+    color: var(--surface);
+    border: 2px solid var(--accent);
+    padding: 12px 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border-radius: 40px;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+  }
+  #edit-toggle-btn:hover {
+    transform: scale(1.05);
+    background: var(--accent);
+    color: #fff;
+  }
+
+  #editor-drawer {
+    position: fixed;
+    top: 0; right: -420px;
+    width: 400px;
+    height: 100vh;
+    background: #0f171c;
+    color: #dcecf3;
+    z-index: 9999;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  #editor-drawer.open { right: 0; }
+
+  .drawer-header {
+    padding: 20px;
+    background: #15222a;
+    border-bottom: 1px solid #254352;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .drawer-header h3 { font-size: 1.1rem; color: #fff; }
+  .drawer-close { background: none; border: none; color: #9fbac5; font-size: 1.2rem; cursor: pointer; }
+
+  .drawer-content {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .editor-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .editor-group label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    color: #8a63b8;
+    font-weight: 600;
+  }
+  .editor-group input, .editor-group textarea {
+    background: #182a34;
+    border: 1px solid #254352;
+    color: #fff;
+    padding: 10px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.8rem;
+  }
+  .editor-group textarea { resize: vertical; min-height: 60px; }
+
+  .color-pickers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .drawer-footer {
+    padding: 20px;
+    background: #15222a;
+    border-top: 1px solid #254352;
+  }
+  .btn-save-html {
+    width: 100%;
+    padding: 14px;
+    background: #8a63b8;
+    color: #fff;
+    border: none;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background 0.3s;
+  }
+  .btn-save-html:hover { background: #6e3fa3; }
 </style>
+</head>
+
+<body>
+
+<button id="edit-toggle-btn" onclick="toggleEditor()">⚙️ PERSONALIZZA</button>
+
+<div id="editor-drawer">
+  <div class="drawer-header">
+    <h3>Pannello Personalizzazione</h3>
+    <button class="drawer-close" onclick="toggleEditor()">✕</button>
+  </div>
+  <div class="drawer-content">
+    
+    <div class="editor-group">
+      <label>Colori della Grafica</label>
+      <div class="color-pickers">
+        <div><span style="font-size:0.65rem;">Sfondo</span><input type="color" id="col-surface" value="#dcecf3" onchange="updateTheme()"></div>
+        <div><span style="font-size:0.65rem;">Sfondo Alt</span><input type="color" id="col-alt" value="#cee3ec" onchange="updateTheme()"></div>
+        <div><span style="font-size:0.65rem;">Testi</span><input type="color" id="col-text" value="#0f232c" onchange="updateTheme()"></div>
+        <div><span style="font-size:0.65rem;">Accento / Dettagli</span><input type="color" id="col-accent" value="#6e3fa3" onchange="updateTheme()"></div>
+      </div>
+    </div>
+
+    <hr style="border-color:#254352; margin:5px 0;">
+
+    <div class="editor-group">
+      <label>Titolo Principal Studio</label>
+      <input type="text" id="inp-title-1" value="BOTTEGA" oninput="liveUpdate()">
+      <input type="text" id="inp-title-2" value="INCHIOSTRO" oninput="liveUpdate()">
+    </div>
+
+    <div class="editor-group">
+      <label>Sottotitolo / Bio Hero</label>
+      <textarea id="inp-hero-sub" oninput="liveUpdate()">Tatuaggi disegnati su misura, tirati a mano libera e trasferiti ago dopo ago. Blackwork, fineline e tradizione giapponese, in uno studio privato di due sedie.</textarea>
+    </div>
+
+    <div class="editor-group">
+      <label>Nome Artista & Info</label>
+      <input type="text" id="inp-artist" value="Marco Sella" oninput="liveUpdate()">
+      <input type="text" id="inp-location" value="MILANO — VIA TORTONA" oninput="liveUpdate()">
+      <input type="text" id="inp-city-full" value="Via Tortona 34, Milano" oninput="liveUpdate()">
+      <input type="text" id="inp-email" value="booking@bottegainchiostro.it" oninput="liveUpdate()">
+    </div>
+
+    <hr style="border-color:#254352; margin:5px 0;">
+
+    <div class="editor-group">
+      <label>URL Immagine Ritratti / Chi Sono</label>
+      <input type="text" id="inp-skin-img" placeholder="https://link-immagine.jpg" oninput="liveUpdate()">
+    </div>
+
+    <div class="editor-group">
+      <label>URL Immagini Portfolio (Separati da virgola)</label>
+      <textarea id="inp-portfolio-imgs" placeholder="https://img1.jpg, https://img2.jpg..." oninput="liveUpdate()"></textarea>
+    </div>
+
+    <div class="editor-group">
+      <label>P.IVA / Copyright Footer</label>
+      <input type="text" id="inp-footer" value="©️ 2026 BOTTEGA INCHIOSTRO — P.IVA 00000000000" oninput="liveUpdate()">
+    </div>
+
+  </div>
+  <div class="drawer-footer">
+    <button class="btn-save-html" onclick="exportHTML()">💾 SALVA INDEX.HTML</button>
+  </div>
+</div>
 
 <div class="ruler" id="ruler" aria-hidden="true"></div>
 <div class="needle" id="needle" aria-hidden="true">
@@ -310,17 +470,17 @@
 <section class="hero">
   <div class="wrap">
     <div class="hero-top">
-      <span class="mono tag">MILANO — VIA TORTONA</span>
+      <span class="mono tag" id="lbl-location">MILANO — VIA TORTONA</span>
       <span class="mono tag">SU APPUNTAMENTO</span>
     </div>
     <h1 class="press">
-      <span style="--i:0">BOTTEGA</span>
-      <span style="--i:1">INCHIOSTRO</span>
+      <span style="--i:0" id="lbl-title-1">BOTTEGA</span>
+      <span style="--i:1" id="lbl-title-2">INCHIOSTRO</span>
     </h1>
     <div class="hero-sub">
-      <p>Tatuaggi disegnati su misura, tirati a mano libera e trasferiti ago dopo ago. Blackwork, fineline e tradizione giapponese, in uno studio privato di due sedie.</p>
+      <p id="lbl-hero-sub">Tatuaggi disegnati su misura, tirati a mano libera e trasferiti ago dopo ago. Blackwork, fineline e tradizione giapponese, in uno studio privato di due sedie.</p>
       <div class="hero-meta mono">
-        <span>ARTISTA <b>Marco Sella</b></span>
+        <span>ARTISTA <b id="lbl-artist">Marco Sella</b></span>
         <span>ATTIVO DAL <b>2016</b></span>
         <span>AGENDA <b>3–4 settimane</b></span>
       </div>
@@ -330,7 +490,7 @@
 
 <section class="about alt">
   <div class="wrap about-grid">
-    <div class="skin"></div>
+    <div class="skin" id="skin-box" data-label="SH.00 — RITRATTO"></div>
     <div class="about-text">
       <div class="reg mono">REG A — CHI SONO</div>
       <p class="lead">Il tatuaggio è l'unico disegno che invecchia insieme a chi lo porta.</p>
@@ -376,11 +536,11 @@
   <div class="wrap">
     <div class="reg mono">REG C — LAVORI RECENTI</div>
     <div class="folio">
-      <figure class="polaroid p1"><span class="tape"></span><div class="ink"></div><figcaption class="mono"><span>AVAMBRACCIO</span><span>BLACKWORK</span></figcaption></figure>
-      <figure class="polaroid p2"><span class="tape"></span><div class="ink"></div><figcaption class="mono"><span>SCHIENA</span><span>IREZUMI</span></figcaption></figure>
-      <figure class="polaroid p3"><span class="tape"></span><div class="ink"></div><figcaption class="mono"><span>CAVIGLIA</span><span>FINELINE</span></figcaption></figure>
-      <figure class="polaroid p4"><span class="tape"></span><div class="ink"></div><figcaption class="mono"><span>PETTO</span><span>CHICANO</span></figcaption></figure>
-      <figure class="polaroid p5"><span class="tape"></span><div class="ink"></div><figcaption class="mono"><span>POLPACCIO</span><span>BLACKWORK</span></figcaption></figure>
+      <figure class="polaroid p1"><span class="tape"></span><div class="ink" id="p-img-1"></div><figcaption class="mono"><span>AVAMBRACCIO</span><span>BLACKWORK</span></figcaption></figure>
+      <figure class="polaroid p2"><span class="tape"></span><div class="ink" id="p-img-2"></div><figcaption class="mono"><span>SCHIENA</span><span>IREZUMI</span></figcaption></figure>
+      <figure class="polaroid p3"><span class="tape"></span><div class="ink" id="p-img-3"></div><figcaption class="mono"><span>CAVIGLIA</span><span>FINELINE</span></figcaption></figure>
+      <figure class="polaroid p4"><span class="tape"></span><div class="ink" id="p-img-4"></div><figcaption class="mono"><span>PETTO</span><span>CHICANO</span></figcaption></figure>
+      <figure class="polaroid p5"><span class="tape"></span><div class="ink" id="p-img-5"></div><figcaption class="mono"><span>POLPACCIO</span><span>BLACKWORK</span></figcaption></figure>
     </div>
   </div>
 </section>
@@ -444,12 +604,12 @@
       <div class="ticket-main">
         <h2 style="font-size:2.4rem;">Prenota la tua seduta</h2>
         <p>Racconta cosa hai in mente: zona del corpo, riferimenti, disponibilità. Rispondo entro 48 ore lavorative.</p>
-        <a class="cta" href="mailto:booking@bottegainchiostro.it">Scrivi a booking@bottegainchiostro.it →</a>
+        <a class="cta" id="lbl-cta-email" href="mailto:booking@bottegainchiostro.it">Scrivi a booking@bottegainchiostro.it →</a>
       </div>
       <div class="ticket-side mono">
         <div>
           <div style="margin-bottom:6px;color:var(--text-muted);">STUDIO</div>
-          <div>Via Tortona 34, Milano</div>
+          <div id="lbl-city-full">Via Tortona 34, Milano</div>
           <div>Mar–Sab, 11:00–19:00</div>
         </div>
         <div class="social-row" aria-label="Social">
@@ -466,11 +626,74 @@
 </section>
 
 <footer class="wrap mono">
-  <span>© 2026 BOTTEGA INCHIOSTRO</span>
+  <span id="lbl-footer">©️ 2026 BOTTEGA INCHIOSTRO</span>
   <span>P.IVA 00000000000 — TEMPLATE DI STUDIO</span>
 </footer>
 
 <script>
+  function toggleEditor() {
+    document.getElementById('editor-drawer').classList.toggle('open');
+  }
+
+  function updateTheme() {
+    const root = document.documentElement;
+    root.style.setProperty('--surface', document.getElementById('col-surface').value);
+    root.style.setProperty('--surface-alt', document.getElementById('col-alt').value);
+    root.style.setProperty('--text', document.getElementById('col-text').value);
+    root.style.setProperty('--accent', document.getElementById('col-accent').value);
+  }
+
+  function liveUpdate() {
+    document.getElementById('lbl-title-1').innerText = document.getElementById('inp-title-1').value;
+    document.getElementById('lbl-title-2').innerText = document.getElementById('inp-title-2').value;
+    document.getElementById('lbl-hero-sub').innerText = document.getElementById('inp-hero-sub').value;
+    document.getElementById('lbl-artist').innerText = document.getElementById('inp-artist').value;
+    document.getElementById('lbl-location').innerText = document.getElementById('inp-location').value;
+    document.getElementById('lbl-city-full').innerText = document.getElementById('inp-city-full').value;
+    
+    const email = document.getElementById('inp-email').value;
+    const cta = document.getElementById('lbl-cta-email');
+    cta.innerText = 'Scrivi a ' + email + ' →';
+    cta.href = 'mailto:' + email;
+
+    document.getElementById('lbl-footer').innerText = document.getElementById('inp-footer').value;
+
+    // Immagine Skin
+    const skinImg = document.getElementById('inp-skin-img').value;
+    if(skinImg) {
+      document.getElementById('skin-box').style.backgroundImage = `url('${skinImg}')`;
+    }
+
+    // Portfolio
+    const portImgs = document.getElementById('inp-portfolio-imgs').value.split(',');
+    portImgs.forEach((url, idx) => {
+      const el = document.getElementById(`p-img-${idx+1}`);
+      if(el && url.trim()) {
+        el.style.backgroundImage = `url('${url.trim()}')`;
+      }
+    });
+  }
+
+  function exportHTML() {
+    // Clona il documento per pulire i componenti dell'editor prima di scaricare
+    const clone = document.documentElement.cloneNode(true);
+    
+    // Rimuove bottone e drawer
+    const drawer = clone.querySelector('#editor-drawer');
+    const btn = clone.querySelector('#edit-toggle-btn');
+    if(drawer) drawer.remove();
+    if(btn) btn.remove();
+
+    // Ottieni il testo finale formattato
+    const htmlContent = "<!DOCTYPE html>\n<html lang=\"it\">\n" + clone.innerHTML + "\n</html>";
+
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'index.html';
+    a.click();
+  }
+
   (function(){
     var ruler = document.getElementById('ruler');
     if (ruler) {
@@ -508,7 +731,6 @@
           var r = card.getBoundingClientRect();
           var px = (e.clientX - r.left) / r.width - 0.5;
           var py = (e.clientY - r.top) / r.height - 0.5;
-          var base = card.classList.contains('polaroid') ? (card.style.getPropertyValue('--base-rot') || '0deg') : '0deg';
           card.style.transform = 'rotate(' + (px * 2) + 'deg) translateY(' + (py * -4) + 'px)';
         });
         card.addEventListener('mouseleave', function(){
@@ -518,3 +740,5 @@
     }
   })();
 </script>
+</body>
+</html>
