@@ -575,7 +575,7 @@
     </div>
 
     <script>
-        // DATI DEI 25 MODELLI
+        // DATI DEI 27 MODELLI
         const templates = [
             { id: '01', title: 'Alchemical', file: 'alchemical.html', style: 'Esoterico & Simbolico', icon: '<path d="M12 2L2 22h20L12 2zm0 4l6.5 13h-13L12 6z" fill="#d4af37"/>' },
             { id: '02', title: 'Alone', file: 'alone.html', style: 'Dark Minimalist', icon: '<circle cx="12" cy="12" r="9" stroke="#d4af37" stroke-width="2" fill="none"/>' },
@@ -599,9 +599,11 @@
             { id: '20', title: 'Ossidiana Tattoo', file: 'ossidiana-tattoo-template.html', style: 'Blackwork Pesante', icon: '<polygon points="12 2 20 22 4 22" fill="#d4af37"/>' },
             { id: '21', title: 'Parco Sculture', file: 'parco-sculture.html', style: '3D Neoclassico', icon: '<rect x="7" y="7" width="10" height="10" stroke="#d4af37" stroke-width="2" fill="none"/>' },
             { id: '22', title: 'Pelle Viva Tattoo', file: 'pelle-viva-tattoo-template.html', style: 'Organico / Tessuto', icon: '<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" fill="#d4af37"/>' },
-            { id: '23', title: 'Serra Botanica', file: 'serra-botanica.html', style: 'Natura Fine Line', icon: '<path d="M12 22s8-4 8-10A8 8 0 0 0 4 12c0 6 8 10 8 10z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '24', title: 'Suminagashi', file: 'suminagashi.html', style: 'Inchiostro ad Acqua', icon: '<circle cx="12" cy="12" r="9" stroke="#d4af37" stroke-width="1"/><circle cx="12" cy="12" r="5" stroke="#d4af37" stroke-width="1"/>' },
-            { id: '25', title: 'Yugen', file: 'yugen.html', style: 'Zen Minimal / Misterioso', icon: '<line x1="4" y1="12" x2="20" y2="12" stroke="#d4af37" stroke-width="2"/>' }
+            { id: '23', title: 'Rosa e Inchiostro', file: 'rosa-e-inchiostro.html', style: 'Botanico & Inchiostro Rosa', icon: '<path d="M12 3a6 6 0 0 1 6 6c0 5-6 11-6 11S6 14 6 9a6 6 0 0 1 6-6z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '24', title: 'Serra Botanica', file: 'serra-botanica.html', style: 'Natura Fine Line', icon: '<path d="M12 22s8-4 8-10A8 8 0 0 0 4 12c0 6 8 10 8 10z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '25', title: 'Suminagashi', file: 'suminagashi.html', style: 'Inchiostro ad Acqua', icon: '<circle cx="12" cy="12" r="9" stroke="#d4af37" stroke-width="1"/><circle cx="12" cy="12" r="5" stroke="#d4af37" stroke-width="1"/>' },
+            { id: '26', title: 'Tavola', file: 'tavola.html', style: 'Editoriale / Layout Minimale', icon: '<rect x="3" y="3" width="18" height="18" rx="2" stroke="#d4af37" stroke-width="2" fill="none"/><line x1="3" y1="9" x2="21" y2="9" stroke="#d4af37" stroke-width="1.5"/>' },
+            { id: '27', title: 'Yugen', file: 'yugen.html', style: 'Zen Minimal / Misterioso', icon: '<line x1="4" y1="12" x2="20" y2="12" stroke="#d4af37" stroke-width="2"/>' }
         ];
 
         // RENDER 3D CAROUSEL & GRID
@@ -664,11 +666,9 @@
         function updateCarousel() {
             const items = document.querySelectorAll('.carousel-item');
             const total = items.length;
-            const angleStep = 360 / total;
 
             items.forEach((item, index) => {
                 const offset = index - currIndex;
-                const theta = offset * 25; // Angolo di rotazione
                 const transZ = Math.abs(offset) * -80;
                 const transX = offset * 220;
                 const rotY = offset * -15;
