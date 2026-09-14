@@ -54,71 +54,98 @@
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
       transition: all 0.3s ease;
     }
+
+    /* Modal / Drawer Overlay animations */
+    #editor-drawer {
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #drawer-backdrop {
+      transition: opacity 0.35s ease;
+    }
   </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden select-none">
+<body class="h-screen w-screen overflow-hidden select-none bg-[#070504] relative">
 
-  <header class="h-16 bg-[#070504] border-b border-[#241c19] px-4 flex items-center justify-between shrink-0 z-30">
-    <div class="flex items-center gap-3">
-      <div class="w-3 h-3 rounded-full bg-[#c94a3a] shadow-[0_0_8px_#c94a3a] animate-pulse"></div>
-      <h1 class="font-oswald text-lg tracking-wider text-white uppercase">Camera Oscura — <span class="text-[#c94a3a]">Live Editor</span></h1>
-    </div>
-
-    <!-- Toolbar della Dashboard -->
-    <div class="flex items-center gap-2">
-      <!-- Toggle Sidebar -->
-      <button id="btn-toggle-sidebar" class="px-3 py-1.5 text-xs bg-[#1a1412] hover:bg-[#28201d] text-gray-300 rounded border border-[#382b27] transition flex items-center gap-1.5">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
-        <span class="hidden sm:inline">Pannello</span>
+  <!-- BOTTONE FLUTTUANTE PERSONALIZZA (DISCRETO & ELEGANTE) -->
+  <div class="fixed top-5 right-6 z-50 flex items-center gap-3">
+    <!-- Viewport Switcher (Floating) -->
+    <div class="bg-[#14100e]/90 backdrop-blur-md border border-[#382b27] rounded-full p-1 flex items-center shadow-lg">
+      <button id="view-desktop" class="px-2.5 py-1 text-xs bg-[#241c19] text-white rounded-full transition flex items-center gap-1" title="Vista Desktop">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        <span class="hidden sm:inline text-[11px]">Desktop</span>
       </button>
-
-      <!-- Viewport Controls -->
-      <div class="bg-[#14100e] border border-[#241c19] rounded p-0.5 flex items-center">
-        <button id="view-desktop" class="p-1.5 text-xs bg-[#241c19] text-white rounded transition" title="Vista Desktop">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        </button>
-        <button id="view-mobile" class="p-1.5 text-xs text-gray-400 hover:text-white rounded transition" title="Vista Mobile">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-        </button>
-      </div>
-
-      <div class="h-5 w-px bg-[#241c19] mx-1"></div>
-
-      <!-- Action Buttons -->
-      <button id="btn-reset" class="px-3 py-1.5 text-xs bg-red-950/40 hover:bg-red-900/60 text-red-300 rounded border border-red-900/50 transition">
-        Reset
-      </button>
-      
-      <button id="btn-export-json" class="px-3 py-1.5 text-xs bg-[#1a1412] hover:bg-[#28201d] text-gray-300 rounded border border-[#382b27] transition hidden md:block">
-        Salva JSON
-      </button>
-      <input type="file" id="input-import-json" accept=".json" class="hidden">
-      <button id="btn-import-json" class="px-3 py-1.5 text-xs bg-[#1a1412] hover:bg-[#28201d] text-gray-300 rounded border border-[#382b27] transition hidden md:block">
-        Carica JSON
-      </button>
-
-      <button id="btn-copy" class="px-3 py-1.5 text-xs bg-[#7a2420] hover:bg-[#962d28] text-white rounded border border-[#962d28] transition font-medium">
-        Copia HTML
-      </button>
-
-      <button id="btn-download" class="px-4 py-1.5 text-xs bg-[#c94a3a] hover:bg-[#dc5443] text-white rounded font-semibold transition shadow-[0_0_12px_rgba(201,74,58,0.4)] flex items-center gap-1.5">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-        Scarica index.html
+      <button id="view-mobile" class="px-2.5 py-1 text-xs text-gray-400 hover:text-white rounded-full transition flex items-center gap-1" title="Vista Mobile">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+        <span class="hidden sm:inline text-[11px]">Mobile</span>
       </button>
     </div>
-  </header>
 
-  <div class="flex flex-1 overflow-hidden relative">
+    <!-- Main Customize Button -->
+    <button id="btn-open-editor" class="px-4 py-2 bg-[#14100e]/95 hover:bg-[#1a1412] text-white text-xs font-semibold rounded-full border border-[#7a2420] shadow-[0_0_15px_rgba(201,74,58,0.3)] hover:shadow-[0_0_20px_rgba(201,74,58,0.5)] transition flex items-center gap-2 backdrop-blur-md group">
+      <span class="w-2 h-2 rounded-full bg-[#c94a3a] shadow-[0_0_8px_#c94a3a] group-hover:scale-125 transition-transform"></span>
+      <svg class="w-4 h-4 text-[#c94a3a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+      <span class="font-oswald tracking-wide uppercase">Personalizzazioni</span>
+    </button>
+  </div>
+
+  <!-- ANTEPRIMA LIVE A SCHERMO INTERO -->
+  <main class="w-full h-full bg-[#050302] flex items-center justify-center overflow-hidden">
+    <div id="device-wrapper" class="device-desktop relative bg-black transition-all duration-300">
+      <iframe id="preview-iframe" class="w-full h-full border-0 bg-[#070504]"></iframe>
+    </div>
+  </main>
+
+  <!-- DRAWER OVERLAY & PANNELLO EDITOR -->
+  <!-- Backdrop -->
+  <div id="drawer-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+  <!-- Drawer Container -->
+  <aside id="editor-drawer" class="fixed top-0 right-0 h-full w-[440px] max-w-[95vw] bg-[#0d0a09] border-l border-[#241c19] flex flex-col z-50 translate-x-full shadow-2xl">
     
-    <!-- PANNELLO EDITOR (LEFT SIDEBAR) -->
-    <aside id="sidebar" class="w-96 max-w-[90vw] bg-[#0d0a09] border-r border-[#241c19] flex flex-col h-full z-20 transition-all duration-300 ease-in-out shrink-0">
-      <div class="p-3 bg-[#14100e] border-b border-[#241c19] text-xs text-gray-400 flex justify-between items-center">
-        <span>CONFIGURATORE TEMPLATE</span>
-        <span class="text-[10px] text-[#c94a3a] bg-[#7a2420]/20 px-2 py-0.5 rounded border border-[#7a2420]/40">v2.4 GitHub Ready</span>
+    <!-- Drawer Header -->
+    <div class="p-4 bg-[#14100e] border-b border-[#241c19] flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-2.5">
+        <div class="w-2.5 h-2.5 rounded-full bg-[#c94a3a] shadow-[0_0_8px_#c94a3a] animate-pulse"></div>
+        <div>
+          <h2 class="font-oswald text-base text-white uppercase tracking-wider">Camera Oscura — <span class="text-[#c94a3a]">Live Editor</span></h2>
+          <p class="text-[10px] text-gray-400">Personalizza e scarica il template per GitHub</p>
+        </div>
+      </div>
+      
+      <!-- Close Button -->
+      <button id="btn-close-editor" class="p-1.5 text-gray-400 hover:text-white hover:bg-[#241c19] rounded-lg transition" title="Chiudi (ESC)">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Toolbar Azioni Download/Export -->
+    <div class="p-3 bg-[#070504] border-b border-[#241c19] flex flex-wrap items-center justify-between gap-2 shrink-0">
+      <div class="flex items-center gap-1.5">
+        <button id="btn-reset" class="px-2.5 py-1 text-xs bg-red-950/40 hover:bg-red-900/60 text-red-300 rounded border border-red-900/50 transition">
+          Reset
+        </button>
+        <button id="btn-export-json" class="px-2.5 py-1 text-xs bg-[#1a1412] hover:bg-[#28201d] text-gray-300 rounded border border-[#382b27] transition">
+          JSON ↓
+        </button>
+        <input type="file" id="input-import-json" accept=".json" class="hidden">
+        <button id="btn-import-json" class="px-2.5 py-1 text-xs bg-[#1a1412] hover:bg-[#28201d] text-gray-300 rounded border border-[#382b27] transition">
+          JSON ↑
+        </button>
       </div>
 
-      <!-- Form Controls Scrollable Area -->
-      <div id="editor-controls" class="flex-1 overflow-y-auto p-4 space-y-3 text-sm select-text">
+      <div class="flex items-center gap-1.5">
+        <button id="btn-copy" class="px-2.5 py-1 text-xs bg-[#7a2420] hover:bg-[#962d28] text-white rounded border border-[#962d28] transition font-medium">
+          Copia
+        </button>
+        <button id="btn-download" class="px-3 py-1 text-xs bg-[#c94a3a] hover:bg-[#dc5443] text-white rounded font-semibold transition shadow-[0_0_12px_rgba(201,74,58,0.4)] flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Scarica index.html
+        </button>
+      </div>
+    </div>
+
+    <!-- Form Controls Scrollable Area -->
+    <div id="editor-controls" class="flex-1 overflow-y-auto p-4 space-y-3 text-sm select-text">
         
         <!-- SECTION 1: COLORI E STILI -->
         <div class="border border-[#241c19] rounded bg-[#070504] overflow-hidden">
@@ -1256,6 +1283,31 @@
       renderDynamicControls();
       updatePreview();
     }
+
+    // DRAWER OPEN/CLOSE CONTROLS
+    const drawer = document.getElementById('editor-drawer');
+    const backdrop = document.getElementById('drawer-backdrop');
+    const btnOpen = document.getElementById('btn-open-editor');
+    const btnClose = document.getElementById('btn-close-editor');
+
+    function openEditor() {
+      drawer.classList.remove('translate-x-full');
+      backdrop.classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    function closeEditor() {
+      drawer.classList.add('translate-x-full');
+      backdrop.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    btnOpen.addEventListener('click', openEditor);
+    btnClose.addEventListener('click', closeEditor);
+    backdrop.addEventListener('click', closeEditor);
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeEditor();
+    });
 
     window.onload = function() {
       initApp();
