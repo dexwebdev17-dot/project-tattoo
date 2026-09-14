@@ -1,1100 +1,552 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATELIER TATTOO • 3D Interactive Showroom</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg-dark: #030305;
-            --accent-gold: #d4af37;
-            --gold-gradient: linear-gradient(135deg, #ffffff 10%, #f3e5ab 30%, #d4af37 70%, #aa820a 100%);
-            --card-glass: rgba(15, 15, 22, 0.65);
-            --card-border: rgba(212, 175, 55, 0.2);
-            --border-hover: rgba(212, 175, 55, 0.8);
-            --text-primary: #f8f8fa;
-            --text-secondary: #9a9ab0;
-            --text-muted: #575766;
-            --heart-red: #ff4757;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aurum Atelier — Tatuaggi esoterici di luce</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f2f5;
+    --bg-2:#faf7f3;
+    --panel:#ffffff;
+    --gold:#b8912f;
+    --gold-soft:#e3cd93;
+    --gold-line:#ddc987;
+    --ink:#2c2530;
+    --muted:#847a88;
+    --muted-2:#b2a8b5;
+    --line:#e6e0e6;
+    --rose:#d9aab3;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(ellipse at 50% 0%, #f9eede 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 90%, #ecdde4 0%, transparent 50%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Cormorant Garamond', Georgia, serif;
+    font-size:18px; line-height:1.65; font-weight:400;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{ color:inherit; text-decoration:none;}
+  img{ max-width:100%; display:block;}
+  ::selection{ background:var(--gold-soft); color:var(--ink);}
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-        }
+  .wrap{ max-width:1140px; margin:0 auto; padding:0 32px;}
+  .display{ font-family:'Cinzel', serif; letter-spacing:.04em;}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-primary);
-            min-height: 100vh;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            cursor: default;
-        }
+  .moon-row{ display:flex; align-items:center; justify-content:center; gap:22px; color:var(--gold); opacity:.75;}
+  .moon-row .rule{ width:60px; height:1px; background:linear-gradient(90deg, transparent, var(--gold-line));}
+  .moon-row .rule.r{ background:linear-gradient(90deg, var(--gold-line), transparent);}
 
-        /* Canvas per le particelle di sfondo */
-        #bg-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 0;
-            pointer-events: none;
-        }
+  /* ---------------- HEADER ---------------- */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(244,242,245,.86); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{ display:flex; align-items:center; justify-content:space-between; padding:18px 32px; max-width:1140px; margin:0 auto;}
+  .brand{ display:flex; align-items:center; gap:12px;}
+  .brand svg{ width:26px; height:26px; color:var(--gold);}
+  .brand .name{ display:flex; flex-direction:column; line-height:1.2;}
+  .brand .name b{ font-size:14.5px; letter-spacing:.08em;}
+  .brand .name span{ font-size:10.5px; font-style:italic; color:var(--muted);}
+  nav ul{ list-style:none; display:flex; gap:30px;}
+  nav ul li a{ font-size:15px; color:var(--muted); font-style:italic; transition:color .2s ease;}
+  nav ul li a:hover{ color:var(--gold);}
+  .nav-cta{
+    display:inline-flex; align-items:center; gap:8px; font-family:'Cinzel',serif;
+    font-size:12px; letter-spacing:.06em; color:var(--gold); border:1px solid var(--gold-line);
+    padding:9px 18px; transition:background .2s ease, color .2s ease;
+  }
+  .nav-cta:hover{ background:var(--gold); color:#fff;}
+  .burger{ display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer;}
+  .burger span{ width:20px; height:1px; background:var(--gold);}
 
-        /* Cursore personalizzato */
-        #custom-cursor {
-            position: fixed;
-            width: 20px;
-            height: 20px;
-            border: 1px solid var(--accent-gold);
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, background-color 0.3s ease;
-            z-index: 9999;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
-        }
+  /* ---------------- HERO ---------------- */
+  .hero{ padding:180px 0 100px; text-align:center; position:relative;}
+  .sigil-orb{ width:180px; height:180px; margin:0 auto 40px; position:relative;}
+  .sigil-orb svg{ width:100%; height:100%;}
+  h1.hero-title{
+    font-size:clamp(30px,4.6vw,50px); font-weight:500; line-height:1.25;
+    max-width:720px; margin:0 auto 22px; letter-spacing:.02em;
+  }
+  .hero-sub{ font-style:italic; color:var(--muted); font-size:19px; max-width:50ch; margin:0 auto 44px;}
+  .hero-actions{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap;}
+  .btn{
+    display:inline-flex; align-items:center; gap:10px; font-family:'Cinzel',serif;
+    font-size:12.5px; letter-spacing:.05em; padding:14px 26px; border:1px solid var(--gold-line);
+    color:var(--ink); transition:background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .btn.primary{ background:var(--gold); color:#fff; border-color:var(--gold);}
+  .btn.primary:hover{ background:#a37f28;}
+  .btn:not(.primary):hover{ border-color:var(--gold); color:var(--gold);}
 
-        #custom-cursor-dot {
-            position: fixed;
-            width: 4px;
-            height: 4px;
-            background: #fff;
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            z-index: 10000;
-        }
+  /* ---------------- SECTION SHELL ---------------- */
+  section{ padding:100px 0;}
+  .sec-head{ text-align:center; margin-bottom:18px;}
+  .sec-head .eyebrow{ font-family:'Cinzel',serif; font-size:11.5px; letter-spacing:.12em; color:var(--gold); display:block; margin-bottom:10px;}
+  .sec-head h2{ font-size:clamp(26px,3.4vw,34px); font-weight:500;}
+  .sec-sub{ text-align:center; font-style:italic; color:var(--muted); font-size:16px; max-width:56ch; margin:0 auto 56px;}
 
-        /* App Wrapper */
-        .app-wrapper {
-            position: relative;
-            z-index: 1;
-            padding: 40px 24px 80px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+  /* ---------------- IL LABORATORIO (about) ---------------- */
+  .lab{ display:grid; grid-template-columns:.8fr 1.2fr; gap:60px; align-items:center;}
+  .lab-orb{
+    aspect-ratio:1/1; border-radius:50%; border:1px solid var(--gold-line);
+    background:radial-gradient(circle at 40% 30%, #fffaf0, var(--panel) 70%);
+    display:flex; align-items:center; justify-content:center; position:relative;
+    box-shadow:0 20px 50px rgba(184,145,47,.15);
+  }
+  .lab-orb::before{
+    content:""; position:absolute; inset:16px; border:1px solid var(--gold-soft); border-radius:50%;
+  }
+  .lab-orb svg{ width:52%; height:52%; color:var(--gold);}
+  .lab-text p{ color:var(--muted); font-size:16.5px; margin-bottom:20px; max-width:60ch;}
+  .lab-text p strong{ color:var(--ink); font-weight:600;}
+  .field-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-top:30px;}
+  .field{ border:1px solid var(--line); background:var(--panel); padding:16px 18px; border-radius:2px;}
+  .field .k{ font-family:'Cinzel',serif; font-size:10px; letter-spacing:.06em; color:var(--gold); margin-bottom:6px;}
+  .field .v{ font-size:15.5px;}
 
-        /* Header Navigation */
-        header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            margin-bottom: 30px;
-            position: relative;
-        }
+  /* ---------------- GLI ELEMENTI ---------------- */
+  .elementi-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:22px;}
+  .elemento{
+    background:var(--panel); border:1px solid var(--line); padding:30px 22px; text-align:center;
+    transition:border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+  }
+  .elemento:hover{ border-color:var(--gold-line); transform:translateY(-4px); box-shadow:0 16px 30px rgba(184,145,47,.12);}
+  .elemento .ring{
+    width:60px; height:60px; margin:0 auto 20px; border-radius:50%; border:1px solid var(--gold-soft);
+    display:flex; align-items:center; justify-content:center; color:var(--gold);
+  }
+  .elemento .sym{ font-family:'Cinzel',serif; font-size:11px; color:var(--muted-2); letter-spacing:.05em; margin-bottom:10px;}
+  .elemento h3{ font-size:17px; font-weight:500; margin-bottom:10px;}
+  .elemento p{ font-size:13.5px; color:var(--muted);}
 
-        .nav-controls {
-            position: absolute;
-            top: 0;
-            right: 0;
-            display: flex;
-            gap: 12px;
-        }
+  /* ---------------- I SIGILLI (portfolio) ---------------- */
+  .sigilli-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:38px 30px;}
+  .sigillo{ text-align:center; cursor:pointer;}
+  .sigillo-medallion{
+    position:relative; aspect-ratio:1/1; border-radius:50%; overflow:hidden;
+    border:1px solid var(--gold-line);
+    box-shadow:0 0 0 6px var(--bg), 0 0 0 7px var(--gold-soft);
+    transition:box-shadow .4s ease, transform .4s ease;
+  }
+  .sigillo-medallion svg{ position:absolute; inset:0; width:100%; height:100%;}
+  .sigillo-medallion::after{
+    content:""; position:absolute; inset:-60%;
+    background:linear-gradient(115deg, transparent 42%, rgba(255,255,255,.95) 50%, transparent 58%);
+    transform:translateX(-130%); pointer-events:none;
+  }
+  .sigillo.flash .sigillo-medallion::after{ animation:sweep .9s ease;}
+  @keyframes sweep{ to{ transform:translateX(130%);} }
+  .sigillo.expanded .sigillo-medallion{
+    box-shadow:0 0 0 6px var(--bg), 0 0 0 7px var(--gold), 0 0 34px rgba(184,145,47,.4);
+    transform:scale(1.04);
+  }
+  .sigillo-name{ font-family:'Cinzel',serif; font-size:13px; letter-spacing:.04em; margin-top:18px;}
+  .sigillo-cat{ font-size:13.5px; font-style:italic; color:var(--muted); margin-top:4px;}
+  .sigillo-details{
+    max-height:0; opacity:0; overflow:hidden; transition:max-height .5s ease, opacity .4s ease, margin .4s ease;
+    font-size:13px; color:var(--muted); margin-top:0;
+  }
+  .sigillo.expanded .sigillo-details{ max-height:120px; opacity:1; margin-top:12px;}
+  .sigillo-details .meta{ display:flex; justify-content:center; gap:18px; margin-top:8px; font-family:'Cinzel',serif; font-size:10px; letter-spacing:.04em; color:var(--gold);}
 
-        .control-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--card-border);
-            color: var(--text-primary);
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-family: 'Syne', sans-serif;
-            font-size: 0.75rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+  /* ---------------- IL RITO ---------------- */
+  .rito-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
+  .rito-card{ background:var(--panel); padding:32px 24px; text-align:center;}
+  .rito-card .rn{ font-family:'Cinzel',serif; font-size:12px; color:var(--gold); letter-spacing:.06em; display:block; margin-bottom:16px;}
+  .rito-card h4{ font-size:18px; font-weight:500; margin-bottom:10px;}
+  .rito-card p{ font-size:14px; color:var(--muted);}
 
-        .control-btn:hover, .control-btn.active {
-            border-color: var(--accent-gold);
-            background: rgba(212, 175, 55, 0.15);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-        }
+  /* ---------------- TESTIMONIANZE ---------------- */
+  .voci-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
+  .voce{ background:var(--panel); padding:28px 24px;}
+  .voce .mark{ font-family:'Cinzel',serif; font-size:22px; color:var(--gold); display:block; margin-bottom:14px;}
+  .voce p.q{ font-size:16px; font-style:italic; margin-bottom:18px;}
+  .voce .who{ font-size:13px; color:var(--muted-2); border-top:1px solid var(--line); padding-top:14px;}
 
-        .control-btn.active-fav {
-            border-color: var(--heart-red);
-            color: var(--heart-red);
-            background: rgba(255, 71, 87, 0.15);
-            box-shadow: 0 0 20px rgba(255, 71, 87, 0.2);
-        }
+  /* ---------------- CONTATTI ---------------- */
+  .contact-grid{ display:grid; grid-template-columns:1fr 1fr; gap:60px;}
+  .form-row{ display:flex; flex-direction:column; gap:8px; margin-bottom:22px;}
+  .form-row label{ font-family:'Cinzel',serif; font-size:11px; letter-spacing:.05em; color:var(--gold);}
+  .form-row input, .form-row select, .form-row textarea{
+    background:transparent; border:none; border-bottom:1px solid var(--line);
+    color:var(--ink); font-family:inherit; font-size:16px; padding:8px 2px;
+  }
+  .form-row input:focus, .form-row select:focus, .form-row textarea:focus{ outline:none; border-color:var(--gold);}
+  .form-two{ display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  .form-note{ font-size:13px; font-style:italic; color:var(--muted-2); margin-top:10px;}
+  .form-status{ font-size:14px; color:var(--gold); margin-top:16px; display:none; font-style:italic;}
 
-        .control-btn.audio-on {
-            border-color: #2ed573;
-            color: #2ed573;
-            background: rgba(46, 213, 115, 0.15);
-        }
+  .info-block{ border:1px solid var(--line); background:var(--panel); padding:30px 28px;}
+  .info-block .k{ font-family:'Cinzel',serif; font-size:10.5px; letter-spacing:.06em; color:var(--gold); margin-bottom:6px; margin-top:22px;}
+  .info-block .k:first-child{ margin-top:0;}
+  .info-block .v{ font-size:16px;}
+  .info-block .v.muted{ color:var(--muted);}
+  .socials{ display:flex; gap:10px; margin-top:22px;}
+  .socials a{ font-family:'Cinzel',serif; font-size:11px; letter-spacing:.03em; border:1px solid var(--line); padding:9px 14px; color:var(--muted);}
+  .socials a:hover{ color:var(--gold); border-color:var(--gold-line);}
 
-        .category-badge {
-            font-family: 'Syne', sans-serif;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            color: var(--accent-gold);
-            margin-bottom: 16px;
-            font-weight: 700;
-            padding: 6px 20px;
-            background: rgba(212, 175, 55, 0.05);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 50px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
-        }
+  /* ---------------- FOOTER ---------------- */
+  footer{ border-top:1px solid var(--line); padding:40px 0; text-align:center;}
+  footer p{ font-size:13px; font-style:italic; color:var(--muted-2);}
 
-        h1 {
-            font-family: 'Cinzel', serif;
-            font-size: clamp(2.5rem, 5vw, 4.2rem);
-            font-weight: 900;
-            letter-spacing: 8px;
-            text-transform: uppercase;
-            background: var(--gold-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 12px;
-            line-height: 1.1;
-        }
-
-        .subtitle {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            font-weight: 300;
-            letter-spacing: 1px;
-            max-width: 600px;
-            line-height: 1.6;
-        }
-
-        /* Search Bar */
-        .search-container {
-            margin-top: 25px;
-            width: 100%;
-            max-width: 500px;
-            position: relative;
-        }
-
-        .search-input {
-            width: 100%;
-            background: rgba(15, 15, 22, 0.8);
-            border: 1px solid var(--card-border);
-            padding: 14px 22px;
-            padding-right: 45px;
-            border-radius: 40px;
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
-            outline: none;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-
-        .search-input:focus {
-            border-color: var(--accent-gold);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.25);
-        }
-
-        .search-icon {
-            position: absolute;
-            right: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-            pointer-events: none;
-            font-size: 0.9rem;
-        }
-
-        /* View Modes */
-        .view-switch {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            background: rgba(255, 255, 255, 0.02);
-            padding: 4px;
-            border-radius: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .switch-btn {
-            padding: 8px 20px;
-            border-radius: 30px;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-family: 'Syne', sans-serif;
-            font-size: 0.75rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .switch-btn.active {
-            background: var(--accent-gold);
-            color: #000;
-            font-weight: 700;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
-        }
-
-        /* Heart Button (Fav) Style */
-        .fav-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            z-index: 10;
-        }
-
-        .fav-btn:hover {
-            transform: scale(1.15);
-            border-color: var(--heart-red);
-            color: var(--heart-red);
-        }
-
-        .fav-btn.active {
-            color: var(--heart-red);
-            border-color: var(--heart-red);
-            background: rgba(255, 71, 87, 0.2);
-            box-shadow: 0 0 12px rgba(255, 71, 87, 0.4);
-        }
-
-        /* 3D SHOWROOM CAROUSEL MODE */
-        .showroom-container {
-            position: relative;
-            height: 520px;
-            perspective: 1200px;
-            margin: 20px 0 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .carousel-3d {
-            position: relative;
-            width: 320px;
-            height: 440px;
-            transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .carousel-item {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            left: 0;
-            top: 0;
-            background: var(--card-glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-            cursor: pointer;
-            overflow: hidden;
-        }
-
-        .carousel-item::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(180deg, rgba(212, 175, 55, 0.08) 0%, transparent 60%);
-            pointer-events: none;
-        }
-
-        .carousel-nav {
-            position: absolute;
-            bottom: -20px;
-            display: flex;
-            gap: 20px;
-            z-index: 10;
-        }
-
-        .nav-arrow {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--card-border);
-            color: var(--accent-gold);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .nav-arrow:hover {
-            background: var(--accent-gold);
-            color: #000;
-            transform: scale(1.1);
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
-        }
-
-        /* Visual Graphic Art Box Inside Card */
-        .card-visual {
-            width: 100%;
-            height: 200px;
-            border-radius: 12px;
-            background: #0a0a0f;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card-visual svg {
-            width: 70%;
-            height: 70%;
-            opacity: 0.85;
-            transition: transform 0.5s ease;
-        }
-
-        .carousel-item:hover .card-visual svg, .grid-card:hover .card-visual svg {
-            transform: scale(1.1) rotate(2deg);
-        }
-
-        /* GRID MODE */
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 28px;
-            opacity: 0;
-            display: none;
-            transition: opacity 0.5s ease;
-        }
-
-        .grid-container.active {
-            display: grid;
-            opacity: 1;
-        }
-
-        @media (max-width: 1024px) {
-            .grid-container { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        @media (max-width: 640px) {
-            .grid-container { grid-template-columns: 1fr; }
-        }
-
-        .grid-card {
-            background: var(--card-glass);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 380px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .grid-card:hover {
-            border-color: var(--border-hover);
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.15);
-        }
-
-        .card-info {
-            margin-top: 16px;
-        }
-
-        .card-header-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .card-number {
-            font-family: 'Syne', sans-serif;
-            font-size: 0.75rem;
-            color: var(--accent-gold);
-            font-weight: 700;
-            background: rgba(212, 175, 55, 0.1);
-            padding: 2px 8px;
-            border-radius: 6px;
-            border: 1px solid rgba(212, 175, 55, 0.2);
-        }
-
-        .card-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.25rem;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            color: #fff;
-            text-transform: uppercase;
-        }
-
-        .card-footer-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 14px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            margin-top: 12px;
-        }
-
-        .demo-link {
-            font-size: 0.75rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: color 0.3s ease;
-        }
-
-        .grid-card:hover .demo-link, .carousel-item:hover .demo-link {
-            color: var(--accent-gold);
-        }
-
-        /* MODAL QUICK VIEW */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(20px);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s ease;
-        }
-
-        .modal-overlay.open {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .modal-content {
-            background: #0d0d12;
-            border: 1px solid var(--accent-gold);
-            border-radius: 24px;
-            width: 90%;
-            max-width: 700px;
-            padding: 40px;
-            position: relative;
-            transform: scale(0.9);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 0 50px rgba(212, 175, 55, 0.2);
-        }
-
-        .modal-overlay.open .modal-content {
-            transform: scale(1);
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .modal-close:hover {
-            color: var(--accent-gold);
-        }
-
-        .modal-title {
-            font-family: 'Cinzel', serif;
-            font-size: 2rem;
-            color: #fff;
-            margin-bottom: 8px;
-        }
-
-        .modal-body {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin: 24px 0;
-        }
-
-        @media (max-width: 600px) {
-            .modal-body { grid-template-columns: 1fr; }
-        }
-
-        .modal-btn {
-            width: 100%;
-            padding: 16px;
-            background: var(--gold-gradient);
-            color: #000;
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            border: none;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .modal-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
-        }
-
-        .no-favs-msg {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            letter-spacing: 1px;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 80px;
-            font-size: 0.75rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            font-family: 'Syne', sans-serif;
-        }
-    </style>
+  /* ---------------- RESPONSIVE ---------------- */
+  @media (max-width:960px){
+    nav ul{ display:none;}
+    .burger{ display:flex;}
+    .lab{ grid-template-columns:1fr; gap:36px;}
+    .lab-orb{ max-width:280px; margin:0 auto;}
+    .elementi-grid{ grid-template-columns:repeat(2,1fr);}
+    .sigilli-grid{ grid-template-columns:repeat(2,1fr);}
+    .rito-grid{ grid-template-columns:repeat(2,1fr);}
+    .voci-grid{ grid-template-columns:1fr;}
+    .contact-grid{ grid-template-columns:1fr;}
+  }
+  @media (max-width:600px){
+    .elementi-grid{ grid-template-columns:1fr;}
+    .sigilli-grid{ grid-template-columns:1fr; max-width:320px; margin:0 auto;}
+    .rito-grid{ grid-template-columns:1fr;}
+    .field-grid{ grid-template-columns:1fr;}
+    .form-two{ grid-template-columns:1fr;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto;}
+    *{ transition:none !important; animation:none !important;}
+  }
+</style>
 </head>
 <body>
 
-    <canvas id="bg-canvas"></canvas>
-    <div id="custom-cursor"></div>
-    <div id="custom-cursor-dot"></div>
+<header>
+  <div class="nav">
+    <div class="brand">
+      <svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1"><circle cx="13" cy="13" r="10"/><circle cx="13" cy="13" r="4"/></svg>
+      <div class="name"><b>AURUM ATELIER</b><span>Tatuaggi esoterici di luce</span></div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="#laboratorio">Laboratorio</a></li>
+        <li><a href="#elementi">Elementi</a></li>
+        <li><a href="#sigilli">Sigilli</a></li>
+        <li><a href="#rito">Il Rito</a></li>
+        <li><a href="#voci">Voci</a></li>
+      </ul>
+    </nav>
+    <a href="#contatti" class="nav-cta">Prenota una seduta</a>
+    <button class="burger" aria-label="menu" onclick="document.querySelector('nav ul').classList.toggle('open')"><span></span><span></span><span></span></button>
+  </div>
+</header>
 
-    <div class="app-wrapper">
-        <header>
-            <div class="nav-controls">
-                <button class="control-btn" id="audio-toggle-btn">
-                    <span>♫</span> <span id="audio-status-text">MUSIC ON</span>
-                </button>
-                <button class="control-btn" id="fav-filter-btn">
-                    <span>♥️</span> PREFERITI (<span id="fav-count">0</span>)
-                </button>
-            </div>
+<main>
 
-            <span class="category-badge">Confidential Collection</span>
-            <h1>Atelier Tattoo</h1>
-            <p class="subtitle">Showroom digitale interattiva d'élite. Seleziona o naviga la collezione 3D per esplorare le anteprime dei template.</p>
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="sigil-orb">
+        <svg viewBox="0 0 180 180" fill="none" stroke="#b8912f" stroke-width="1">
+          <circle cx="90" cy="90" r="86" opacity=".5"/>
+          <circle cx="90" cy="90" r="68" opacity=".7"/>
+          <circle cx="90" cy="90" r="6" fill="#b8912f" stroke="none"/>
+          <g opacity=".8">
+            <circle cx="90" cy="8" r="3" fill="#b8912f" stroke="none"/>
+            <circle cx="90" cy="172" r="3" fill="#b8912f" stroke="none"/>
+            <circle cx="8" cy="90" r="3" fill="#b8912f" stroke="none"/>
+            <circle cx="172" cy="90" r="3" fill="#b8912f" stroke="none"/>
+          </g>
+          <path d="M90 22 A68 68 0 0 1 158 90" opacity=".9"/>
+        </svg>
+      </div>
+      <h1 class="hero-title display">Ogni simbolo è una fase della luce che attraversa la pelle.</h1>
+      <p class="hero-sub">Un atelier dove i tatuaggi vengono incastonati come pietre lungo cerchi alchemici e fasi lunari, disegnati sottilissimi in oro.</p>
+      <div class="hero-actions">
+        <a href="#sigilli" class="btn primary">Scopri i sigilli</a>
+        <a href="#contatti" class="btn">Prenota una seduta</a>
+      </div>
+    </div>
+  </section>
 
-            <!-- BARRA DI RICERCA -->
-            <div class="search-container">
-                <input type="text" id="search-input" class="search-input" placeholder="Cerca per nome o stile (es. Botanico, Dark, 12)...">
-                <span class="search-icon">🔍</span>
-            </div>
+  <div class="wrap"><div class="moon-row">
+    <span class="rule"></span>
+    <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="currentColor" opacity=".15"/><path d="M7 1a6 6 0 0 0 0 12A5 5 0 0 1 7 1z" fill="currentColor"/></svg>
+    <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="currentColor" opacity=".4"/></svg>
+    <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="none" stroke="currentColor"/></svg>
+    <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="currentColor" opacity=".4"/></svg>
+    <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="currentColor" opacity=".15"/><path d="M7 1a6 6 0 0 1 0 12A5 5 0 0 0 7 1z" fill="currentColor"/></svg>
+    <span class="rule r"></span>
+  </div></div>
 
-            <div class="view-switch">
-                <button class="switch-btn active" id="btn-showroom">Showroom 3D</button>
-                <button class="switch-btn" id="btn-grid">Griglia Tattile</button>
-            </div>
-        </header>
+  <!-- ============ IL LABORATORIO ============ -->
+  <section id="laboratorio">
+    <div class="wrap lab">
+      <div class="lab-orb">
+        <svg viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.3">
+          <path d="M24 8h12M30 8v14l-14 24a4 4 0 0 0 3.5 6h21a4 4 0 0 0 3.5-6L30 22"/>
+          <path d="M20 40h20"/>
+        </svg>
+      </div>
+      <div class="lab-text">
+        <span class="eyebrow display">Il laboratorio</span>
+        <p><strong>Vera Solenni</strong> fonda l'atelier dopo anni di studio tra astrologia, alchimia simbolica e incisione orafa. Ogni tatuaggio nasce come un piccolo rito: si osserva la fase in cui ci si trova, si sceglie il simbolo, lo si incastona nella pelle come si farebbe con una pietra in un anello.</p>
+        <p>Le linee sono sempre sottili, quasi disegnate con oro liquido: l'obiettivo non è riempire la pelle, ma lasciarla respirare intorno al segno.</p>
+        <div class="field-grid">
+          <div class="field"><div class="k display">Specializzazione</div><div class="v">Esoterico, celeste, geometria sacra</div></div>
+          <div class="field"><div class="k display">Tecnica</div><div class="v">Linea sottile, fine line dorata</div></div>
+          <div class="field"><div class="k display">Sedute / mese</div><div class="v">Numero limitato, su selezione</div></div>
+          <div class="field"><div class="k display">Materiali</div><div class="v">Aghi monouso, inchiostri certificati</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <!-- MODE 1: 3D SHOWROOM -->
-        <div class="showroom-container" id="showroom-view">
-            <div class="carousel-3d" id="carousel3d"></div>
-            <div class="carousel-nav">
-                <button class="nav-arrow" id="prev-btn">←</button>
-                <button class="nav-arrow" id="next-btn">→</button>
-            </div>
+  <!-- ============ GLI ELEMENTI ============ -->
+  <section id="elementi">
+    <div class="wrap">
+      <div class="sec-head"><span class="eyebrow display">Gli elementi</span><h2>Quattro discipline, un unico linguaggio</h2></div>
+      <p class="sec-sub">Ogni simbolo appartiene a una delle quattro famiglie del laboratorio.</p>
+      <div class="elementi-grid">
+        <div class="elemento">
+          <div class="ring"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="13" cy="13" r="9"/><path d="M13 4v18M4 13h18"/></svg></div>
+          <div class="sym display">SOL</div>
+          <h3>Celeste</h3>
+          <p>Soli, stelle e mappe astrali costruite su cerchi concentrici sottilissimi.</p>
+        </div>
+        <div class="elemento">
+          <div class="ring"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M13 4a9 9 0 0 0 0 18A7 7 0 0 1 13 4z"/></svg></div>
+          <div class="sym display">LUNA</div>
+          <h3>Lunare</h3>
+          <p>Cicli e fasi della luna, spesso disposti in sequenza lungo la clavicola o il polso.</p>
+        </div>
+        <div class="elemento">
+          <div class="ring"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M13 5c3 4 3 7 0 9-3-2-3-5 0-9Z"/><path d="M13 14v8"/></svg></div>
+          <div class="sym display">FLOS</div>
+          <h3>Botanico</h3>
+          <p>Rami, semi e germogli intrecciati a linee gold-line, mai completamente chiusi.</p>
+        </div>
+        <div class="elemento">
+          <div class="ring"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M13 4l8 6-3 10H8L5 10z"/></svg></div>
+          <div class="sym display">CRYS</div>
+          <h3>Cristallo</h3>
+          <p>Geometria sacra e forme sfaccettate, come pietre incastonate nella pelle.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ I SIGILLI (portfolio) ============ -->
+  <section id="sigilli">
+    <div class="wrap">
+      <div class="sec-head"><span class="eyebrow display">I sigilli</span><h2>L'archivio della luce</h2></div>
+      <p class="sec-sub">Tocca un sigillo: la luce lo attraversa e il dossier si apre.</p>
+      <div class="sigilli-grid" id="sigilliGrid">
+
+        <div class="sigillo">
+          <div class="sigillo-medallion">
+            <svg viewBox="0 0 200 200"><rect width="200" height="200" fill="#faf3e6"/>
+              <circle cx="100" cy="100" r="55" fill="none" stroke="#b8912f" stroke-width="1"/>
+              <path d="M100 45a55 55 0 0 0 0 110A42 42 0 0 1 100 45z" fill="#e3cd93" opacity=".5"/>
+            </svg>
+          </div>
+          <div class="sigillo-name display">Sigillo I</div>
+          <div class="sigillo-cat">Fase lunare, avambraccio</div>
+          <div class="sigillo-details">
+            <p>Sequenza di cinque fasi lunari, linea sottile continua, 2 sedute.</p>
+            <div class="meta"><span>ZONA · AVAMBRACCIO</span><span>TECNICA · FINE LINE</span></div>
+          </div>
         </div>
 
-        <!-- MODE 2: GRID -->
-        <div class="grid-container" id="grid-view"></div>
-
-        <footer>
-            &copy; Tattoo Studio Digital Assets • Confidential & Exclusive
-        </footer>
-    </div>
-
-    <!-- MODAL QUICK VIEW -->
-    <div class="modal-overlay" id="modal">
-        <div class="modal-content">
-            <button class="modal-close" id="modal-close">✕</button>
-            <span class="card-number" id="modal-num">01</span>
-            <h2 class="modal-title" id="modal-title">Template</h2>
-            <div class="modal-body">
-                <div class="card-visual" id="modal-visual"></div>
-                <div>
-                    <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;" id="modal-desc">
-                        Esperienza d'arte digitale sartoriale progettata per mostrare tatuaggi e progetti visivi ad alto impatto emotivo.
-                    </p>
-                    <div style="margin-bottom: 20px;">
-                        <span style="font-size: 0.7rem; color: var(--accent-gold); letter-spacing: 2px; text-transform: uppercase;">Stile Visivo</span>
-                        <p style="color: #fff; font-size: 0.85rem;" id="modal-style">Dark / Esoterico / Luxury</p>
-                    </div>
-                </div>
-            </div>
-            <a href="#" target="_blank" class="modal-btn" id="modal-link">Lancia Demo Live ↗️</a>
+        <div class="sigillo">
+          <div class="sigillo-medallion">
+            <svg viewBox="0 0 200 200"><rect width="200" height="200" fill="#f7eef2"/>
+              <circle cx="100" cy="100" r="55" fill="none" stroke="#b8912f" stroke-width="1"/>
+              <path d="M100 55 L100 145 M60 100 L140 100" stroke="#b8912f" stroke-width="1"/>
+              <circle cx="100" cy="100" r="20" fill="none" stroke="#b8912f" stroke-width="1"/>
+            </svg>
+          </div>
+          <div class="sigillo-name display">Sigillo II</div>
+          <div class="sigillo-cat">Mappa astrale, scapola</div>
+          <div class="sigillo-details">
+            <p>Costellazione personale costruita sulla data di nascita, 3 sedute.</p>
+            <div class="meta"><span>ZONA · SCAPOLA</span><span>TECNICA · PUNTINISMO</span></div>
+          </div>
         </div>
+
+        <div class="sigillo">
+          <div class="sigillo-medallion">
+            <svg viewBox="0 0 200 200"><rect width="200" height="200" fill="#f4f2f5"/>
+              <path d="M100 50c15 20 15 35 0 45-15-10-15-25 0-45Z" fill="none" stroke="#b8912f" stroke-width="1"/>
+              <path d="M100 95v55" stroke="#b8912f" stroke-width="1"/>
+              <path d="M100 120c-14 6-14 18 0 22" fill="none" stroke="#b8912f" stroke-width="1"/>
+            </svg>
+          </div>
+          <div class="sigillo-name display">Sigillo III</div>
+          <div class="sigillo-cat">Ramo botanico, caviglia</div>
+          <div class="sigillo-details">
+            <p>Germoglio stilizzato con radice a spirale, seduta singola.</p>
+            <div class="meta"><span>ZONA · CAVIGLIA</span><span>TECNICA · FINE LINE</span></div>
+          </div>
+        </div>
+
+        <div class="sigillo">
+          <div class="sigillo-medallion">
+            <svg viewBox="0 0 200 200"><rect width="200" height="200" fill="#faf3e6"/>
+              <path d="M100 55l35 25-13 45H78l-13-45z" fill="none" stroke="#b8912f" stroke-width="1"/>
+              <path d="M100 55v70M65 80l70 0" stroke="#b8912f" stroke-width=".8" opacity=".6"/>
+            </svg>
+          </div>
+          <div class="sigillo-name display">Sigillo IV</div>
+          <div class="sigillo-cat">Geometria cristallina, sterno</div>
+          <div class="sigillo-details">
+            <p>Prisma sfaccettato costruito su griglia esagonale, 2 sedute.</p>
+            <div class="meta"><span>ZONA · STERNO</span><span>TECNICA · LINEA GEOMETRICA</span></div>
+          </div>
+        </div>
+
+        <div class="sigillo">
+          <div class="sigillo-medallion">
+            <svg viewBox="0 0 200 200"><rect width="200" height="200" fill="#f7eef2"/>
+              <circle cx="100" cy="100" r="55" fill="none" stroke="#b8912f" stroke-width="1"/>
+              <circle cx="100" cy="100" r="30" fill="none" stroke="#b8912f" stroke-width="1"/>
+              <circle cx="100" cy="100" r="4" fill="#b8912f" stroke="none"/>
+            </svg>
+          </div>
+          <div class="sigillo-name display">Sigillo V</div>
+          <div class="sigillo-cat">Cerchio alchemico, nuca</div>
+          <div class="sigillo-details">
+            <p>Doppio cerchio concentrico con punto centrale, motivo minimale.</p>
+            <div class="meta"><span>ZONA · NUCA</span><span>TECNICA · FINE LINE</span></div>
+          </div>
+        </div>
+
+        <div class="sigillo">
+          <div class="sigillo-medallion">
+            <svg viewBox="0 0 200 200"><rect width="200" height="200" fill="#f4f2f5"/>
+              <path d="M60 120 Q100 60 140 120" fill="none" stroke="#b8912f" stroke-width="1"/>
+              <circle cx="100" cy="120" r="6" fill="none" stroke="#b8912f" stroke-width="1"/>
+              <path d="M60 120h80" stroke="#b8912f" stroke-width=".8" opacity=".6"/>
+            </svg>
+          </div>
+          <div class="sigillo-name display">Sigillo VI</div>
+          <div class="sigillo-cat">Fase solare, polso</div>
+          <div class="sigillo-details">
+            <p>Arco solare minimale con punto centrale, tatuaggio a seduta singola.</p>
+            <div class="meta"><span>ZONA · POLSO</span><span>TECNICA · FINE LINE</span></div>
+          </div>
+        </div>
+
+      </div>
     </div>
+  </section>
 
-    <script>
-        // DATI DEI 24 MODELLI RE-INDICIZZATI DA 01 A 24 IN SEQUENZA PERFETTA
-        const templates = [
-            { id: '01', title: 'Alchemical', file: 'alchemical.html', style: 'Esoterico & Simbolico', icon: '<path d="M12 2L2 22h20L12 2zm0 4l6.5 13h-13L12 6z" fill="#d4af37"/>' },
-            { id: '02', title: 'Bottega Inchiostro', file: 'bottega-inchiostro.html', style: 'Artigianale Classico', icon: '<path d="M12 2L4 10v12h16V10L12 2z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '03', title: 'Camera Oscura', file: 'camera-oscura.html', style: 'Fotografico High-Contrast', icon: '<circle cx="12" cy="12" r="5" fill="#d4af37"/>' },
-            { id: '04', title: 'Cartella Clinica', file: 'cartellaclinica.html', style: 'Avant-Garde Anatomico', icon: '<path d="M12 4v16M4 12h16" stroke="#d4af37" stroke-width="2"/>' },
-            { id: '05', title: 'Casa Degli Arcani', file: 'casa-degli-arcani.html', style: 'Tarot & Mistico', icon: '<polygon points="12,2 22,12 12,22 2,12" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '06', title: 'Dopo La Pioggia', file: 'dopo-la-pioggia.html', style: 'Etereo & Fluido', icon: '<path d="M12 2.5C12 2.5 5 9.5 5 14.5C5 18.37 8.13 21.5 12 21.5C15.87 21.5 19 18.37 19 14.5C19 9.5 12 2.5 12 2.5Z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '07', title: 'Erbario Tattoo', file: 'erbario-tattoo-template.html', style: 'Botanico / Micro-Realismo', icon: '<path d="M12 22V2M12 8c4-4 8-2 8 2s-4 6-8 6M12 14c-4-4-8-2-8 2s4 6 8 6" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '08', title: 'Holographic', file: 'holographic.html', style: 'Futuristico / Cyber', icon: '<polygon points="12,2 19,7 19,17 12,22 5,17 5,7" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '09', title: 'Luce Bianca', file: 'luce-bianca.html', style: 'Luminoso Minimal', icon: '<circle cx="12" cy="12" r="8" stroke="#ffffff" stroke-width="2" fill="none"/>' },
-            { id: '10', title: 'Manoscritto', file: 'manoscritto.html', style: 'Calligrafico Script', icon: '<path d="M4 20h16M4 14h12M4 8h16" stroke="#d4af37" stroke-width="2"/>' },
-            { id: '11', title: 'Mappa Astrale', file: 'mappa-astrale.html', style: 'Geometrico & Costellazioni', icon: '<circle cx="12" cy="12" r="9" stroke="#d4af37" stroke-width="1"/><circle cx="12" cy="12" r="3" fill="#d4af37"/>' },
-            { id: '12', title: 'Marchetti', file: 'marchetti.html', style: 'Heritage Traditional', icon: '<path d="M12 2l10 10-10 10L2 12z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '13', title: 'Marea', file: 'marea.html', style: 'Onde / Inchiostro Giapponese', icon: '<path d="M2 12c3-3 6-3 9 0s6 3 9 0" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '14', title: 'Mirabilia Tattoo', file: 'mirabilia-tattoo-template.html', style: 'Wunderkammer / Antiquariato', icon: '<polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9 12 2" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '15', title: 'Miraggio', file: 'miraggio.html', style: 'Astratto / Atmosferico', icon: '<circle cx="12" cy="12" r="7" stroke="#d4af37" stroke-dasharray="2 2" stroke-width="2" fill="none"/>' },
-            { id: '16', title: 'Ordito', file: 'ordito.html', style: 'Tessitura Geometrica', icon: '<path d="M4 4l16 16M4 20L20 4" stroke="#d4af37" stroke-width="2"/>' },
-            { id: '17', title: 'Ossidiana Tattoo', file: 'ossidiana-tattoo-template.html', style: 'Blackwork Pesante', icon: '<polygon points="12 2 20 22 4 22" fill="#d4af37"/>' },
-            { id: '18', title: 'Parco Sculture', file: 'parco-sculture.html', style: '3D Neoclassico', icon: '<rect x="7" y="7" width="10" height="10" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '19', title: 'Pelle Viva Tattoo', file: 'pelle-viva-tattoo-template.html', style: 'Organico / Tessuto', icon: '<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" fill="#d4af37"/>' },
-            { id: '20', title: 'Rosa e Inchiostro', file: 'rosa-e-inchiostro.html', style: 'Botanico & Inchiostro Rosa', icon: '<path d="M12 3a6 6 0 0 1 6 6c0 5-6 11-6 11S6 14 6 9a6 6 0 0 1 6-6z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '21', title: 'Serra Botanica', file: 'serra-botanica.html', style: 'Natura Fine Line', icon: '<path d="M12 22s8-4 8-10A8 8 0 0 0 4 12c0 6 8 10 8 10z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '22', title: 'Suminagashi', file: 'suminagashi.html', style: 'Inchiostro ad Acqua', icon: '<circle cx="12" cy="12" r="9" stroke="#d4af37" stroke-width="1"/><circle cx="12" cy="12" r="5" stroke="#d4af37" stroke-width="1"/>' },
-            { id: '23', title: 'Tavola', file: 'tavola.html', style: 'Editoriale / Layout Minimale', icon: '<rect x="3" y="3" width="18" height="18" rx="2" stroke="#d4af37" stroke-width="2" fill="none"/><line x1="3" y1="9" x2="21" y2="9" stroke="#d4af37" stroke-width="1.5"/>' },
-            { id: '24', title: 'Yugen', file: 'yugen.html', style: 'Zen Minimal / Misterioso', icon: '<line x1="4" y1="12" x2="20" y2="12" stroke="#d4af37" stroke-width="2"/>' }
-        ];
+  <!-- ============ IL RITO ============ -->
+  <section id="rito">
+    <div class="wrap">
+      <div class="sec-head"><span class="eyebrow display">Il rito</span><h2>Quattro fasi, come la luna</h2></div>
+      <div class="rito-grid">
+        <div class="rito-card"><span class="rn display">FASE I</span><h4>Ascolto</h4><p>Si osserva l'intenzione dietro il simbolo e si sceglie l'elemento più affine.</p></div>
+        <div class="rito-card"><span class="rn display">FASE II</span><h4>Trasmutazione</h4><p>L'idea diventa disegno: cerchi, proporzioni e linee sottilissime in oro.</p></div>
+        <div class="rito-card"><span class="rn display">FASE III</span><h4>Incisione</h4><p>Il sigillo viene inciso con ago sottile, spesso in una seduta unica.</p></div>
+        <div class="rito-card"><span class="rn display">FASE IV</span><h4>Custodia</h4><p>Indicazioni per la cura e il consolidamento del segno nel tempo.</p></div>
+      </div>
+    </div>
+  </section>
 
-        // SISTEMA AUDIO (WEB AUDIO API DELICATO & SOFT)
-        let audioCtx = null;
-        let isAudioPlaying = false;
-        let ambientOsc1 = null, ambientOsc2 = null, ambientGain = null;
+  <!-- ============ VOCI ============ -->
+  <section id="voci">
+    <div class="wrap">
+      <div class="sec-head"><span class="eyebrow display">Voci</span><h2>Parole lasciate dopo il rito</h2></div>
+      <div class="voci-grid">
+        <div class="voce"><span class="mark display">§</span><p class="q">Un'esperienza che sembrava più una seduta di meditazione che un tatuaggio qualunque.</p><div class="who">Sigillo II — E. Vitale</div></div>
+        <div class="voce"><span class="mark display">§</span><p class="q">La cura nel disegno delle linee dorate si vede da vicino: nulla è mai troppo pieno.</p><div class="who">Sigillo IV — S. Bruni</div></div>
+        <div class="voce"><span class="mark display">§</span><p class="q">Ho scelto la fase lunare giusta per me, non un disegno da catalogo. Si sente la differenza.</p><div class="who">Sigillo I — L. Conforti</div></div>
+      </div>
+    </div>
+  </section>
 
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-        }
+  <!-- ============ CONTATTI ============ -->
+  <section id="contatti">
+    <div class="wrap">
+      <div class="sec-head"><span class="eyebrow display">Contatti</span><h2>Prenota una seduta</h2></div>
+      <p class="sec-sub">Racconta l'intenzione dietro il simbolo che vuoi incastonare.</p>
+      <div class="contact-grid">
+        <form id="ritoForm">
+          <div class="form-two">
+            <div class="form-row"><label for="nome">Nome e cognome</label><input id="nome" type="text" required placeholder="Il tuo nome"></div>
+            <div class="form-row"><label for="email">Email</label><input id="email" type="email" required placeholder="tuo@indirizzo.it"></div>
+          </div>
+          <div class="form-two">
+            <div class="form-row">
+              <label for="elemento">Elemento desiderato</label>
+              <select id="elemento"><option>Celeste</option><option>Lunare</option><option>Botanico</option><option>Cristallo</option></select>
+            </div>
+            <div class="form-row"><label for="zona">Zona del corpo</label><input id="zona" type="text" placeholder="Es. polso, nuca…"></div>
+          </div>
+          <div class="form-row"><label for="msg">Racconta l'intenzione</label><textarea id="msg" rows="4" placeholder="Cosa rappresenta per te il simbolo…"></textarea></div>
+          <button type="submit" class="btn primary">Invia richiesta</button>
+          <p class="form-note">Risposta entro pochi giorni con una prima proposta di sigillo.</p>
+          <p class="form-status" id="formStatus">La luce ha ricevuto la tua richiesta.</p>
+        </form>
 
-        function playSoundClick() {
-            if (!audioCtx) return;
-            try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                
-                osc.frequency.setValueAtTime(220, audioCtx.currentTime); 
-                osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.08);
-                
-                gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.04, audioCtx.currentTime + 0.01);
-                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.08);
-                
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.08);
-            } catch (e) {}
-        }
+        <div class="info-block">
+          <div class="k display">Atelier</div>
+          <div class="v">Via dei Cristalli 9, primo piano</div>
+          <div class="v muted">Su appuntamento</div>
+          <div class="k display">Orario</div>
+          <div class="v">Mar–Sab, 11:00–19:00</div>
+          <div class="k display">Corrispondenza</div>
+          <div class="v">rito@aurumatelier.it</div>
+          <div class="socials"><a href="#">Instagram</a><a href="#">Pinterest</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        function playSoundFav() {
-            if (!audioCtx) return;
-            try {
-                const osc1 = audioCtx.createOscillator();
-                const osc2 = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                
-                osc1.type = 'sine';
-                osc2.type = 'sine';
-                
-                osc1.frequency.setValueAtTime(523.25, audioCtx.currentTime);
-                osc2.frequency.setValueAtTime(783.99, audioCtx.currentTime);
-                
-                gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.02);
-                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.25);
-                
-                osc1.connect(gain);
-                osc2.connect(gain);
-                gain.connect(audioCtx.destination);
-                
-                osc1.start();
-                osc2.start();
-                osc1.stop(audioCtx.currentTime + 0.25);
-                osc2.stop(audioCtx.currentTime + 0.25);
-            } catch (e) {}
-        }
+</main>
 
-        function toggleAmbientMusic() {
-            initAudio();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+<footer>
+  <p>© 2026 Aurum Atelier — ogni sigillo è unico, come la fase in cui è stato inciso.</p>
+</footer>
 
-            if (isAudioPlaying) {
-                if (ambientGain) {
-                    ambientGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.5);
-                    setTimeout(() => {
-                        if (ambientOsc1) ambientOsc1.stop();
-                        if (ambientOsc2) ambientOsc2.stop();
-                    }, 1500);
-                }
-                isAudioPlaying = false;
-                document.getElementById('audio-status-text').innerText = "MUSIC OFF";
-                document.getElementById('audio-toggle-btn').classList.remove('audio-on');
-            } else {
-                ambientOsc1 = audioCtx.createOscillator();
-                ambientOsc2 = audioCtx.createOscillator();
-                ambientGain = audioCtx.createGain();
+<script>
+  // ---- mobile nav ----
+  const style = document.createElement('style');
+  style.textContent = `
+    @media (max-width:960px){
+      nav ul.open{
+        display:flex; flex-direction:column; position:fixed; top:64px; left:0; right:0;
+        background:#f4f2f5; border-bottom:1px solid #e6e0e6; padding:8px 0;
+      }
+      nav ul.open li a{ display:block; padding:14px 32px; border-top:1px solid #ece7ec; }
+    }`;
+  document.head.appendChild(style);
 
-                ambientOsc1.type = 'sine';
-                ambientOsc2.type = 'sine';
+  // ---- sigillo click: reflect light + expand ----
+  document.querySelectorAll('.sigillo').forEach(sig => {
+    sig.addEventListener('click', () => {
+      const wasExpanded = sig.classList.contains('expanded');
+      document.querySelectorAll('.sigillo.expanded').forEach(s => s.classList.remove('expanded'));
+      if(!wasExpanded){
+        sig.classList.add('expanded', 'flash');
+        sig.addEventListener('animationend', () => sig.classList.remove('flash'), { once:true });
+        sig.scrollIntoView({ behavior:'smooth', block:'nearest' });
+      }
+    });
+  });
 
-                ambientOsc1.frequency.setValueAtTime(65.41, audioCtx.currentTime);
-                ambientOsc2.frequency.setValueAtTime(130.81, audioCtx.currentTime);
+  // ---- fake form submit ----
+  document.getElementById('ritoForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    document.getElementById('formStatus').style.display = 'block';
+    this.reset();
+  });
+</script>
 
-                ambientGain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-                ambientGain.gain.exponentialRampToValueAtTime(0.018, audioCtx.currentTime + 3);
-
-                ambientOsc1.connect(ambientGain);
-                ambientOsc2.connect(ambientGain);
-                ambientGain.connect(audioCtx.destination);
-
-                ambientOsc1.start();
-                ambientOsc2.start();
-
-                isAudioPlaying = true;
-                document.getElementById('audio-status-text').innerText = "MUSIC ON";
-                document.getElementById('audio-toggle-btn').classList.add('audio-on');
-            }
-        }
-
-        document.getElementById('audio-toggle-btn').addEventListener('click', () => {
-            playSoundClick();
-            toggleAmbientMusic();
-        });
-
-        // PREFERITI GESTIONE LOCALSTORAGE
-        let favorites = JSON.parse(localStorage.getItem('tattoo_favorites')) || [];
-        let showOnlyFavs = false;
-        let searchQuery = '';
-
-        function saveFavorites() {
-            localStorage.setItem('tattoo_favorites', JSON.stringify(favorites));
-            document.getElementById('fav-count').innerText = favorites.length;
-        }
-
-        function toggleFavorite(id, e) {
-            if (e) e.stopPropagation();
-            playSoundFav();
-            if (favorites.includes(id)) {
-                favorites = favorites.filter(favId => favId !== id);
-            } else {
-                favorites.push(id);
-            }
-            saveFavorites();
-            renderTemplates();
-        }
-
-        // RICERCA & FILTRI RENDER
-        const carouselEl = document.getElementById('carousel3d');
-        const gridEl = document.getElementById('grid-view');
-        const searchInput = document.getElementById('search-input');
-        let currIndex = 0;
-
-        searchInput.addEventListener('input', (e) => {
-            searchQuery = e.target.value.toLowerCase().trim();
-            currIndex = 0;
-            renderTemplates();
-        });
-
-        function renderTemplates() {
-            carouselEl.innerHTML = '';
-            gridEl.innerHTML = '';
-
-            let listToRender = templates;
-
-            if (showOnlyFavs) {
-                listToRender = listToRender.filter(t => favorites.includes(t.id));
-            }
-
-            if (searchQuery !== '') {
-                listToRender = listToRender.filter(t => 
-                    t.title.toLowerCase().includes(searchQuery) || 
-                    t.style.toLowerCase().includes(searchQuery) ||
-                    t.id.includes(searchQuery)
-                );
-            }
-
-            if (listToRender.length === 0) {
-                const msg = showOnlyFavs && searchQuery === '' 
-                    ? 'Nessun template salvato nei preferiti. Clicca sul cuore ♥️ per aggiungerne uno!'
-                    : 'Nessun template trovato per la ricerca effettuata.';
-                gridEl.innerHTML = `<div class="no-favs-msg">${msg}</div>`;
-                carouselEl.innerHTML = `<div class="no-favs-msg">${msg}</div>`;
-                return;
-            }
-
-            listToRender.forEach((t, i) => {
-                const isFav = favorites.includes(t.id);
-
-                // Item Carousel 3D
-                const cItem = document.createElement('div');
-                cItem.className = 'carousel-item';
-                cItem.innerHTML = `
-                    <div class="card-header-flex">
-                        <span class="card-title">${t.title}</span>
-                        <div class="header-actions">
-                            <span class="card-number">${t.id}</span>
-                            <button class="fav-btn ${isFav ? 'active' : ''}" title="Salva nei Preferiti">♥️</button>
-                        </div>
-                    </div>
-                    <div class="card-visual">
-                        <svg viewBox="0 0 24 24">${t.icon}</svg>
-                    </div>
-                    <div class="card-info">
-                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px;">${t.style}</p>
-                        <div class="card-footer-flex">
-                            <span class="demo-link">Dettagli & Demo ↗️</span>
-                        </div>
-                    </div>
-                `;
-                cItem.querySelector('.fav-btn').addEventListener('click', (e) => toggleFavorite(t.id, e));
-                cItem.addEventListener('click', () => {
-                    playSoundClick();
-                    openModal(t);
-                });
-                carouselEl.appendChild(cItem);
-
-                // Item Grid
-                const gCard = document.createElement('div');
-                gCard.className = 'grid-card';
-                gCard.innerHTML = `
-                    <div class="card-header-flex">
-                        <span class="card-title">${t.title}</span>
-                        <div class="header-actions">
-                            <span class="card-number">${t.id}</span>
-                            <button class="fav-btn ${isFav ? 'active' : ''}" title="Salva nei Preferiti">♥️</button>
-                        </div>
-                    </div>
-                    <div class="card-visual">
-                        <svg viewBox="0 0 24 24">${t.icon}</svg>
-                    </div>
-                    <div class="card-info">
-                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px;">${t.style}</p>
-                        <div class="card-footer-flex">
-                            <span class="demo-link">Esplora Demo</span>
-                            <span style="color: var(--accent-gold);">→</span>
-                        </div>
-                    </div>
-                `;
-                gCard.querySelector('.fav-btn').addEventListener('click', (e) => toggleFavorite(t.id, e));
-                gCard.addEventListener('click', () => {
-                    playSoundClick();
-                    openModal(t);
-                });
-                gridEl.appendChild(gCard);
-            });
-
-            if (currIndex >= listToRender.length) currIndex = 0;
-            updateCarousel();
-        }
-
-        function updateCarousel() {
-            const items = document.querySelectorAll('.carousel-item');
-            if (!items.length) return;
-
-            items.forEach((item, index) => {
-                const offset = index - currIndex;
-                const transZ = Math.abs(offset) * -80;
-                const transX = offset * 220;
-                const rotY = offset * -15;
-
-                if (Math.abs(offset) > 3) {
-                    item.style.opacity = '0';
-                    item.style.pointerEvents = 'none';
-                } else {
-                    item.style.opacity = '1';
-                    item.style.pointerEvents = 'all';
-                }
-
-                item.style.transform = `translateX(${transX}px) translateZ(${transZ}px) rotateY(${rotY}deg)`;
-                item.style.zIndex = 100 - Math.abs(offset);
-            });
-        }
-
-        document.getElementById('next-btn').addEventListener('click', () => {
-            playSoundClick();
-            const items = document.querySelectorAll('.carousel-item');
-            if (currIndex < items.length - 1) currIndex++;
-            else currIndex = 0;
-            updateCarousel();
-        });
-
-        document.getElementById('prev-btn').addEventListener('click', () => {
-            playSoundClick();
-            const items = document.querySelectorAll('.carousel-item');
-            if (currIndex > 0) currIndex--;
-            else currIndex = items.length - 1;
-            updateCarousel();
-        });
-
-        // FILTRO PREFERITI TOGGLE
-        const favFilterBtn = document.getElementById('fav-filter-btn');
-        favFilterBtn.addEventListener('click', () => {
-            playSoundClick();
-            showOnlyFavs = !showOnlyFavs;
-            favFilterBtn.classList.toggle('active-fav', showOnlyFavs);
-            currIndex = 0;
-            renderTemplates();
-        });
-
-        // SWITCH VIEW MODES
-        const btnShowroom = document.getElementById('btn-showroom');
-        const btnGrid = document.getElementById('btn-grid');
-        const showroomView = document.getElementById('showroom-view');
-        const gridView = document.getElementById('grid-view');
-
-        btnShowroom.addEventListener('click', () => {
-            playSoundClick();
-            btnShowroom.classList.add('active');
-            btnGrid.classList.remove('active');
-            showroomView.style.display = 'flex';
-            gridView.classList.remove('active');
-        });
-
-        btnGrid.addEventListener('click', () => {
-            playSoundClick();
-            btnGrid.classList.add('active');
-            btnShowroom.classList.remove('active');
-            showroomView.style.display = 'none';
-            gridView.classList.add('active');
-        });
-
-        // MODAL
-        const modal = document.getElementById('modal');
-        function openModal(t) {
-            document.getElementById('modal-num').innerText = t.id;
-            document.getElementById('modal-title').innerText = t.title;
-            document.getElementById('modal-style').innerText = t.style;
-            document.getElementById('modal-visual').innerHTML = `<svg viewBox="0 0 24 24">${t.icon}</svg>`;
-            document.getElementById('modal-link').href = t.file;
-            modal.classList.add('open');
-        }
-
-        document.getElementById('modal-close').addEventListener('click', () => {
-            playSoundClick();
-            modal.classList.remove('open');
-        });
-
-        // CANVAS BACKGROUND PARTICLES
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 0.5;
-                this.speedX = Math.random() * 0.5 - 0.25;
-                this.speedY = Math.random() * 0.5 - 0.25;
-                this.alpha = Math.random() * 0.5 + 0.2;
-            }
-
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-
-                if (this.x > canvas.width) this.x = 0;
-                if (this.x < 0) this.x = canvas.width;
-                if (this.y > canvas.height) this.y = 0;
-                if (this.y < 0) this.y = canvas.height;
-            }
-
-            draw() {
-                ctx.fillStyle = `rgba(212, 175, 55, ${this.alpha})`;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        for (let i = 0; i < 70; i++) particles.push(new Particle());
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-            requestAnimationFrame(animateParticles);
-        }
-
-        animateParticles();
-
-        // CURSORE MAGNETIC
-        const cursor = document.getElementById('custom-cursor');
-        const cursorDot = document.getElementById('custom-cursor-dot');
-
-        window.addEventListener('mousemove', (e) => {
-            cursor.style.left = `${e.clientX}px`;
-            cursor.style.top = `${e.clientY}px`;
-            cursorDot.style.left = `${e.clientX}px`;
-            cursorDot.style.top = `${e.clientY}px`;
-        });
-
-        // PRIMO CLICK UTENTE
-        window.addEventListener('click', () => {
-            initAudio();
-        }, { once: true });
-
-        // INIT
-        saveFavorites();
-        renderTemplates();
-    </script>
 </body>
 </html>
