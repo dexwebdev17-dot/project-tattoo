@@ -225,11 +225,38 @@
 </head>
 <body>
 
+<!-- ======================================================== -->
+<!-- PANNELLO DI PERSONALIZZAZIONE TEMPLATE IN-BROWSER       -->
+<!-- ======================================================== -->
+<div id="editor-panel" style="position: fixed; right: 20px; top: 80px; background: rgba(44, 37, 48, 0.95); border: 1px solid var(--gold); padding: 20px; border-radius: 8px; z-index: 10000; width: 280px; color: #fff; font-family: 'Cinzel', serif; box-shadow: 0 10px 30px rgba(0,0,0,0.4); backdrop-filter: blur(10px);">
+    <h3 style="margin-bottom: 15px; color: var(--gold); font-size: 0.9rem; letter-spacing: .08em; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">PERSONALIZZA BOZZA</h3>
+    
+    <!-- Modifica Nome Studio -->
+    <label style="font-size: 0.7rem; display: block; margin-bottom: 4px; color: var(--gold-soft);">Nome Studio:</label>
+    <input type="text" id="edit-brand-name" placeholder="AURUM ATELIER" value="AURUM ATELIER" style="width: 100%; padding: 8px; margin-bottom: 12px; background: rgba(0,0,0,0.3); border: 1px solid #555; color: #fff; border-radius: 4px; font-family: inherit; font-size: 0.8rem;">
+
+    <!-- Modifica Subtitle / Slogan -->
+    <label style="font-size: 0.7rem; display: block; margin-bottom: 4px; color: var(--gold-soft);">Slogan / Descrizione:</label>
+    <input type="text" id="edit-brand-sub" placeholder="Tatuaggi esoterici di luce" value="Tatuaggi esoterici di luce" style="width: 100%; padding: 8px; margin-bottom: 12px; background: rgba(0,0,0,0.3); border: 1px solid #555; color: #fff; border-radius: 4px; font-family: inherit; font-size: 0.8rem;">
+
+    <!-- Cambio Colore Principale -->
+    <label style="font-size: 0.7rem; display: block; margin-bottom: 4px; color: var(--gold-soft);">Colore Dettagli (Gold):</label>
+    <input type="color" id="edit-color" value="#b8912f" style="width: 100%; height: 32px; margin-bottom: 12px; cursor: pointer; background: transparent; border: 1px solid #555; border-radius: 4px; padding: 2px;">
+
+    <!-- Caricamento Logo/Foto -->
+    <label style="font-size: 0.7rem; display: block; margin-bottom: 4px; color: var(--gold-soft);">Carica tuo Logo / Simbolo:</label>
+    <input type="file" id="edit-logo" accept="image/*" style="font-size: 0.7rem; margin-bottom: 15px; width: 100%; color: #ccc;">
+
+    <button id="btn-save-custom" style="width: 100%; padding: 10px; background: var(--gold); color: #2c2530; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: .05em; transition: background .2s;">CONFERMA BOZZA</button>
+</div>
+
 <header>
   <div class="nav">
     <div class="brand">
-      <svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1"><circle cx="13" cy="13" r="10"/><circle cx="13" cy="13" r="4"/></svg>
-      <div class="name"><b>AURUM ATELIER</b><span>Tatuaggi esoterici di luce</span></div>
+      <div id="brand-logo-container">
+        <svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1"><circle cx="13" cy="13" r="10"/><circle cx="13" cy="13" r="4"/></svg>
+      </div>
+      <div class="name"><b id="display-brand-name">AURUM ATELIER</b><span id="display-brand-sub">Tatuaggi esoterici di luce</span></div>
     </div>
     <nav>
       <ul>
@@ -251,15 +278,15 @@
   <section class="hero">
     <div class="wrap">
       <div class="sigil-orb">
-        <svg viewBox="0 0 180 180" fill="none" stroke="#b8912f" stroke-width="1">
+        <svg viewBox="0 0 180 180" fill="none" stroke="var(--gold)" stroke-width="1">
           <circle cx="90" cy="90" r="86" opacity=".5"/>
           <circle cx="90" cy="90" r="68" opacity=".7"/>
-          <circle cx="90" cy="90" r="6" fill="#b8912f" stroke="none"/>
+          <circle cx="90" cy="90" r="6" fill="var(--gold)" stroke="none"/>
           <g opacity=".8">
-            <circle cx="90" cy="8" r="3" fill="#b8912f" stroke="none"/>
-            <circle cx="90" cy="172" r="3" fill="#b8912f" stroke="none"/>
-            <circle cx="8" cy="90" r="3" fill="#b8912f" stroke="none"/>
-            <circle cx="172" cy="90" r="3" fill="#b8912f" stroke="none"/>
+            <circle cx="90" cy="8" r="3" fill="var(--gold)" stroke="none"/>
+            <circle cx="90" cy="172" r="3" fill="var(--gold)" stroke="none"/>
+            <circle cx="8" cy="90" r="3" fill="var(--gold)" stroke="none"/>
+            <circle cx="172" cy="90" r="3" fill="var(--gold)" stroke="none"/>
           </g>
           <path d="M90 22 A68 68 0 0 1 158 90" opacity=".9"/>
         </svg>
@@ -350,8 +377,8 @@
         <div class="sigillo">
           <div class="sigillo-medallion">
             <svg viewBox="0 0 200 200"><rect width="200" height="200" fill="#faf3e6"/>
-              <circle cx="100" cy="100" r="55" fill="none" stroke="#b8912f" stroke-width="1"/>
-              <path d="M100 45a55 55 0 0 0 0 110A42 42 0 0 1 100 45z" fill="#e3cd93" opacity=".5"/>
+              <circle cx="100" cy="100" r="55" fill="none" stroke="var(--gold)" stroke-width="1"/>
+              <path d="M100 45a55 55 0 0 0 0 110A42 42 0 0 1 100 45z" fill="var(--gold-soft)" opacity=".5"/>
             </svg>
           </div>
           <div class="sigillo-name display">Sigillo I</div>
@@ -365,9 +392,9 @@
         <div class="sigillo">
           <div class="sigillo-medallion">
             <svg viewBox="0 0 200 200"><rect width="200" height="200" fill="#f7eef2"/>
-              <circle cx="100" cy="100" r="55" fill="none" stroke="#b8912f" stroke-width="1"/>
-              <path d="M100 55 L100 145 M60 100 L140 100" stroke="#b8912f" stroke-width="1"/>
-              <circle cx="100" cy="100" r="20" fill="none" stroke="#b8912f" stroke-width="1"/>
+              <circle cx="100" cy="100" r="55" fill="none" stroke="var(--gold)" stroke-width="1"/>
+              <path d="M100 55 L100 145 M60 100 L140 100" stroke="var(--gold)" stroke-width="1"/>
+              <circle cx="100" cy="100" r="20" fill="none" stroke="var(--gold)" stroke-width="1"/>
             </svg>
           </div>
           <div class="sigillo-name display">Sigillo II</div>
@@ -381,9 +408,9 @@
         <div class="sigillo">
           <div class="sigillo-medallion">
             <svg viewBox="0 0 200 200"><rect width="200" height="200" fill="#f4f2f5"/>
-              <path d="M100 50c15 20 15 35 0 45-15-10-15-25 0-45Z" fill="none" stroke="#b8912f" stroke-width="1"/>
-              <path d="M100 95v55" stroke="#b8912f" stroke-width="1"/>
-              <path d="M100 120c-14 6-14 18 0 22" fill="none" stroke="#b8912f" stroke-width="1"/>
+              <path d="M100 50c15 20 15 35 0 45-15-10-15-25 0-45Z" fill="none" stroke="var(--gold)" stroke-width="1"/>
+              <path d="M100 95v55" stroke="var(--gold)" stroke-width="1"/>
+              <path d="M100 120c-14 6-14 18 0 22" fill="none" stroke="var(--gold)" stroke-width="1"/>
             </svg>
           </div>
           <div class="sigillo-name display">Sigillo III</div>
@@ -397,8 +424,8 @@
         <div class="sigillo">
           <div class="sigillo-medallion">
             <svg viewBox="0 0 200 200"><rect width="200" height="200" fill="#faf3e6"/>
-              <path d="M100 55l35 25-13 45H78l-13-45z" fill="none" stroke="#b8912f" stroke-width="1"/>
-              <path d="M100 55v70M65 80l70 0" stroke="#b8912f" stroke-width=".8" opacity=".6"/>
+              <path d="M100 55l35 25-13 45H78l-13-45z" fill="none" stroke="var(--gold)" stroke-width="1"/>
+              <path d="M100 55v70M65 80l70 0" stroke="var(--gold)" stroke-width=".8" opacity=".6"/>
             </svg>
           </div>
           <div class="sigillo-name display">Sigillo IV</div>
@@ -412,9 +439,9 @@
         <div class="sigillo">
           <div class="sigillo-medallion">
             <svg viewBox="0 0 200 200"><rect width="200" height="200" fill="#f7eef2"/>
-              <circle cx="100" cy="100" r="55" fill="none" stroke="#b8912f" stroke-width="1"/>
-              <circle cx="100" cy="100" r="30" fill="none" stroke="#b8912f" stroke-width="1"/>
-              <circle cx="100" cy="100" r="4" fill="#b8912f" stroke="none"/>
+              <circle cx="100" cy="100" r="55" fill="none" stroke="var(--gold)" stroke-width="1"/>
+              <circle cx="100" cy="100" r="30" fill="none" stroke="var(--gold)" stroke-width="1"/>
+              <circle cx="100" cy="100" r="4" fill="var(--gold)" stroke="none"/>
             </svg>
           </div>
           <div class="sigillo-name display">Sigillo V</div>
@@ -428,9 +455,9 @@
         <div class="sigillo">
           <div class="sigillo-medallion">
             <svg viewBox="0 0 200 200"><rect width="200" height="200" fill="#f4f2f5"/>
-              <path d="M60 120 Q100 60 140 120" fill="none" stroke="#b8912f" stroke-width="1"/>
-              <circle cx="100" cy="120" r="6" fill="none" stroke="#b8912f" stroke-width="1"/>
-              <path d="M60 120h80" stroke="#b8912f" stroke-width=".8" opacity=".6"/>
+              <path d="M60 120 Q100 60 140 120" fill="none" stroke="var(--gold)" stroke-width="1"/>
+              <circle cx="100" cy="120" r="6" fill="none" stroke="var(--gold)" stroke-width="1"/>
+              <path d="M60 120h80" stroke="var(--gold)" stroke-width=".8" opacity=".6"/>
             </svg>
           </div>
           <div class="sigillo-name display">Sigillo VI</div>
@@ -511,7 +538,7 @@
 </main>
 
 <footer>
-  <p>© 2026 Aurum Atelier — ogni sigillo è unico, come la fase in cui è stato inciso.</p>
+  <p>©️ 2026 Aurum Atelier — ogni sigillo è unico, come la fase in cui è stato inciso.</p>
 </footer>
 
 <script>
@@ -545,6 +572,45 @@
     e.preventDefault();
     document.getElementById('formStatus').style.display = 'block';
     this.reset();
+  });
+
+  // ========================================================
+  // LOGICA DEL PANNELLO DI PERSONALIZZIONE
+  // ========================================================
+
+  // 1. Modifica dinamica Nome Studio
+  document.getElementById('edit-brand-name').addEventListener('input', (e) => {
+    const name = e.target.value || "AURUM ATELIER";
+    document.getElementById('display-brand-name').innerText = name;
+  });
+
+  // 2. Modifica dinamica Slogan / Subtitle
+  document.getElementById('edit-brand-sub').addEventListener('input', (e) => {
+    const sub = e.target.value || "Tatuaggi esoterici di luce";
+    document.getElementById('display-brand-sub').innerText = sub;
+  });
+
+  // 3. Cambio del colore d'accento Gold in tempo reale
+  document.getElementById('edit-color').addEventListener('input', (e) => {
+    document.documentElement.style.setProperty('--gold', e.target.value);
+  });
+
+  // 4. Caricamento dinamico del Logo dello studio
+  document.getElementById('edit-logo').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const container = document.getElementById('brand-logo-container');
+        container.innerHTML = `<img src="${evt.target.result}" style="width:26px; height:26px; object-fit:contain; border-radius:50%;" alt="Logo Custom">`;
+      }
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // 5. Pulsante di Conferma
+  document.getElementById('btn-save-custom').addEventListener('click', () => {
+    alert('Bozza personalizzata salvata! Le impostazioni della pagina sono state aggiornate.');
   });
 </script>
 
