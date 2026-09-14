@@ -3,49 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATELIER • Tattoo Experience Showcase</title>
-    <!-- Fonts -->
+    <title>ATELIER TATTOO • 3D Interactive Showroom</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Syne:wght@500;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <!-- FontAwesome icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-dark: #060609;
+            --bg-dark: #030305;
             --accent-gold: #d4af37;
-            --accent-gold-light: #f3e5ab;
-            --accent-glow: rgba(212, 175, 55, 0.35);
-            --gold-gradient: linear-gradient(135deg, #ffffff 10%, #f3e5ab 35%, #d4af37 75%, #aa820a 100%);
-            --card-glass: rgba(18, 18, 26, 0.7);
-            --card-border: rgba(212, 175, 55, 0.22);
-            --border-hover: rgba(212, 175, 55, 0.9);
+            --gold-gradient: linear-gradient(135deg, #ffffff 10%, #f3e5ab 30%, #d4af37 70%, #aa820a 100%);
+            --card-glass: rgba(15, 15, 22, 0.65);
+            --card-border: rgba(212, 175, 55, 0.2);
+            --border-hover: rgba(212, 175, 55, 0.8);
             --text-primary: #f8f8fa;
-            --text-secondary: #a0a0b2;
-            --text-muted: #575768;
-            --radius-main: 20px;
-            --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --text-secondary: #9a9ab0;
+            --text-muted: #575766;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            cursor: none; /* Custom Cursor */
+            user-select: none;
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
-            position: relative;
+            cursor: default;
         }
 
-        /* Ambient Fluid Background Canvas */
+        /* Canvas per le particelle di sfondo */
         #bg-canvas {
             position: fixed;
             top: 0;
@@ -56,566 +49,369 @@
             pointer-events: none;
         }
 
-        /* Custom Dynamic Cursor */
+        /* Cursore personalizzato */
         #custom-cursor {
             position: fixed;
-            width: 10px;
-            height: 10px;
-            background: var(--accent-gold);
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--accent-gold);
             border-radius: 50%;
             pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, background-color 0.3s ease;
             z-index: 9999;
-            transform: translate(-50%, -50%);
-            transition: transform 0.05s ease-out, background-color 0.3s;
-            box-shadow: 0 0 12px var(--accent-gold);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
         }
 
-        #cursor-follower {
+        #custom-cursor-dot {
             position: fixed;
-            width: 38px;
-            height: 38px;
-            border: 1px solid rgba(212, 175, 55, 0.5);
+            width: 4px;
+            height: 4px;
+            background: #fff;
             border-radius: 50%;
             pointer-events: none;
-            z-index: 9998;
             transform: translate(-50%, -50%);
-            transition: transform 0.18s ease-out, border-color 0.3s, width 0.3s, height 0.3s;
+            z-index: 10000;
         }
 
-        body:hover #cursor-follower { opacity: 1; }
-
-        .cursor-hover #custom-cursor {
-            transform: translate(-50%, -50%) scale(1.8);
-            background: #fff;
-            box-shadow: 0 0 20px #fff;
+        .hovered #custom-cursor {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(212, 175, 55, 0.1);
+            border-color: #fff;
         }
 
-        .cursor-hover #cursor-follower {
-            transform: translate(-50%, -50%) scale(1.5);
-            border-color: var(--accent-gold);
-            background: rgba(212, 175, 55, 0.08);
-        }
-
-        /* Main Container Wrap */
+        /* App Wrapper */
         .app-wrapper {
             position: relative;
             z-index: 1;
-            padding: 30px 24px 120px;
-            max-width: 1380px;
+            padding: 40px 24px 80px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
-        /* Header Bar */
+        /* Header Navigation */
         header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
             margin-bottom: 40px;
+            position: relative;
         }
 
-        .header-top {
+        .nav-controls {
+            position: absolute;
+            top: 0;
+            right: 0;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .brand-logo {
-            display: flex;
-            align-items: center;
             gap: 12px;
-            font-family: 'Cinzel', serif;
-            font-weight: 900;
-            font-size: 1.1rem;
-            letter-spacing: 4px;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
             color: var(--text-primary);
-        }
-
-        .brand-logo i {
-            color: var(--accent-gold);
-            font-size: 1.4rem;
-            filter: drop-shadow(0 0 8px var(--accent-gold));
-        }
-
-        .status-badge {
+            padding: 8px 16px;
+            border-radius: 30px;
             font-family: 'Syne', sans-serif;
-            font-size: 0.68rem;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            letter-spacing: 3.5px;
-            color: var(--accent-gold);
-            padding: 6px 16px;
-            background: rgba(212, 175, 55, 0.08);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 50px;
-            backdrop-filter: blur(12px);
-            display: inline-flex;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .pulse-dot {
-            width: 6px;
-            height: 6px;
-            background-color: var(--accent-gold);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent-gold);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
-            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .icon-btn {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(212, 175, 55, 0.25);
-            color: var(--text-primary);
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition-smooth);
-            position: relative;
-        }
-
-        .icon-btn:hover {
-            background: rgba(212, 175, 55, 0.2);
+        .control-btn:hover {
             border-color: var(--accent-gold);
+            background: rgba(212, 175, 55, 0.15);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .category-badge {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
             color: var(--accent-gold);
-            box-shadow: 0 0 18px rgba(212, 175, 55, 0.3);
+            margin-bottom: 16px;
+            font-weight: 700;
+            padding: 6px 20px;
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
         }
 
-        .badge-counter {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: var(--accent-gold);
-            color: #000;
-            font-size: 0.65rem;
-            font-weight: 800;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Hero Text */
-        .hero-title-wrap {
-            text-align: center;
-            max-width: 850px;
-            margin: 0 auto 50px auto;
-        }
-
-        .hero-title-wrap h1 {
+        h1 {
             font-family: 'Cinzel', serif;
-            font-size: clamp(2.8rem, 7vw, 5rem);
+            font-size: clamp(2.5rem, 5vw, 4.2rem);
             font-weight: 900;
-            letter-spacing: 12px;
+            letter-spacing: 8px;
             text-transform: uppercase;
             background: var(--gold-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             line-height: 1.1;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.9));
         }
 
-        .hero-subtitle {
-            font-size: 1.1rem;
+        .subtitle {
+            font-size: 0.95rem;
             color: var(--text-secondary);
             font-weight: 300;
             letter-spacing: 1px;
-            line-height: 1.7;
-        }
-
-        /* Featured 3D Showcase Carousel Section */
-        .showcase-container {
-            margin-bottom: 70px;
-            position: relative;
-        }
-
-        .showcase-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 24px;
-            padding: 0 10px;
-        }
-
-        .showcase-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            color: var(--accent-gold);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .carousel-track-wrapper {
-            overflow: hidden;
-            position: relative;
-            padding: 30px 10px;
-        }
-
-        .carousel-track {
-            display: flex;
-            gap: 28px;
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .featured-card {
-            min-width: 340px;
-            height: 420px;
-            background: linear-gradient(145deg, rgba(25, 25, 36, 0.8), rgba(12, 12, 18, 0.9));
-            border: 1px solid var(--card-border);
-            border-radius: 24px;
-            padding: 28px;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
-            transition: var(--transition-smooth);
-            overflow: hidden;
-        }
-
-        .featured-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at var(--fx-x, 50%) var(--fx-y, 50%), rgba(212, 175, 55, 0.25), transparent 60%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .featured-card:hover::before { opacity: 1; }
-
-        .featured-card:hover {
-            border-color: var(--accent-gold);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 35px rgba(212, 175, 55, 0.3);
-            transform: translateY(-10px);
-        }
-
-        .featured-art-icon {
-            width: 70px;
-            height: 70px;
-            background: rgba(212, 175, 55, 0.1);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.2rem;
-            color: var(--accent-gold);
-            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.15);
-        }
-
-        .featured-badge {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            font-family: 'Syne', sans-serif;
-            font-size: 0.65rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            background: var(--accent-gold);
-            color: #000;
-            font-weight: 800;
-            padding: 4px 12px;
-            border-radius: 50px;
-        }
-
-        .featured-body h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 1.8rem;
-            color: #fff;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-        }
-
-        .featured-body p {
-            color: var(--text-secondary);
-            font-size: 0.88rem;
+            max-width: 600px;
             line-height: 1.6;
         }
 
-        .carousel-nav-btns {
+        /* View Modes */
+        .view-switch {
             display: flex;
             gap: 10px;
+            margin-top: 25px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 4px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .carousel-nav-btn {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(212,175,55,0.25);
-            color: #fff;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+        .switch-btn {
+            padding: 8px 20px;
+            border-radius: 30px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'Syne', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .switch-btn.active {
+            background: var(--accent-gold);
+            color: #000;
+            font-weight: 700;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+
+        /* 3D SHOWROOM CAROUSEL MODE */
+        .showroom-container {
+            position: relative;
+            height: 520px;
+            perspective: 1200px;
+            margin: 20px 0 60px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: var(--transition-smooth);
         }
 
-        .carousel-nav-btn:hover {
-            background: var(--accent-gold);
-            color: #000;
-        }
-
-        /* Control Bar (Search, Filters, View Modes) */
-        .control-bar {
-            background: rgba(15, 15, 22, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(212, 175, 55, 0.25);
-            border-radius: 24px;
-            padding: 16px 24px;
-            margin-bottom: 50px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-        }
-
-        .search-field {
+        .carousel-3d {
             position: relative;
-            flex: 1;
-            min-width: 260px;
+            width: 320px;
+            height: 440px;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .search-field i {
+        .carousel-item {
             position: absolute;
-            left: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--accent-gold);
-        }
-
-        .search-input {
             width: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50px;
-            padding: 12px 20px 12px 48px;
-            color: #fff;
-            font-size: 0.9rem;
-            outline: none;
-            transition: var(--transition-smooth);
-        }
-
-        .search-input:focus {
-            border-color: var(--accent-gold);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-        }
-
-        .filter-pills {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            scrollbar-width: none;
-            padding-bottom: 2px;
-        }
-
-        .filter-pills::-webkit-scrollbar { display: none; }
-
-        .pill-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: var(--text-secondary);
-            padding: 8px 18px;
-            border-radius: 50px;
-            font-size: 0.78rem;
-            font-family: 'Syne', sans-serif;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            white-space: nowrap;
-            transition: var(--transition-smooth);
-        }
-
-        .pill-btn:hover, .pill-btn.active {
-            background: rgba(212, 175, 55, 0.18);
-            border-color: var(--accent-gold);
-            color: var(--accent-gold-light);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
-        }
-
-        /* Card Grid Layout */
-        .templates-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-            perspective: 1200px;
-        }
-
-        @media (max-width: 1080px) { .templates-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 680px) { .templates-grid { grid-template-columns: 1fr; } }
-
-        /* Enhanced Card Design */
-        .tattoo-card {
+            height: 100%;
+            left: 0;
+            top: 0;
             background: var(--card-glass);
             backdrop-filter: blur(20px);
             border: 1px solid var(--card-border);
-            border-radius: var(--radius-main);
-            padding: 30px;
+            border-radius: 20px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 250px;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.15s ease-out, border-color 0.4s ease, box-shadow 0.4s ease;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            cursor: pointer;
             overflow: hidden;
         }
 
-        /* Visual Graphic Background Pattern on Card */
-        .card-bg-glow {
-            position: absolute;
-            top: -40%;
-            right: -40%;
-            width: 220px;
-            height: 220px;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            transition: transform 0.6s ease;
-        }
-
-        .tattoo-card:hover .card-bg-glow {
-            transform: scale(1.6);
-        }
-
-        .tattoo-card::after {
+        .carousel-item::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(212, 175, 55, 0.22), transparent 55%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(180deg, rgba(212, 175, 55, 0.08) 0%, transparent 60%);
             pointer-events: none;
         }
 
-        .tattoo-card:hover {
-            border-color: var(--border-hover);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.2);
+        .carousel-nav {
+            position: absolute;
+            bottom: -20px;
+            display: flex;
+            gap: 20px;
+            z-index: 10;
         }
 
-        .tattoo-card:hover::after { opacity: 1; }
+        .nav-arrow {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
 
-        .card-header-row {
+        .nav-arrow:hover {
+            background: var(--accent-gold);
+            color: #000;
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Visual Graphic Art Box Inside Card */
+        .card-visual {
+            width: 100%;
+            height: 200px;
+            border-radius: 12px;
+            background: #0a0a0f;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-visual svg {
+            width: 70%;
+            height: 70%;
+            opacity: 0.85;
+            transition: transform 0.5s ease;
+        }
+
+        .carousel-item:hover .card-visual svg {
+            transform: scale(1.1) rotate(2deg);
+        }
+
+        /* GRID MODE */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+            opacity: 0;
+            display: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .grid-container.active {
+            display: grid;
+            opacity: 1;
+        }
+
+        @media (max-width: 1024px) {
+            .grid-container { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 640px) {
+            .grid-container { grid-template-columns: 1fr; }
+        }
+
+        .grid-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 380px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .grid-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.15);
+        }
+
+        .card-info {
+            margin-top: 16px;
+        }
+
+        .card-header-flex {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 2;
+            align-items: center;
+            margin-bottom: 8px;
         }
 
-        .card-num-pill {
+        .card-number {
             font-family: 'Syne', sans-serif;
-            font-size: 0.72rem;
-            font-weight: 800;
+            font-size: 0.75rem;
             color: var(--accent-gold);
-            letter-spacing: 2px;
-            background: rgba(212, 175, 55, 0.12);
-            padding: 4px 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(212, 175, 55, 0.3);
+            font-weight: 700;
+            background: rgba(212, 175, 55, 0.1);
+            padding: 2px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
         }
 
-        .fav-heart-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.2rem;
-            transition: var(--transition-smooth);
-        }
-
-        .fav-heart-btn:hover, .fav-heart-btn.active {
-            color: #ff4757;
-            transform: scale(1.25);
-        }
-
-        .card-main-content {
-            position: relative;
-            z-index: 2;
-            margin-bottom: 20px;
-        }
-
-        .tattoo-card h3 {
+        .card-title {
             font-family: 'Syne', sans-serif;
-            font-size: 1.45rem;
-            font-weight: 800;
-            letter-spacing: 1px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
             color: #fff;
             text-transform: uppercase;
-            margin-bottom: 6px;
+        }
+
+        .card-footer-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 12px;
+        }
+
+        .demo-link {
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
             transition: color 0.3s ease;
         }
 
-        .tattoo-card:hover h3 {
-            color: var(--accent-gold-light);
-            text-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
-        }
-
-        .card-cat-label {
-            font-size: 0.75rem;
-            color: var(--accent-gold);
-            text-transform: uppercase;
-            letter-spacing: 2.5px;
-            font-weight: 700;
-            opacity: 0.85;
-        }
-
-        .card-footer-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 18px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            position: relative;
-            z-index: 2;
-        }
-
-        .explore-link {
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 2.5px;
-            color: var(--text-secondary);
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: var(--transition-smooth);
-        }
-
-        .tattoo-card:hover .explore-link {
+        .grid-card:hover .demo-link, .carousel-item:hover .demo-link {
             color: var(--accent-gold);
         }
 
-        .tattoo-card:hover .explore-link i {
-            transform: translateX(6px);
-        }
-
-        /* Glassmorphism Modal Quick View Overlay */
-        .modal-backdrop {
+        /* MODAL QUICK VIEW */
+        .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(3, 3, 6, 0.88);
-            backdrop-filter: blur(25px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
             z-index: 1000;
             display: flex;
             align-items: center;
@@ -623,99 +419,92 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.4s ease;
-            padding: 20px;
         }
 
-        .modal-backdrop.active {
+        .modal-overlay.open {
             opacity: 1;
             pointer-events: all;
         }
 
-        .modal-box {
-            background: rgba(18, 18, 26, 0.95);
+        .modal-content {
+            background: #0d0d12;
             border: 1px solid var(--accent-gold);
-            border-radius: 28px;
-            width: 100%;
-            max-width: 780px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 700px;
             padding: 40px;
             position: relative;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.95), 0 0 60px rgba(212, 175, 55, 0.25);
-            transform: scale(0.9) translateY(30px);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: scale(0.9);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.2);
         }
 
-        .modal-backdrop.active .modal-box {
-            transform: scale(1) translateY(0);
+        .modal-overlay.open .modal-content {
+            transform: scale(1);
         }
 
-        .modal-close-btn {
+        .modal-close {
             position: absolute;
-            top: 24px; right: 24px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #fff;
-            width: 44px; height: 44px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            transition: var(--transition-smooth);
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
         }
 
-        .modal-close-btn:hover {
-            background: var(--accent-gold);
-            color: #000;
-            transform: rotate(90deg);
-        }
-
-        .modal-hero-preview {
-            width: 100%;
-            height: 220px;
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(10, 10, 15, 0.9));
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 18px;
-            margin: 24px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .modal-hero-preview i {
-            font-size: 4.2rem;
+        .modal-close:hover {
             color: var(--accent-gold);
-            margin-bottom: 12px;
-            filter: drop-shadow(0 0 20px var(--accent-gold));
         }
 
-        .btn-launch {
-            display: inline-block;
+        .modal-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .modal-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin: 24px 0;
+        }
+
+        @media (max-width: 600px) {
+            .modal-body { grid-template-columns: 1fr; }
+        }
+
+        .modal-btn {
             width: 100%;
+            padding: 16px;
             background: var(--gold-gradient);
             color: #000;
             font-family: 'Syne', sans-serif;
             font-weight: 800;
-            font-size: 0.9rem;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            padding: 18px;
-            border-radius: 50px;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
             text-align: center;
             text-decoration: none;
-            transition: var(--transition-smooth);
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.35);
+            display: inline-block;
         }
 
-        .btn-launch:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.55);
+        .modal-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
         }
 
         footer {
             text-align: center;
-            margin-top: 100px;
-            font-size: 0.78rem;
-            letter-spacing: 4px;
+            margin-top: 80px;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
             text-transform: uppercase;
             color: var(--text-muted);
             font-family: 'Syne', sans-serif;
@@ -724,233 +513,259 @@
 </head>
 <body>
 
-    <!-- Ambient Dynamic Canvas -->
     <canvas id="bg-canvas"></canvas>
-
-    <!-- Custom Glowing Mouse Cursor -->
     <div id="custom-cursor"></div>
-    <div id="cursor-follower"></div>
+    <div id="custom-cursor-dot"></div>
 
     <div class="app-wrapper">
         <header>
-            <div class="header-top">
-                <div class="brand-logo">
-                    <i class="fa-solid fa-compass-drafting"></i>
-                    <span>ATELIER TATTOO</span>
-                </div>
-                <div class="status-badge">
-                    <span class="pulse-dot"></span> Private Master Archive 2026
-                </div>
-                <div class="header-actions">
-                    <button class="icon-btn interactive-el" id="sound-toggle-btn" title="Audio Toggle">
-                        <i class="fa-solid fa-volume-high"></i>
-                    </button>
-                    <button class="icon-btn interactive-el" id="fav-counter-btn" title="Preferiti">
-                        <i class="fa-solid fa-heart"></i>
-                        <span class="badge-counter" id="fav-count-num">0</span>
-                    </button>
-                </div>
+            <div class="nav-controls">
+                <button class="control-btn" id="audio-toggle">
+                    <span id="audio-icon">🔊</span> SOUND
+                </button>
             </div>
 
-            <div class="hero-title-wrap">
-                <h1>Atelier Tagù</h1>
-                <p class="hero-subtitle">Vetrina sartoriale interattiva d'élite. 25 esperienze digitali ad alto impatto visivo progettate per maestri tatuatori e studi d'arte.</p>
+            <span class="category-badge">Confidential Collection</span>
+            <h1>Atelier Tattoo</h1>
+            <p class="subtitle">Showroom digitale interattiva d'élite. Seleziona o naviga la collezione 3D per esplorare le anteprime dei template.</p>
+
+            <div class="view-switch">
+                <button class="switch-btn active" id="btn-showroom">Showroom 3D</button>
+                <button class="switch-btn" id="btn-grid">Griglia Tattile</button>
             </div>
         </header>
 
-        <!-- Featured 3D Showcase Carousel -->
-        <section class="showcase-container">
-            <div class="showcase-header">
-                <div class="showcase-title">
-                    <i class="fa-solid fa-star"></i> Showcase in Evidenza
-                </div>
-                <div class="carousel-nav-btns">
-                    <button class="carousel-nav-btn interactive-el" id="carousel-prev"><i class="fa-solid fa-chevron-left"></i></button>
-                    <button class="carousel-nav-btn interactive-el" id="carousel-next"><i class="fa-solid fa-chevron-right"></i></button>
-                </div>
-            </div>
-
-            <div class="carousel-track-wrapper">
-                <div class="carousel-track" id="carousel-track">
-                    <!-- Featured dynamic cards injected via JavaScript -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Filter & Search Control Bar -->
-        <div class="control-bar">
-            <div class="search-field">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="search-input" class="search-input interactive-el" placeholder="Cerca layout (es. Alchemical, Marea, Dark)...">
-            </div>
-
-            <div class="filter-pills" id="filter-pills-wrap">
-                <button class="pill-btn active interactive-el" data-filter="all">Tutti (25)</button>
-                <button class="pill-btn interactive-el" data-filter="Esoterico">Esoterico</button>
-                <button class="pill-btn interactive-el" data-filter="Natura">Natura</button>
-                <button class="pill-btn interactive-el" data-filter="Dark">Dark</button>
-                <button class="pill-btn interactive-el" data-filter="Minimal">Minimal</button>
-                <button class="pill-btn interactive-el" data-filter="Astrale">Astrale</button>
+        <!-- MODE 1: 3D SHOWROOM -->
+        <div class="showroom-container" id="showroom-view">
+            <div class="carousel-3d" id="carousel3d"></div>
+            <div class="carousel-nav">
+                <button class="nav-arrow" id="prev-btn">←</button>
+                <button class="nav-arrow" id="next-btn">→</button>
             </div>
         </div>
 
-        <!-- Main Template Collection Grid -->
-        <div class="templates-grid" id="templates-grid">
-            <!-- Dynamic 25 templates injected via JS -->
-        </div>
+        <!-- MODE 2: GRID -->
+        <div class="grid-container" id="grid-view"></div>
 
         <footer>
-            &copy; ATELIER DIGITAL ASSETS • CONFIDENTIAL PRIVATE SHOWCASE
+            &copy; Tattoo Studio Digital Assets • Confidential & Exclusive
         </footer>
     </div>
 
-    <!-- Quick View Modal Window -->
-    <div class="modal-backdrop" id="modal-backdrop">
-        <div class="modal-box">
-            <button class="modal-close-btn interactive-el" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
-            
-            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
-                <span class="card-num-pill" id="modal-num">01</span>
-                <span style="font-family: 'Syne', sans-serif; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; color: var(--accent-gold);" id="modal-cat">Esoterico</span>
+    <!-- MODAL QUICK VIEW -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">✕</button>
+            <span class="card-number" id="modal-num">01</span>
+            <h2 class="modal-title" id="modal-title">Template</h2>
+            <div class="modal-body">
+                <div class="card-visual" id="modal-visual"></div>
+                <div>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;" id="modal-desc">
+                        Esperienza d'arte digitale sartoriale progettata per mostrare tatuaggi e progetti visivi ad alto impatto emotivo.
+                    </p>
+                    <div style="margin-bottom: 20px;">
+                        <span style="font-size: 0.7rem; color: var(--accent-gold); letter-spacing: 2px; text-transform: uppercase;">Stile Visivo</span>
+                        <p style="color: #fff; font-size: 0.85rem;" id="modal-style">Dark / Esoterico / Luxury</p>
+                    </div>
+                </div>
             </div>
-
-            <h2 style="font-family: 'Cinzel', serif; font-size: 2.2rem; color: #fff; letter-spacing: 3px;" id="modal-title">Template Title</h2>
-
-            <div class="modal-hero-preview">
-                <i class="fa-solid fa-gem" id="modal-icon"></i>
-                <span style="font-family: 'Syne', sans-serif; letter-spacing: 3px; font-weight: 800; color: var(--accent-gold-light);">LIVE INTERACTIVE ENGINE</span>
-            </div>
-
-            <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.7; margin-bottom: 28px;" id="modal-desc">
-                Descrizione dettagliata del layout.
-            </p>
-
-            <a href="#" target="_blank" class="btn-launch interactive-el" id="modal-launch-link">
-                Lancia Demo Live <i class="fa-solid fa-arrow-up-right-from-square" style="margin-left: 8px;"></i>
-            </a>
+            <a href="#" target="_blank" class="modal-btn" id="modal-link">Lancia Demo Live ↗️</a>
         </div>
     </div>
 
     <script>
-        // Data Source: All 25 Templates
-        const templatesData = [
-            { id: '01', title: 'Alchemical', file: 'alchemical.html', category: 'Esoterico', icon: 'fa-wand-magic-sparkles', desc: 'Layout alchemico basato su geometria sacra, simbolismo classico ed elevato impatto visivo per tatuaggi simbolici ed esoterici.' },
-            { id: '02', title: 'Alone', file: 'alone.html', category: 'Dark', icon: 'fa-moon', desc: 'Design d’atmosfera introspettiva e scura, focalizzato su contrasti netti ed espressività d’autore dark.' },
-            { id: '03', title: 'Archivio', file: 'archivio.html', category: 'Minimal', icon: 'fa-box-archive', desc: 'Struttura a catalogo museale con una spaziatura tipografica di precisione chirurgica.' },
-            { id: '04', title: 'Bottega Inchiostro', file: 'bottega-inchiostro.html', category: 'Esoterico', icon: 'fa-feather-pointed', desc: 'Calore artigianale ed eleganza d’altri tempi fondati sull’arte dell’incisione e dell’inchiostro puro.' },
-            { id: '05', title: 'Camera Oscura', file: 'camera-oscura.html', category: 'Dark', icon: 'fa-camera-retro', desc: 'Ispirato alle pellicole d’epoca con contrasti ad alto impatto per tatuaggi realistic in bianco e nero.' },
-            { id: '06', title: 'Cartella Clinica', file: 'cartellaclinica.html', category: 'Minimal', icon: 'fa-notes-medical', desc: 'Design concettuale e rigoroso per chi predilige la precisione anatomica e schemi grafici puliti.' },
-            { id: '07', title: 'Casa Degli Arcani', file: 'casa-degli-arcani.html', category: 'Esoterico', icon: 'fa-eye', desc: 'Ispirazione ai Tarocchi d’artista con carte interattive per mostrare flash art e bozze uniche.' },
-            { id: '08', title: 'Dopo La Pioggia', file: 'dopo-la-pioggia.html', category: 'Natura', icon: 'fa-cloud-rain', desc: 'Toni organici e freschi per tatuaggi botanici, acquerello e micro-realismo delicato.' },
-            { id: '09', title: 'Erbario Tattoo', file: 'erbario-tattoo-template.html', category: 'Natura', icon: 'fa-leaf', desc: 'Elegante trattato botanico vintage ripensato per illustrazioni floreali e naturali d’alta classe.' },
-            { id: '10', title: 'Holographic', file: 'holographic.html', category: 'Astrale', icon: 'fa-compact-disc', desc: 'Estetica futuristica cangiante con bagliori e riflessi iridescenti per studi all’avanguardia.' },
-            { id: '11', title: 'Luce Bianca', file: 'luce-bianca.html', category: 'Minimal', icon: 'fa-sun', desc: 'Design etereo ad alto contrasto luminoso per una percezione di estrema pulizia ed eleganza.' },
-            { id: '12', title: 'Manoscritto', file: 'manoscritto.html', category: 'Esoterico', icon: 'fa-scroll', desc: 'Tipografia incisa e pergamena digitale pensata per lettering raffinato e disegni storici.' },
-            { id: '13', title: 'Mappa Astrale', file: 'mappa-astrale.html', category: 'Astrale', icon: 'fa-meteor', desc: 'Costellazioni interattive e orbite geometriche per tatuaggi fineline, cosmici e spirituali.' },
-            { id: '14', title: 'Marchetti', file: 'marchetti.html', category: 'Minimal', icon: 'fa-pen-nib', desc: 'Tributo al design editoriale classico con griglie rigide ed una forte personalità artistica.' },
-            { id: '15', title: 'Marea', file: 'marea.html', category: 'Natura', icon: 'fa-water', desc: 'Movimenti fluidi e morbidi ispirati alle profondità oceaniche e al flusso continuo dell’acqua.' },
-            { id: '16', title: 'Mirabilia Tattoo', file: 'mirabilia-tattoo-template.html', category: 'Esoterico', icon: 'fa-dragon', desc: 'Una Wunderkammer digitale (stanza delle meraviglie) dove ogni tatuaggio è un pezzo raro.' },
-            { id: '17', title: 'Miraggio', file: 'miraggio.html', category: 'Astrale', icon: 'fa-compass', desc: 'Sfumature calde del deserto ed effetti ottici di rifrazione per uno stile caldo ed avvolgente.' },
-            { id: '18', title: 'Nuvole Di Carta', file: 'nuvole-di-carta.html', category: 'Minimal', icon: 'fa-cloud', desc: 'Texture morbide e leggerezza visiva per illustrazioni d’autore minimali e tratteggi sottili.' },
-            { id: '19', title: 'Ordito', file: 'ordito.html', category: 'Dark', icon: 'fa-cubes', desc: 'Intrecci complessi e trame geometriche per body-suit e composizioni ornamentali dense.' },
-            { id: '20', title: 'Ossidiana Tattoo', file: 'ossidiana-tattoo-template.html', category: 'Dark', icon: 'fa-gem', desc: 'Profondità vulcanica e riflessi scuri satinati per stili Ornamental Blackwork e Heavy Dark.' },
-            { id: '21', title: 'Parco Sculture', file: 'parco-sculture.html', category: 'Natura', icon: 'fa-landmark', desc: 'Monumentale ed espressivo come le opere d’arte in pietra per tatuaggi 3D e Neoclassici.' },
-            { id: '22', title: 'Pelle Viva Tattoo', file: 'pelle-viva-tattoo-template.html', category: 'Minimal', icon: 'fa-hand-holding-heart', desc: 'Tono visivo caldo e viscerale al contempo, per celebrare il legame profondo tra corpo e inchiostro.' },
-            { id: '23', title: 'Serra Botanica', file: 'serra-botanica.html', category: 'Natura', icon: 'fa-seedling', desc: 'Architettura in vetro ed elementi naturali per tatuatrici e tatuatori specializzati nel floreale.' },
-            { id: '24', title: 'Suminagashi', file: 'suminagashi.html', category: 'Astrale', icon: 'fa-ripple', desc: 'Ispirato all’antica arte giapponese dell’inchiostro fluttuante sull’acqua per forme organiche.' },
-            { id: '25', title: 'Yugen', file: 'yugen.html', category: 'Esoterico', icon: 'fa-yin-yang', desc: 'Parola giapponese per indicare la grazia sottile dell’universo: un layout profondo e poetico.' }
+        // DATI DEI 25 MODELLI
+        const templates = [
+            { id: '01', title: 'Alchemical', file: 'alchemical.html', style: 'Esoterico & Simbolico', icon: '<path d="M12 2L2 22h20L12 2zm0 4l6.5 13h-13L12 6z" fill="#d4af37"/>' },
+            { id: '02', title: 'Alone', file: 'alone.html', style: 'Dark Minimalist', icon: '<circle cx="12" cy="12" r="9" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '03', title: 'Archivio', file: 'archivio.html', style: 'Editorial / Documentario', icon: '<rect x="4" y="4" width="16" height="16" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '04', title: 'Bottega Inchiostro', file: 'bottega-inchiostro.html', style: 'Artigianale Classico', icon: '<path d="M12 2L4 10v12h16V10L12 2z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '05', title: 'Camera Oscura', file: 'camera-oscura.html', style: 'Fotografico High-Contrast', icon: '<circle cx="12" cy="12" r="5" fill="#d4af37"/>' },
+            { id: '06', title: 'Cartella Clinica', file: 'cartellaclinica.html', style: 'Avant-Garde Anatomico', icon: '<path d="M12 4v16M4 12h16" stroke="#d4af37" stroke-width="2"/>' },
+            { id: '07', title: 'Casa Degli Arcani', file: 'casa-degli-arcani.html', style: 'Tarot & Mistico', icon: '<polygon points="12,2 22,12 12,22 2,12" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '08', title: 'Dopo La Pioggia', file: 'dopo-la-pioggia.html', style: 'Etereo & Fluido', icon: '<path d="M12 2.5C12 2.5 5 9.5 5 14.5C5 18.37 8.13 21.5 12 21.5C15.87 21.5 19 18.37 19 14.5C19 9.5 12 2.5 12 2.5Z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '09', title: 'Erbario Tattoo', file: 'erbario-tattoo-template.html', style: 'Botanico / Micro-Realismo', icon: '<path d="M12 22V2M12 8c4-4 8-2 8 2s-4 6-8 6M12 14c-4-4-8-2-8 2s4 6 8 6" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '10', title: 'Holographic', file: 'holographic.html', style: 'Futuristico / Cyber', icon: '<polygon points="12,2 19,7 19,17 12,22 5,17 5,7" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '11', title: 'Luce Bianca', file: 'luce-bianca.html', style: 'Luminoso Minimal', icon: '<circle cx="12" cy="12" r="8" stroke="#ffffff" stroke-width="2" fill="none"/>' },
+            { id: '12', title: 'Manoscritto', file: 'manoscritto.html', style: 'Calligrafico Script', icon: '<path d="M4 20h16M4 14h12M4 8h16" stroke="#d4af37" stroke-width="2"/>' },
+            { id: '13', title: 'Mappa Astrale', file: 'mappa-astrale.html', style: 'Geometrico & Costellazioni', icon: '<circle cx="12" cy="12" r="9" stroke="#d4af37" stroke-width="1"/><circle cx="12" cy="12" r="3" fill="#d4af37"/>' },
+            { id: '14', title: 'Marchetti', file: 'marchetti.html', style: 'Heritage Traditional', icon: '<path d="M12 2l10 10-10 10L2 12z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '15', title: 'Marea', file: 'marea.html', style: 'Onde / Inchiostro Giapponese', icon: '<path d="M2 12c3-3 6-3 9 0s6 3 9 0" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '16', title: 'Mirabilia Tattoo', file: 'mirabilia-tattoo-template.html', style: 'Wunderkammer / Antiquariato', icon: '<polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9 12 2" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '17', title: 'Miraggio', file: 'miraggio.html', style: 'Astratto / Atmosferico', icon: '<circle cx="12" cy="12" r="7" stroke="#d4af37" stroke-dasharray="2 2" stroke-width="2" fill="none"/>' },
+            { id: '18', title: 'Nuvole Di Carta', file: 'nuvole-di-carta.html', style: 'Delicato Soft Line', icon: '<path d="M6 16.5A3.5 3.5 0 0 1 5.5 9.5 5 5 0 0 1 15 8a4 4 0 0 1 4 4.5" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '19', title: 'Ordito', file: 'ordito.html', style: 'Tessitura Geometrica', icon: '<path d="M4 4l16 16M4 20L20 4" stroke="#d4af37" stroke-width="2"/>' },
+            { id: '20', title: 'Ossidiana Tattoo', file: 'ossidiana-tattoo-template.html', style: 'Blackwork Pesante', icon: '<polygon points="12 2 20 22 4 22" fill="#d4af37"/>' },
+            { id: '21', title: 'Parco Sculture', file: 'parco-sculture.html', style: '3D Neoclassico', icon: '<rect x="7" y="7" width="10" height="10" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '22', title: 'Pelle Viva Tattoo', file: 'pelle-viva-tattoo-template.html', style: 'Organico / Tessuto', icon: '<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" fill="#d4af37"/>' },
+            { id: '23', title: 'Serra Botanica', file: 'serra-botanica.html', style: 'Natura Fine Line', icon: '<path d="M12 22s8-4 8-10A8 8 0 0 0 4 12c0 6 8 10 8 10z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '24', title: 'Suminagashi', file: 'suminagashi.html', style: 'Inchiostro ad Acqua', icon: '<circle cx="12" cy="12" r="9" stroke="#d4af37" stroke-width="1"/><circle cx="12" cy="12" r="5" stroke="#d4af37" stroke-width="1"/>' },
+            { id: '25', title: 'Yugen', file: 'yugen.html', style: 'Zen Minimal / Misterioso', icon: '<line x1="4" y1="12" x2="20" y2="12" stroke="#d4af37" stroke-width="2"/>' }
         ];
 
-        // State variables
-        let favorites = JSON.parse(localStorage.getItem('atelier_favs_v2') || '[]');
-        let soundEnabled = true;
-        let activeFilter = 'all';
-        let searchQuery = '';
+        // RENDER 3D CAROUSEL & GRID
+        const carouselEl = document.getElementById('carousel3d');
+        const gridEl = document.getElementById('grid-view');
+        let currIndex = 0;
 
-        // Web Audio Synthesizer Sound Engine
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playTone(freq = 600, type = 'sine', duration = 0.04) {
-            if (!soundEnabled) return;
-            try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch(e) {}
+        function renderTemplates() {
+            carouselEl.innerHTML = '';
+            gridEl.innerHTML = '';
+
+            templates.forEach((t, i) => {
+                // Item Carousel 3D
+                const cItem = document.createElement('div');
+                cItem.className = 'carousel-item';
+                cItem.innerHTML = `
+                    <div class="card-header-flex">
+                        <span class="card-title">${t.title}</span>
+                        <span class="card-number">${t.id}</span>
+                    </div>
+                    <div class="card-visual">
+                        <svg viewBox="0 0 24 24">${t.icon}</svg>
+                    </div>
+                    <div class="card-info">
+                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px;">${t.style}</p>
+                        <div class="card-footer-flex">
+                            <span class="demo-link">Dettagli & Demo ↗️</span>
+                        </div>
+                    </div>
+                `;
+                cItem.addEventListener('click', () => openModal(t));
+                carouselEl.appendChild(cItem);
+
+                // Item Grid
+                const gCard = document.createElement('div');
+                gCard.className = 'grid-card';
+                gCard.innerHTML = `
+                    <div class="card-header-flex">
+                        <span class="card-title">${t.title}</span>
+                        <span class="card-number">${t.id}</span>
+                    </div>
+                    <div class="card-visual">
+                        <svg viewBox="0 0 24 24">${t.icon}</svg>
+                    </div>
+                    <div class="card-info">
+                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px;">${t.style}</p>
+                        <div class="card-footer-flex">
+                            <span class="demo-link">Esplora Demo</span>
+                            <span style="color: var(--accent-gold);">→</span>
+                        </div>
+                    </div>
+                `;
+                gCard.addEventListener('click', () => openModal(t));
+                gridEl.appendChild(gCard);
+            });
+
+            updateCarousel();
         }
 
-        // Custom Cursor Movement
-        const cursor = document.getElementById('custom-cursor');
-        const follower = document.getElementById('cursor-follower');
+        function updateCarousel() {
+            const items = document.querySelectorAll('.carousel-item');
+            const total = items.length;
+            const angleStep = 360 / total;
 
-        window.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            follower.style.left = e.clientX + 'px';
-            follower.style.top = e.clientY + 'px';
+            items.forEach((item, index) => {
+                const offset = index - currIndex;
+                const theta = offset * 25; // Angolo di rotazione
+                const transZ = Math.abs(offset) * -80;
+                const transX = offset * 220;
+                const rotY = offset * -15;
+
+                if (Math.abs(offset) > 3) {
+                    item.style.opacity = '0';
+                    item.style.pointerEvents = 'none';
+                } else {
+                    item.style.opacity = '1';
+                    item.style.pointerEvents = 'all';
+                }
+
+                item.style.transform = `translateX(${transX}px) translateZ(${transZ}px) rotateY(${rotY}deg)`;
+                item.style.zIndex = 100 - Math.abs(offset);
+            });
+        }
+
+        document.getElementById('next-btn').addEventListener('click', () => {
+            if (currIndex < templates.length - 1) currIndex++;
+            else currIndex = 0;
+            updateCarousel();
         });
 
-        document.addEventListener('mouseover', (e) => {
-            if (e.target.closest('.interactive-el') || e.target.closest('.tattoo-card') || e.target.closest('.featured-card')) {
-                document.body.classList.add('cursor-hover');
-            } else {
-                document.body.classList.remove('cursor-hover');
-            }
+        document.getElementById('prev-btn').addEventListener('click', () => {
+            if (currIndex > 0) currIndex--;
+            else currIndex = templates.length - 1;
+            updateCarousel();
         });
 
-        // Background Ambient Canvas Particles
+        // SWITCH VIEW MODES
+        const btnShowroom = document.getElementById('btn-showroom');
+        const btnGrid = document.getElementById('btn-grid');
+        const showroomView = document.getElementById('showroom-view');
+        const gridView = document.getElementById('grid-view');
+
+        btnShowroom.addEventListener('click', () => {
+            btnShowroom.classList.add('active');
+            btnGrid.classList.remove('active');
+            showroomView.style.display = 'flex';
+            gridView.classList.remove('active');
+        });
+
+        btnGrid.addEventListener('click', () => {
+            btnGrid.classList.add('active');
+            btnShowroom.classList.remove('active');
+            showroomView.style.display = 'none';
+            gridView.classList.add('active');
+        });
+
+        // MODAL
+        const modal = document.getElementById('modal');
+        function openModal(t) {
+            document.getElementById('modal-num').innerText = t.id;
+            document.getElementById('modal-title').innerText = t.title;
+            document.getElementById('modal-style').innerText = t.style;
+            document.getElementById('modal-visual').innerHTML = `<svg viewBox="0 0 24 24">${t.icon}</svg>`;
+            document.getElementById('modal-link').href = t.file;
+            modal.classList.add('open');
+        }
+
+        document.getElementById('modal-close').addEventListener('click', () => {
+            modal.classList.remove('open');
+        });
+
+        // CANVAS BACKGROUND PARTICLES
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
-        let mouse = { x: window.innerWidth/2, y: window.innerHeight/2 };
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
+
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-        });
-
         class Particle {
             constructor() {
-                this.reset();
-            }
-            reset() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
                 this.size = Math.random() * 2 + 0.5;
-                this.speedX = (Math.random() - 0.5) * 0.3;
-                this.speedY = (Math.random() - 0.5) * 0.3;
-                this.alpha = Math.random() * 0.4 + 0.1;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.alpha = Math.random() * 0.5 + 0.2;
             }
+
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
 
-                // Mouse interaction repulsion/attraction
-                const dx = mouse.x - this.x;
-                const dy = mouse.y - this.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 120) {
-                    this.x -= (dx / dist) * 0.8;
-                    this.y -= (dy / dist) * 0.8;
-                }
-
-                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-                    this.reset();
-                }
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
             }
+
             draw() {
                 ctx.fillStyle = `rgba(212, 175, 55, ${this.alpha})`;
                 ctx.beginPath();
@@ -959,212 +774,31 @@
             }
         }
 
-        for(let i = 0; i < 75; i++) particles.push(new Particle());
+        for (let i = 0; i < 70; i++) particles.push(new Particle());
 
-        function animateBg() {
+        function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animateBg);
-        }
-        animateBg();
-
-        // Render Hero Showcase Carousel (First 6 items)
-        const carouselTrack = document.getElementById('carousel-track');
-        let carouselPos = 0;
-
-        function renderShowcase() {
-            carouselTrack.innerHTML = '';
-            const featuredItems = templatesData.slice(0, 8);
-
-            featuredItems.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'featured-card interactive-el';
-                card.innerHTML = `
-                    <span class="featured-badge">Esclusivo</span>
-                    <div class="featured-art-icon">
-                        <i class="fa-solid ${item.icon}"></i>
-                    </div>
-                    <div class="featured-body">
-                        <h2>${item.title}</h2>
-                        <p>${item.desc}</p>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-family:'Syne',sans-serif; font-size:0.75rem; letter-spacing:2px; color:var(--accent-gold);">${item.category}</span>
-                        <span style="color:#fff; font-size:0.85rem; font-weight:700;">PROVA DEMO <i class="fa-solid fa-arrow-right"></i></span>
-                    </div>
-                `;
-
-                card.addEventListener('mousemove', (e) => {
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    card.style.setProperty('--fx-x', `${x}px`);
-                    card.style.setProperty('--fx-y', `${y}px`);
-                });
-
-                card.addEventListener('click', () => {
-                    playTone(900, 'triangle', 0.08);
-                    openModal(item);
-                });
-
-                carouselTrack.appendChild(card);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
             });
+            requestAnimationFrame(animateParticles);
         }
 
-        document.getElementById('carousel-next').addEventListener('click', () => {
-            playTone(800, 'sine', 0.04);
-            if (carouselPos > -1400) carouselPos -= 360;
-            carouselTrack.style.transform = `translateX(${carouselPos}px)`;
+        animateParticles();
+
+        // CURSORE MAGNETIC
+        const cursor = document.getElementById('custom-cursor');
+        const cursorDot = document.getElementById('custom-cursor-dot');
+
+        window.addEventListener('mousemove', (e) => {
+            cursor.style.left = `${e.clientX}px`;
+            cursor.style.top = `${e.clientY}px`;
+            cursorDot.style.left = `${e.clientX}px`;
+            cursorDot.style.top = `${e.clientY}px`;
         });
 
-        document.getElementById('carousel-prev').addEventListener('click', () => {
-            playTone(800, 'sine', 0.04);
-            if (carouselPos < 0) carouselPos += 360;
-            carouselTrack.style.transform = `translateX(${carouselPos}px)`;
-        });
-
-        // Render 25 Main Grid Cards with 3D Tilt Physics
-        const gridEl = document.getElementById('templates-grid');
-
-        function renderGrid() {
-            gridEl.innerHTML = '';
-
-            const filtered = templatesData.filter(item => {
-                const matchesFilter = activeFilter === 'all' || item.category === activeFilter || (activeFilter === 'fav' && favorites.includes(item.id));
-                const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || item.category.toLowerCase().includes(searchQuery.toLowerCase());
-                return matchesFilter && matchesSearch;
-            });
-
-            if (filtered.length === 0) {
-                gridEl.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: var(--text-muted); font-family: 'Syne', sans-serif;">Nessun template trovato con questi filtri.</div>`;
-                return;
-            }
-
-            filtered.forEach(item => {
-                const isFav = favorites.includes(item.id);
-                const card = document.createElement('div');
-                card.className = 'tattoo-card interactive-el';
-                card.dataset.id = item.id;
-
-                card.innerHTML = `
-                    <div class="card-bg-glow"></div>
-                    <div class="card-header-row">
-                        <span class="card-num-pill">${item.id}</span>
-                        <button class="fav-heart-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFav('${item.id}')">
-                            <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
-                        </button>
-                    </div>
-                    <div class="card-main-content">
-                        <h3>${item.title}</h3>
-                        <span class="card-cat-label">${item.category}</span>
-                    </div>
-                    <div class="card-footer-row">
-                        <span class="explore-link">Esplora Layout <i class="fa-solid fa-arrow-right"></i></span>
-                        <i class="fa-solid ${item.icon}" style="color: rgba(212,175,55,0.4); font-size:1.1rem;"></i>
-                    </div>
-                `;
-
-                // 3D Motion Physics
-                card.addEventListener('mousemove', (e) => {
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    const rotateX = ((y - centerY) / centerY) * -12;
-                    const rotateY = ((x - centerX) / centerX) * 12;
-
-                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
-                    card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
-                    card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
-                });
-
-                card.addEventListener('mouseleave', () => {
-                    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)`;
-                });
-
-                card.addEventListener('click', () => {
-                    playTone(1000, 'sine', 0.06);
-                    openModal(item);
-                });
-
-                gridEl.appendChild(card);
-            });
-
-            updateFavCounter();
-        }
-
-        // Favorites Handler
-        window.toggleFav = function(id) {
-            playTone(1100, 'sine', 0.05);
-            if (favorites.includes(id)) {
-                favorites = favorites.filter(f => f !== id);
-            } else {
-                favorites.push(id);
-            }
-            localStorage.setItem('atelier_favs_v2', JSON.stringify(favorites));
-            renderGrid();
-        };
-
-        function updateFavCounter() {
-            document.getElementById('fav-count-num').innerText = favorites.length;
-        }
-
-        // Modal Handler
-        const modal = document.getElementById('modal-backdrop');
-        const modalClose = document.getElementById('modal-close');
-
-        function openModal(item) {
-            document.getElementById('modal-num').innerText = item.id;
-            document.getElementById('modal-cat').innerText = item.category;
-            document.getElementById('modal-title').innerText = item.title;
-            document.getElementById('modal-desc').innerText = item.desc;
-            document.getElementById('modal-icon').className = `fa-solid ${item.icon}`;
-            document.getElementById('modal-launch-link').href = item.file;
-
-            modal.classList.add('active');
-        }
-
-        modalClose.addEventListener('click', () => {
-            playTone(400, 'sine', 0.04);
-            modal.classList.remove('active');
-        });
-
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) modal.classList.remove('active');
-        });
-
-        // Filter Pills & Search Event Listeners
-        document.getElementById('filter-pills-wrap').addEventListener('click', (e) => {
-            if (e.target.classList.contains('pill-btn')) {
-                playTone(700, 'sine', 0.04);
-                document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                activeFilter = e.target.dataset.filter;
-                renderGrid();
-            }
-        });
-
-        document.getElementById('search-input').addEventListener('input', (e) => {
-            searchQuery = e.target.value;
-            renderGrid();
-        });
-
-        document.getElementById('fav-counter-btn').addEventListener('click', () => {
-            playTone(850, 'sine', 0.05);
-            activeFilter = 'fav';
-            renderGrid();
-        });
-
-        document.getElementById('sound-toggle-btn').addEventListener('click', function() {
-            soundEnabled = !soundEnabled;
-            this.innerHTML = soundEnabled ? `<i class="fa-solid fa-volume-high"></i>` : `<i class="fa-solid fa-volume-xmark"></i>`;
-            playTone(1200, 'sine', 0.05);
-        });
-
-        // Initialize Boot
-        renderShowcase();
-        renderGrid();
+        renderTemplates();
     </script>
 </body>
 </html>
