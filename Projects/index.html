@@ -90,7 +90,7 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             position: relative;
         }
 
@@ -133,6 +133,12 @@
             box-shadow: 0 0 20px rgba(255, 71, 87, 0.2);
         }
 
+        .control-btn.audio-on {
+            border-color: #2ed573;
+            color: #2ed573;
+            background: rgba(46, 213, 115, 0.15);
+        }
+
         .category-badge {
             font-family: 'Syne', sans-serif;
             font-size: 0.7rem;
@@ -171,11 +177,49 @@
             line-height: 1.6;
         }
 
+        /* Search Bar */
+        .search-container {
+            margin-top: 25px;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(15, 15, 22, 0.8);
+            border: 1px solid var(--card-border);
+            padding: 14px 22px;
+            padding-right: 45px;
+            border-radius: 40px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.25);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+            font-size: 0.9rem;
+        }
+
         /* View Modes */
         .view-switch {
             display: flex;
             gap: 10px;
-            margin-top: 25px;
+            margin-top: 20px;
             background: rgba(255, 255, 255, 0.02);
             padding: 4px;
             border-radius: 40px;
@@ -566,6 +610,9 @@
     <div class="app-wrapper">
         <header>
             <div class="nav-controls">
+                <button class="control-btn" id="audio-toggle-btn">
+                    <span>♫</span> <span id="audio-status-text">MUSIC ON</span>
+                </button>
                 <button class="control-btn" id="fav-filter-btn">
                     <span>♥️</span> PREFERITI (<span id="fav-count">0</span>)
                 </button>
@@ -574,6 +621,12 @@
             <span class="category-badge">Confidential Collection</span>
             <h1>Atelier Tattoo</h1>
             <p class="subtitle">Showroom digitale interattiva d'élite. Seleziona o naviga la collezione 3D per esplorare le anteprime dei template.</p>
+
+            <!-- BARRA DI RICERCA -->
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="Cerca per nome o stile (es. Botanico, Dark, 12)...">
+                <span class="search-icon">🔍</span>
+            </div>
 
             <div class="view-switch">
                 <button class="switch-btn active" id="btn-showroom">Showroom 3D</button>
@@ -652,9 +705,108 @@
             { id: '27', title: 'Yugen', file: 'yugen.html', style: 'Zen Minimal / Misterioso', icon: '<line x1="4" y1="12" x2="20" y2="12" stroke="#d4af37" stroke-width="2"/>' }
         ];
 
+        // SISTEMA AUDIO (WEB AUDIO API SINTETIZZATO)
+        let audioCtx = null;
+        let isAudioPlaying = false;
+        let ambientOsc1 = null, ambientOsc2 = null, ambientGain = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Effetto sonoro al click dei pulsanti (Click / Metallo)
+        function playSoundClick() {
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+            } catch (e) {}
+        }
+
+        // Effetto sonoro al click sui preferiti (Cuore / Cristallo)
+        function playSoundFav() {
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.15); // C6
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.15);
+            } catch (e) {}
+        }
+
+        // Musica Ambientale Sottofondo Sintetizzata
+        function toggleAmbientMusic() {
+            initAudio();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            if (isAudioPlaying) {
+                // Spegni Musica
+                if (ambientGain) {
+                    ambientGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1);
+                    setTimeout(() => {
+                        if (ambientOsc1) ambientOsc1.stop();
+                        if (ambientOsc2) ambientOsc2.stop();
+                    }, 1000);
+                }
+                isAudioPlaying = false;
+                document.getElementById('audio-status-text').innerText = "MUSIC OFF";
+                document.getElementById('audio-toggle-btn').classList.remove('audio-on');
+            } else {
+                // Avvia Musica Ambient Dark
+                ambientOsc1 = audioCtx.createOscillator();
+                ambientOsc2 = audioCtx.createOscillator();
+                ambientGain = audioCtx.createGain();
+
+                ambientOsc1.type = 'sine';
+                ambientOsc2.type = 'triangle';
+
+                // Accordo Frequenze Dronanti
+                ambientOsc1.frequency.setValueAtTime(55, audioCtx.currentTime); // A1
+                ambientOsc2.frequency.setValueAtTime(110, audioCtx.currentTime); // A2
+
+                ambientGain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+                ambientGain.gain.exponentialRampToValueAtTime(0.05, audioCtx.currentTime + 2); // Fade in
+
+                ambientOsc1.connect(ambientGain);
+                ambientOsc2.connect(ambientGain);
+                ambientGain.connect(audioCtx.destination);
+
+                ambientOsc1.start();
+                ambientOsc2.start();
+
+                isAudioPlaying = true;
+                document.getElementById('audio-status-text').innerText = "MUSIC ON";
+                document.getElementById('audio-toggle-btn').classList.add('audio-on');
+            }
+        }
+
+        document.getElementById('audio-toggle-btn').addEventListener('click', () => {
+            playSoundClick();
+            toggleAmbientMusic();
+        });
+
         // PREFERITI GESTIONE LOCALSTORAGE
         let favorites = JSON.parse(localStorage.getItem('tattoo_favorites')) || [];
         let showOnlyFavs = false;
+        let searchQuery = '';
 
         function saveFavorites() {
             localStorage.setItem('tattoo_favorites', JSON.stringify(favorites));
@@ -663,6 +815,7 @@
 
         function toggleFavorite(id, e) {
             if (e) e.stopPropagation();
+            playSoundFav();
             if (favorites.includes(id)) {
                 favorites = favorites.filter(favId => favId !== id);
             } else {
@@ -672,22 +825,44 @@
             renderTemplates();
         }
 
-        // RENDER 3D CAROUSEL & GRID
+        // RICERCA & FILTRI RENDER
         const carouselEl = document.getElementById('carousel3d');
         const gridEl = document.getElementById('grid-view');
+        const searchInput = document.getElementById('search-input');
         let currIndex = 0;
+
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase().trim();
+            currIndex = 0;
+            renderTemplates();
+        });
 
         function renderTemplates() {
             carouselEl.innerHTML = '';
             gridEl.innerHTML = '';
 
-            const listToRender = showOnlyFavs 
-                ? templates.filter(t => favorites.includes(t.id))
-                : templates;
+            let listToRender = templates;
 
-            if (listToRender.length === 0 && showOnlyFavs) {
-                gridEl.innerHTML = '<div class="no-favs-msg">Nessun template salvato nei preferiti. Clicca sul cuore ♥️ per aggiungerne uno!</div>';
-                carouselEl.innerHTML = '<div class="no-favs-msg">Nessun preferito presente.</div>';
+            // Filtro Preferiti
+            if (showOnlyFavs) {
+                listToRender = listToRender.filter(t => favorites.includes(t.id));
+            }
+
+            // Filtro Ricerca
+            if (searchQuery !== '') {
+                listToRender = listToRender.filter(t => 
+                    t.title.toLowerCase().includes(searchQuery) || 
+                    t.style.toLowerCase().includes(searchQuery) ||
+                    t.id.includes(searchQuery)
+                );
+            }
+
+            if (listToRender.length === 0) {
+                const msg = showOnlyFavs && searchQuery === '' 
+                    ? 'Nessun template salvato nei preferiti. Clicca sul cuore ♥️ per aggiungerne uno!'
+                    : 'Nessun template trovato per la ricerca effettuata.';
+                gridEl.innerHTML = `<div class="no-favs-msg">${msg}</div>`;
+                carouselEl.innerHTML = `<div class="no-favs-msg">${msg}</div>`;
                 return;
             }
 
@@ -716,7 +891,10 @@
                     </div>
                 `;
                 cItem.querySelector('.fav-btn').addEventListener('click', (e) => toggleFavorite(t.id, e));
-                cItem.addEventListener('click', () => openModal(t));
+                cItem.addEventListener('click', () => {
+                    playSoundClick();
+                    openModal(t);
+                });
                 carouselEl.appendChild(cItem);
 
                 // Item Grid
@@ -742,7 +920,10 @@
                     </div>
                 `;
                 gCard.querySelector('.fav-btn').addEventListener('click', (e) => toggleFavorite(t.id, e));
-                gCard.addEventListener('click', () => openModal(t));
+                gCard.addEventListener('click', () => {
+                    playSoundClick();
+                    openModal(t);
+                });
                 gridEl.appendChild(gCard);
             });
 
@@ -774,6 +955,7 @@
         }
 
         document.getElementById('next-btn').addEventListener('click', () => {
+            playSoundClick();
             const items = document.querySelectorAll('.carousel-item');
             if (currIndex < items.length - 1) currIndex++;
             else currIndex = 0;
@@ -781,6 +963,7 @@
         });
 
         document.getElementById('prev-btn').addEventListener('click', () => {
+            playSoundClick();
             const items = document.querySelectorAll('.carousel-item');
             if (currIndex > 0) currIndex--;
             else currIndex = items.length - 1;
@@ -790,6 +973,7 @@
         // FILTRO PREFERITI TOGGLE
         const favFilterBtn = document.getElementById('fav-filter-btn');
         favFilterBtn.addEventListener('click', () => {
+            playSoundClick();
             showOnlyFavs = !showOnlyFavs;
             favFilterBtn.classList.toggle('active-fav', showOnlyFavs);
             currIndex = 0;
@@ -803,6 +987,7 @@
         const gridView = document.getElementById('grid-view');
 
         btnShowroom.addEventListener('click', () => {
+            playSoundClick();
             btnShowroom.classList.add('active');
             btnGrid.classList.remove('active');
             showroomView.style.display = 'flex';
@@ -810,6 +995,7 @@
         });
 
         btnGrid.addEventListener('click', () => {
+            playSoundClick();
             btnGrid.classList.add('active');
             btnShowroom.classList.remove('active');
             showroomView.style.display = 'none';
@@ -828,6 +1014,7 @@
         }
 
         document.getElementById('modal-close').addEventListener('click', () => {
+            playSoundClick();
             modal.classList.remove('open');
         });
 
@@ -895,6 +1082,11 @@
             cursorDot.style.left = `${e.clientX}px`;
             cursorDot.style.top = `${e.clientY}px`;
         });
+
+        // PRIMO CLICK UTENTE (Per abilitare Audio Context del Browser)
+        window.addEventListener('click', () => {
+            initAudio();
+        }, { once: true });
 
         // INIT
         saveFavorites();
