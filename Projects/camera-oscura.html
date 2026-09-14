@@ -1,19 +1,668 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor Template — Marchetti Camera Oscura</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0d0a09;
+      color: #d6cfc6;
+    }
+    .font-oswald {
+      font-family: 'Oswald', sans-serif;
+    }
+    /* Custom Scrollbar per l'editor */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #14100e;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2b221f;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #c94a3a;
+    }
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0, 1, 0, 1);
+    }
+    .accordion-content.open {
+      max-height: 2500px;
+      transition: max-height 0.5s ease-in-out;
+    }
+    /* Preview Frame container */
+    .device-desktop {
+      width: 100%;
+      height: 100%;
+      transition: all 0.3s ease;
+    }
+    .device-mobile {
+      width: 395px;
+      height: 780px;
+      border: 12px solid #241c19;
+      border-radius: 36px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      transition: all 0.3s ease;
+    }
+  </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden select-none">
+
+  <header class="h-16 bg-[#070504] border-b border-[#241c19] px-4 flex items-center justify-between shrink-0 z-30">
+    <div class="flex items-center gap-3">
+      <div class="w-3 h-3 rounded-full bg-[#c94a3a] shadow-[0_0_8px_#c94a3a] animate-pulse"></div>
+      <h1 class="font-oswald text-lg tracking-wider text-white uppercase">Camera Oscura — <span class="text-[#c94a3a]">Live Editor</span></h1>
+    </div>
+
+    <!-- Toolbar della Dashboard -->
+    <div class="flex items-center gap-2">
+      <!-- Toggle Sidebar -->
+      <button id="btn-toggle-sidebar" class="px-3 py-1.5 text-xs bg-[#1a1412] hover:bg-[#28201d] text-gray-300 rounded border border-[#382b27] transition flex items-center gap-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+        <span class="hidden sm:inline">Pannello</span>
+      </button>
+
+      <!-- Viewport Controls -->
+      <div class="bg-[#14100e] border border-[#241c19] rounded p-0.5 flex items-center">
+        <button id="view-desktop" class="p-1.5 text-xs bg-[#241c19] text-white rounded transition" title="Vista Desktop">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </button>
+        <button id="view-mobile" class="p-1.5 text-xs text-gray-400 hover:text-white rounded transition" title="Vista Mobile">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+        </button>
+      </div>
+
+      <div class="h-5 w-px bg-[#241c19] mx-1"></div>
+
+      <!-- Action Buttons -->
+      <button id="btn-reset" class="px-3 py-1.5 text-xs bg-red-950/40 hover:bg-red-900/60 text-red-300 rounded border border-red-900/50 transition">
+        Reset
+      </button>
+      
+      <button id="btn-export-json" class="px-3 py-1.5 text-xs bg-[#1a1412] hover:bg-[#28201d] text-gray-300 rounded border border-[#382b27] transition hidden md:block">
+        Salva JSON
+      </button>
+      <input type="file" id="input-import-json" accept=".json" class="hidden">
+      <button id="btn-import-json" class="px-3 py-1.5 text-xs bg-[#1a1412] hover:bg-[#28201d] text-gray-300 rounded border border-[#382b27] transition hidden md:block">
+        Carica JSON
+      </button>
+
+      <button id="btn-copy" class="px-3 py-1.5 text-xs bg-[#7a2420] hover:bg-[#962d28] text-white rounded border border-[#962d28] transition font-medium">
+        Copia HTML
+      </button>
+
+      <button id="btn-download" class="px-4 py-1.5 text-xs bg-[#c94a3a] hover:bg-[#dc5443] text-white rounded font-semibold transition shadow-[0_0_12px_rgba(201,74,58,0.4)] flex items-center gap-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Scarica index.html
+      </button>
+    </div>
+  </header>
+
+  <div class="flex flex-1 overflow-hidden relative">
+    
+    <!-- PANNELLO EDITOR (LEFT SIDEBAR) -->
+    <aside id="sidebar" class="w-96 max-w-[90vw] bg-[#0d0a09] border-r border-[#241c19] flex flex-col h-full z-20 transition-all duration-300 ease-in-out shrink-0">
+      <div class="p-3 bg-[#14100e] border-b border-[#241c19] text-xs text-gray-400 flex justify-between items-center">
+        <span>CONFIGURATORE TEMPLATE</span>
+        <span class="text-[10px] text-[#c94a3a] bg-[#7a2420]/20 px-2 py-0.5 rounded border border-[#7a2420]/40">v2.4 GitHub Ready</span>
+      </div>
+
+      <!-- Form Controls Scrollable Area -->
+      <div id="editor-controls" class="flex-1 overflow-y-auto p-4 space-y-3 text-sm select-text">
+        
+        <!-- SECTION 1: COLORI E STILI -->
+        <div class="border border-[#241c19] rounded bg-[#070504] overflow-hidden">
+          <button class="accordion-header w-full p-3 text-left font-oswald text-gray-200 flex justify-between items-center bg-[#14100e] hover:bg-[#1a1412] transition">
+            <span>🎨 COLORI & TEMA</span>
+            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div class="accordion-content p-3 space-y-3 border-t border-[#241c19]">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Sfondo Scuro</label>
+                <div class="flex items-center gap-2">
+                  <input type="color" data-css="--nero" class="w-8 h-8 rounded bg-transparent cursor-pointer border-0">
+                  <span class="text-xs font-mono text-gray-300" data-css-val="--nero">#070504</span>
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Sfondo Schede</label>
+                <div class="flex items-center gap-2">
+                  <input type="color" data-css="--nero-alt" class="w-8 h-8 rounded bg-transparent cursor-pointer border-0">
+                  <span class="text-xs font-mono text-gray-300" data-css-val="--nero-alt">#0d0a09</span>
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Rosso Scuro (Btn)</label>
+                <div class="flex items-center gap-2">
+                  <input type="color" data-css="--rosso" class="w-8 h-8 rounded bg-transparent cursor-pointer border-0">
+                  <span class="text-xs font-mono text-gray-300" data-css-val="--rosso">#7a2420</span>
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Rosso Vivo (Accenti)</label>
+                <div class="flex items-center gap-2">
+                  <input type="color" data-css="--rosso-vivo" class="w-8 h-8 rounded bg-transparent cursor-pointer border-0">
+                  <span class="text-xs font-mono text-gray-300" data-css-val="--rosso-vivo">#c94a3a</span>
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Testo Principale</label>
+                <div class="flex items-center gap-2">
+                  <input type="color" data-css="--grigio" class="w-8 h-8 rounded bg-transparent cursor-pointer border-0">
+                  <span class="text-xs font-mono text-gray-300" data-css-val="--grigio">#d6cfc6</span>
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Testo Secondario</label>
+                <div class="flex items-center gap-2">
+                  <input type="color" data-css="--grigio-soft" class="w-8 h-8 rounded bg-transparent cursor-pointer border-0">
+                  <span class="text-xs font-mono text-gray-300" data-css-val="--grigio-soft">#8c8378</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: HEADER & LOGO -->
+        <div class="border border-[#241c19] rounded bg-[#070504] overflow-hidden">
+          <button class="accordion-header w-full p-3 text-left font-oswald text-gray-200 flex justify-between items-center bg-[#14100e] hover:bg-[#1a1412] transition">
+            <span>📌 HEADER & LOGO</span>
+            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div class="accordion-content p-3 space-y-3 border-t border-[#241c19]">
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Nome Studio / Logo</label>
+              <input type="text" data-bind="logo" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white focus:border-[#c94a3a] outline-none">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Voci Menu Navigazione</label>
+              <div class="grid grid-cols-2 gap-2">
+                <input type="text" data-bind="nav1" class="bg-[#14100e] border border-[#241c19] rounded p-1.5 text-xs text-white">
+                <input type="text" data-bind="nav2" class="bg-[#14100e] border border-[#241c19] rounded p-1.5 text-xs text-white">
+                <input type="text" data-bind="nav3" class="bg-[#14100e] border border-[#241c19] rounded p-1.5 text-xs text-white">
+                <input type="text" data-bind="nav4" class="bg-[#14100e] border border-[#241c19] rounded p-1.5 text-xs text-white">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 3: HERO -->
+        <div class="border border-[#241c19] rounded bg-[#070504] overflow-hidden">
+          <button class="accordion-header w-full p-3 text-left font-oswald text-gray-200 flex justify-between items-center bg-[#14100e] hover:bg-[#1a1412] transition">
+            <span>🔥 SEZIONE HERO</span>
+            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div class="accordion-content p-3 space-y-3 border-t border-[#241c19]">
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Etichetta Superiore (Label)</label>
+              <input type="text" data-bind="heroLabel" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white focus:border-[#c94a3a] outline-none">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Titolo Principale (H1)</label>
+              <textarea data-bind="heroTitle" rows="2" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white focus:border-[#c94a3a] outline-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Descrizione</label>
+              <textarea data-bind="heroDesc" rows="3" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white focus:border-[#c94a3a] outline-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Testo Bottone CTA</label>
+              <input type="text" data-bind="heroCta" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white focus:border-[#c94a3a] outline-none">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Testo Suggerimento Scroll</label>
+              <input type="text" data-bind="heroScroll" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white focus:border-[#c94a3a] outline-none">
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 4: FOGLIO CONTATTI (GALLERIA) -->
+        <div class="border border-[#241c19] rounded bg-[#070504] overflow-hidden">
+          <button class="accordion-header w-full p-3 text-left font-oswald text-gray-200 flex justify-between items-center bg-[#14100e] hover:bg-[#1a1412] transition">
+            <span>📷 FOGLIO CONTATTI (GALLERIA)</span>
+            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div class="accordion-content p-3 space-y-4 border-t border-[#241c19]">
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Titolo Sezione</label>
+              <input type="text" data-bind="foglioTitle" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Descrizione Sezione</label>
+              <textarea data-bind="foglioDesc" rows="2" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white"></textarea>
+            </div>
+            
+            <hr class="border-[#241c19]">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-semibold text-[#c94a3a]">FOTOGRAMMI (OPERE)</span>
+              <button id="btn-add-frame" class="px-2 py-1 text-[11px] bg-[#7a2420] hover:bg-[#c94a3a] text-white rounded transition">+ Aggiungi</button>
+            </div>
+
+            <!-- List of Frames Container -->
+            <div id="frames-list" class="space-y-3">
+              <!-- Dynamically Populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 5: PROCESSO DI SVILUPPO -->
+        <div class="border border-[#241c19] rounded bg-[#070504] overflow-hidden">
+          <button class="accordion-header w-full p-3 text-left font-oswald text-gray-200 flex justify-between items-center bg-[#14100e] hover:bg-[#1a1412] transition">
+            <span>🧪 PROCESSO DI SVILUPPO</span>
+            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div class="accordion-content p-3 space-y-3 border-t border-[#241c19]">
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Titolo Sezione</label>
+              <input type="text" data-bind="processTitle" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Sottotitolo</label>
+              <input type="text" data-bind="processDesc" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white">
+            </div>
+            <div id="vasche-list" class="space-y-3 pt-2">
+              <!-- Dynamically Populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 6: ARTISTA & STATISTICHE -->
+        <div class="border border-[#241c19] rounded bg-[#070504] overflow-hidden">
+          <button class="accordion-header w-full p-3 text-left font-oswald text-gray-200 flex justify-between items-center bg-[#14100e] hover:bg-[#1a1412] transition">
+            <span>👤 ARTISTA & BIOGRAFIA</span>
+            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div class="accordion-content p-3 space-y-3 border-t border-[#241c19]">
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Kicker / Sopratitolo</label>
+              <input type="text" data-bind="artistKicker" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Nome Artista</label>
+              <input type="text" data-bind="artistName" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Biografia Paragrafo 1</label>
+              <textarea data-bind="artistBio1" rows="3" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Biografia Paragrafo 2</label>
+              <textarea data-bind="artistBio2" rows="3" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Foto Artista (URL o Upload File)</label>
+              <div class="space-y-2">
+                <input type="text" id="artist-img-url" placeholder="https://..." class="w-full bg-[#14100e] border border-[#241c19] rounded p-1.5 text-xs text-white">
+                <input type="file" id="artist-img-file" accept="image/*" class="w-full text-xs text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#1a1412] file:text-white hover:file:bg-[#28201d]">
+              </div>
+            </div>
+            <hr class="border-[#241c19] my-2">
+            <span class="text-xs font-semibold text-[#c94a3a]">STATISTICHE CHIAVE</span>
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <input type="text" data-bind="stat1Num" class="w-full bg-[#14100e] border border-[#241c19] rounded p-1 text-xs text-white font-mono" placeholder="312">
+                <input type="text" data-bind="stat1Label" class="w-full bg-[#14100e] border border-[#241c19] rounded p-1 text-[10px] text-gray-400 mt-1" placeholder="Opere">
+              </div>
+              <div>
+                <input type="text" data-bind="stat2Num" class="w-full bg-[#14100e] border border-[#241c19] rounded p-1 text-xs text-white font-mono" placeholder="12">
+                <input type="text" data-bind="stat2Label" class="w-full bg-[#14100e] border border-[#241c19] rounded p-1 text-[10px] text-gray-400 mt-1" placeholder="Anni">
+              </div>
+              <div>
+                <input type="text" data-bind="stat3Num" class="w-full bg-[#14100e] border border-[#241c19] rounded p-1 text-xs text-white font-mono" placeholder="6">
+                <input type="text" data-bind="stat3Label" class="w-full bg-[#14100e] border border-[#241c19] rounded p-1 text-[10px] text-gray-400 mt-1" placeholder="Mesi">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 7: PRENOTAZIONE & FOOTER -->
+        <div class="border border-[#241c19] rounded bg-[#070504] overflow-hidden">
+          <button class="accordion-header w-full p-3 text-left font-oswald text-gray-200 flex justify-between items-center bg-[#14100e] hover:bg-[#1a1412] transition">
+            <span>✉️ PRENOTAZIONE & FOOTER</span>
+            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div class="accordion-content p-3 space-y-3 border-t border-[#241c19]">
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Titolo Sezione Prenotazione</label>
+              <input type="text" data-bind="ctaTitle" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Descrizione Prenotazione</label>
+              <textarea data-bind="ctaDesc" rows="2" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Email / Link Contatto</label>
+              <input type="text" data-bind="ctaMail" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Testo Bottone Scrivi</label>
+              <input type="text" data-bind="ctaBtn" class="w-full bg-[#14100e] border border-[#241c19] rounded p-2 text-xs text-white">
+            </div>
+            <hr class="border-[#241c19]">
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Link Footer (Instagram, Citta, Copyright)</label>
+              <div class="space-y-2">
+                <input type="text" data-bind="footLink1" class="w-full bg-[#14100e] border border-[#241c19] rounded p-1.5 text-xs text-white" placeholder="Instagram">
+                <input type="text" data-bind="footLink2" class="w-full bg-[#14100e] border border-[#241c19] rounded p-1.5 text-xs text-white" placeholder="Milano, Via Brera 14">
+                <input type="text" data-bind="footLink3" class="w-full bg-[#14100e] border border-[#241c19] rounded p-1.5 text-xs text-white" placeholder="©️ 2026">
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ANTEPRIMA LIVE IFRAME CONTAINER -->
+    <main class="flex-1 bg-[#050302] flex items-center justify-center p-2 md:p-6 overflow-hidden relative">
+      <div id="device-wrapper" class="device-desktop relative bg-black shadow-2xl transition-all duration-300">
+        <iframe id="preview-iframe" class="w-full h-full border-0 bg-[#070504]"></iframe>
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    // DATI PREDEFINITI DEL TEMPLATE
+    const defaultData = {
+      theme: {
+        "--nero": "#070504",
+        "--nero-alt": "#0d0a09",
+        "--rosso": "#7a2420",
+        "--rosso-vivo": "#c94a3a",
+        "--grigio": "#d6cfc6",
+        "--grigio-soft": "#8c8378"
+      },
+      content: {
+        logo: "MARCHETTI",
+        nav1: "Foglio Contatti",
+        nav2: "Sviluppo",
+        nav3: "Artista",
+        nav4: "Prenotazione",
+        heroLabel: "CAMERA OSCURA — STUDIO PRIVATO",
+        heroTitle: "Ogni pelle è un negativo\nancora da sviluppare.",
+        heroDesc: "Portiamo alla luce quello che hai già in mente. Un processo lento, fatto di esposizione, sviluppo e fissaggio — come in una vera camera oscura.",
+        heroCta: "Prenota una seduta",
+        heroScroll: "FOGLIO CONTATTI ↓",
+        foglioTitle: "Foglio contatti",
+        foglioDesc: "Passa il mouse su ogni fotogramma per vedere l'opera sviluppata.",
+        processTitle: "Il processo di sviluppo",
+        processDesc: "Quattro fasi, come in una vera camera oscura: dall'esposizione alla stampa finale.",
+        artistKicker: "L'ARTISTA",
+        artistName: "Lorenzo Marchetti",
+        artistBio1: "Formatosi tra Milano e Osaka, Lorenzo lavora esclusivamente su appuntamento da oltre dodici anni. Il suo studio conserva ogni progetto come un negativo originale: irripetibile.",
+        artistBio2: "Ogni sessione avviene sotto la stessa luce controllata, lontano da distrazioni — solo l'artista, la pelle e il disegno da sviluppare.",
+        artistImg: "",
+        stat1Num: "312",
+        stat1Label: "Opere sviluppate",
+        stat2Num: "12",
+        stat2Label: "Anni di attività",
+        stat3Num: "6",
+        stat3Label: "Mesi di lista d'attesa",
+        ctaTitle: "Porta alla luce la tua idea",
+        ctaDesc: "I posti in agenda sono limitati. Ogni richiesta viene esaminata personalmente prima della prenotazione.",
+        ctaMail: "studio@marchetti-tattoo.it",
+        ctaBtn: "Scrivi allo studio",
+        footLink1: "Instagram",
+        footLink2: "Milano, Via Brera 14",
+        footLink3: "©️ 2026"
+      },
+      frames: [
+        {
+          num: "FOTOGRAMMA 001",
+          titolo: "Studio in Bianco e Nero",
+          hint: "6 ore · avambraccio",
+          img: "",
+          svg: `<svg viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#c9a86a" stroke-linecap="round"><path d="M100 42 C78 42, 62 58, 62 78 C62 96, 74 108, 88 112" stroke-width="1.1"/><path d="M100 42 C122 42, 138 58, 138 78 C138 96, 126 108, 112 112" stroke-width="1.1"/><path d="M62 78 C50 86, 46 100, 52 114 C58 126, 72 132, 84 128" stroke-width="1"/><path d="M138 78 C150 86, 154 100, 148 114 C142 126, 128 132, 116 128" stroke-width="1"/><path d="M100 55 C88 55, 80 64, 80 76 C80 88, 90 96, 100 98" stroke-width="0.9"/><path d="M100 55 C112 55, 120 64, 120 76 C120 88, 110 96, 100 98" stroke-width="0.9"/><circle cx="100" cy="90" r="6" stroke-width="0.8"/><path d="M100 112 C98 140, 102 160, 96 182" stroke-width="1.1"/><path d="M97 130 C90 128, 84 132, 80 140" stroke-width="0.9"/><path d="M98 148 C80 146, 68 156, 64 172 C80 174, 94 166, 98 148Z" stroke-width="0.9"/></svg>`
+        },
+        {
+          num: "FOTOGRAMMA 002",
+          titolo: "Composizione Florale",
+          hint: "9 ore · costato",
+          img: "",
+          svg: `<svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#c9a86a" stroke-linecap="round"><circle cx="100" cy="100" r="82" stroke-width="0.7"/><circle cx="100" cy="100" r="68" stroke-width="1"/><g stroke-width="0.9"><path d="M100 32 C112 50, 112 66, 100 78 C88 66, 88 50, 100 32Z"/><path d="M100 168 C112 150, 112 134, 100 122 C88 134, 88 150, 100 168Z"/><path d="M32 100 C50 88, 66 88, 78 100 C66 112, 50 112, 32 100Z"/><path d="M168 100 C150 88, 134 88, 122 100 C134 112, 150 112, 168 100Z"/></g><circle cx="100" cy="100" r="14" stroke-width="1"/><circle cx="100" cy="100" r="6" stroke-width="0.7"/></svg>`
+        },
+        {
+          num: "FOTOGRAMMA 003",
+          titolo: "Geometria Sacra",
+          hint: "5 ore · scapola",
+          img: "",
+          svg: `<svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#c9a86a" stroke-linecap="round"><circle cx="100" cy="100" r="78" stroke-width="0.7"/><circle cx="100" cy="100" r="26" stroke-width="0.7"/><circle cx="100" cy="74" r="26" stroke-width="0.6" opacity="0.85"/><circle cx="100" cy="126" r="26" stroke-width="0.6" opacity="0.85"/><circle cx="77" cy="87" r="26" stroke-width="0.6" opacity="0.85"/><circle cx="123" cy="87" r="26" stroke-width="0.6" opacity="0.85"/><polygon points="100,32 156,132 44,132" stroke-width="1.1"/><polygon points="100,168 44,68 156,68" stroke-width="1.1"/></svg>`
+        },
+        {
+          num: "FOTOGRAMMA 004",
+          titolo: "Ritratto Realista",
+          hint: "14 ore · braccio",
+          img: "",
+          svg: `<svg viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#c9a86a" stroke-linecap="round"><path d="M78 42 C72 50, 68 62, 70 76 C64 80, 62 90, 66 98 C68 112, 76 124, 88 130" stroke-width="1"/><path d="M78 42 C92 30, 116 30, 128 46 C138 58, 138 78, 132 96 C128 110, 118 122, 104 128" stroke-width="1"/><path d="M90 76 C96 71, 106 71, 112 76 C106 81, 96 81, 90 76Z" stroke-width="0.9"/><circle cx="101" cy="76" r="3.2" stroke-width="0.7"/><path d="M96 112 C102 116, 112 116, 118 110" stroke-width="0.8"/><path d="M88 130 C86 142, 84 150, 80 158" stroke-width="1"/><path d="M104 128 C108 140, 112 148, 118 156" stroke-width="1"/></svg>`
+        }
+      ],
+      vasche: [
+        { step: "FASE 01", title: "Esposizione", desc: "Il primo incontro: ascoltiamo l'idea e la superficie che la ospiterà, senza ancora disegnare nulla." },
+        { step: "FASE 02", title: "Sviluppo", desc: "Il progetto prende forma su carta, in un dialogo continuo fino alla versione definitiva." },
+        { step: "FASE 03", title: "Fissaggio", desc: "L'opera viene realizzata sulla pelle, con la cura tecnica che ogni pezzo richiede." },
+        { step: "FASE 04", title: "Stampa", desc: "A guarigione avvenuta, il risultato finale viene fotografato e archiviato nel foglio contatti." }
+      ]
+    };
+
+    // Stato Corrente
+    let appState = JSON.parse(localStorage.getItem('marchetti_template_state')) || JSON.parse(JSON.stringify(defaultData));
+
+    // Setup Accordion
+    document.querySelectorAll('.accordion-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const content = header.nextElementSibling;
+        const icon = header.querySelector('svg');
+        const isOpen = content.classList.contains('open');
+        
+        // Close all
+        document.querySelectorAll('.accordion-content').forEach(c => c.classList.remove('open'));
+        document.querySelectorAll('.accordion-header svg').forEach(i => i.classList.remove('rotate-180'));
+        
+        if (!isOpen) {
+          content.classList.add('open');
+          icon.classList.add('rotate-180');
+        }
+      });
+    });
+
+    // Populate Dynamic Lists in Editor Panel
+    function renderDynamicControls() {
+      // Frames List
+      const framesList = document.getElementById('frames-list');
+      framesList.innerHTML = '';
+      appState.frames.forEach((frame, idx) => {
+        const div = document.createElement('div');
+        div.className = "bg-[#14100e] border border-[#241c19] p-3 rounded space-y-2 relative group";
+        div.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span class="text-[10px] font-mono text-[#c94a3a]">FOTOGRAMMA #${idx + 1}</span>
+            <button onclick="removeFrame(${idx})" class="text-red-400 hover:text-red-300 text-xs">Rimuovi</button>
+          </div>
+          <input type="text" value="${frame.num}" onchange="updateFrame(${idx}, 'num', this.value)" class="w-full bg-[#070504] border border-[#241c19] rounded p-1 text-xs text-white" placeholder="Numero">
+          <input type="text" value="${frame.titolo}" onchange="updateFrame(${idx}, 'titolo', this.value)" class="w-full bg-[#070504] border border-[#241c19] rounded p-1 text-xs text-white" placeholder="Titolo">
+          <input type="text" value="${frame.hint}" onchange="updateFrame(${idx}, 'hint', this.value)" class="w-full bg-[#070504] border border-[#241c19] rounded p-1 text-xs text-white" placeholder="Dettagli">
+          <div>
+            <label class="block text-[10px] text-gray-400 mb-0.5">Immagine (URL o File)</label>
+            <input type="text" value="${frame.img || ''}" onchange="updateFrame(${idx}, 'img', this.value)" class="w-full bg-[#070504] border border-[#241c19] rounded p-1 text-[11px] text-white" placeholder="https://...">
+            <input type="file" accept="image/*" onchange="uploadFrameImg(${idx}, this)" class="w-full text-[10px] text-gray-400 mt-1 file:py-0.5 file:px-1 file:rounded file:bg-[#1a1412] file:text-white file:border-0">
+          </div>
+        `;
+        framesList.appendChild(div);
+      });
+
+      // Vasche List (Processo)
+      const vascheList = document.getElementById('vasche-list');
+      vascheList.innerHTML = '';
+      appState.vasche.forEach((vasca, idx) => {
+        const div = document.createElement('div');
+        div.className = "bg-[#14100e] border border-[#241c19] p-2.5 rounded space-y-1.5";
+        div.innerHTML = `
+          <div class="flex items-center gap-2">
+            <input type="text" value="${vasca.step}" onchange="updateVasca(${idx}, 'step', this.value)" class="w-24 bg-[#070504] border border-[#241c19] rounded p-1 text-xs text-[#c94a3a] font-mono">
+            <input type="text" value="${vasca.title}" onchange="updateVasca(${idx}, 'title', this.value)" class="flex-1 bg-[#070504] border border-[#241c19] rounded p-1 text-xs text-white font-semibold">
+          </div>
+          <textarea onchange="updateVasca(${idx}, 'desc', this.value)" rows="2" class="w-full bg-[#070504] border border-[#241c19] rounded p-1 text-xs text-gray-300">${vasca.desc}</textarea>
+        `;
+        vascheList.appendChild(div);
+      });
+    }
+
+    // Helper Dynamic Actions
+    window.removeFrame = function(idx) {
+      appState.frames.splice(idx, 1);
+      saveAndRefresh();
+    };
+
+    window.updateFrame = function(idx, key, val) {
+      appState.frames[idx][key] = val;
+      saveAndRefresh();
+    };
+
+    window.uploadFrameImg = function(idx, input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          appState.frames[idx].img = e.target.result;
+          saveAndRefresh();
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    };
+
+    window.updateVasca = function(idx, key, val) {
+      appState.vasche[idx][key] = val;
+      saveAndRefresh();
+    };
+
+    document.getElementById('btn-add-frame').addEventListener('click', () => {
+      appState.frames.push({
+        num: `FOTOGRAMMA 00${appState.frames.length + 1}`,
+        titolo: "Nuova Opera",
+        hint: "4 ore · braccio",
+        img: "",
+        svg: `<svg viewBox="0 0 200 200" fill="none" stroke="#c9a86a"><rect x="40" y="40" width="120" height="120" stroke-width="1"/><circle cx="100" cy="100" r="30" stroke-width="1"/></svg>`
+      });
+      saveAndRefresh();
+    });
+
+    // Artist Image Upload Handlers
+    document.getElementById('artist-img-url').addEventListener('change', (e) => {
+      appState.content.artistImg = e.target.value;
+      saveAndRefresh();
+    });
+
+    document.getElementById('artist-img-file').addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          appState.content.artistImg = evt.target.result;
+          document.getElementById('artist-img-url').value = '';
+          saveAndRefresh();
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
+
+    // Bind static form inputs
+    function bindInputs() {
+      // CSS Colors
+      document.querySelectorAll('input[data-css]').forEach(input => {
+        const cssVar = input.getAttribute('data-css');
+        input.value = appState.theme[cssVar] || "#000000";
+        input.addEventListener('input', (e) => {
+          appState.theme[cssVar] = e.target.value;
+          document.querySelector(`[data-css-val="${cssVar}"]`).textContent = e.target.value;
+          saveAndRefresh();
+        });
+      });
+
+      // Text Fields
+      document.querySelectorAll('[data-bind]').forEach(input => {
+        const key = input.getAttribute('data-bind');
+        if (appState.content[key] !== undefined) {
+          input.value = appState.content[key];
+        }
+        input.addEventListener('input', (e) => {
+          appState.content[key] = e.target.value;
+          saveAndRefresh();
+        });
+      });
+
+      if (appState.content.artistImg && !appState.content.artistImg.startsWith('data:')) {
+        document.getElementById('artist-img-url').value = appState.content.artistImg;
+      }
+    }
+
+    // GENERATORE CODICE HTML COMPLETO SENZA CODE EDITOR (PER GITHUB INDEX.HTML)
+    function generateCleanHTML(data) {
+      const heroTitleFormatted = (data.content.heroTitle || '').replace(/\n/g, '<br>');
+      
+      // Build Frames HTML
+      const framesHTML = data.frames.map(f => {
+        const mediaContent = f.img 
+          ? `<img src="${f.img}" alt="${f.titolo}">` 
+          : (f.svg || `<div class="w-full h-full bg-[#14100e]"></div>`);
+
+        return `
+    <article class="fotogramma">
+      <span class="frame-numero">${f.num}</span>
+      <div class="frame-img">
+        ${mediaContent}
+      </div>
+      <div class="frame-titolo">${f.titolo}</div>
+      <div class="frame-hint">${f.hint}</div>
+    </article>`;
+      }).join('\n');
+
+      // Build Vasche (Process Steps) HTML
+      const vascheHTML = data.vasche.map(v => `
+    <div class="vasca">
+      <span class="vasca-tempo">${v.step}</span>
+      <h3>${v.title}</h3>
+      <p>${v.desc}</p>
+    </div>`).join('\n');
+
+      // Artist Image
+      const artistMedia = data.content.artistImg 
+        ? `<img src="${data.content.artistImg}" alt="${data.content.artistName}">`
+        : `<svg viewBox="0 0 200 260" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#c9a86a" stroke-linecap="round">
+        <path d="M100 34 C68 34, 52 62, 56 92 C46 96, 45 116, 56 122 C60 150, 78 172, 100 172 C122 172, 140 150, 144 122 C155 116, 154 96, 144 92 C148 62, 132 34, 100 34Z" stroke-width="1"/>
+        <path d="M72 96 C78 90, 90 90, 96 96 C90 102, 78 102, 72 96Z" stroke-width="0.9"/>
+        <path d="M104 96 C110 90, 122 90, 128 96 C122 102, 110 102, 104 96Z" stroke-width="0.9"/>
+        <circle cx="84" cy="96" r="3" stroke-width="0.6"/>
+        <circle cx="116" cy="96" r="3" stroke-width="0.6"/>
+        <path d="M84 138 C92 143, 108 143, 116 138" stroke-width="0.9"/>
+        <path d="M100 172 L100 196 M56 240 C64 210, 84 196, 100 196 C116 196, 136 210, 144 240" stroke-width="1"/>
+      </svg>`;
+
+      return `<!DOCTYPE html>
+<html lang="it">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Marchetti — Camera Oscura</title>
+<title>${data.content.logo} — Camera Oscura</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --nero: #070504;
-    --nero-alt: #0d0a09;
-    --rosso: #7a2420;
-    --rosso-vivo: #c94a3a;
-    --grigio: #d6cfc6;
-    --grigio-soft: #8c8378;
+    --nero: ${data.theme['--nero'] || '#070504'};
+    --nero-alt: ${data.theme['--nero-alt'] || '#0d0a09'};
+    --rosso: ${data.theme['--rosso'] || '#7a2420'};
+    --rosso-vivo: ${data.theme['--rosso-vivo'] || '#c94a3a'};
+    --grigio: ${data.theme['--grigio'] || '#d6cfc6'};
+    --grigio-soft: ${data.theme['--grigio-soft'] || '#8c8378'};
     --linea: #241c19;
   }
 
@@ -221,12 +870,12 @@
     overflow:hidden;
     display:flex; align-items:center; justify-content:center;
   }
-  .frame-img svg{
-    width:64%; height:64%;
+  .frame-img img, .frame-img svg{
+    width:100%; height:100%; object-fit:cover;
     filter:invert(1) grayscale(1) contrast(1.6) brightness(0.9) sepia(0.4) hue-rotate(-30deg);
     transition:filter 0.6s ease;
   }
-  .fotogramma:hover .frame-img svg{
+  .fotogramma:hover .frame-img img, .fotogramma:hover .frame-img svg{
     filter:none;
   }
   .frame-img::before{
@@ -294,12 +943,12 @@
     overflow:hidden;
     display:flex; align-items:center; justify-content:center;
   }
-  .artista-img svg{
-    width:50%;
+  .artista-img img, .artista-img svg{
+    width:100%; height:100%; object-fit:cover;
     filter:invert(1) grayscale(1) contrast(1.5) brightness(0.85) sepia(0.4) hue-rotate(-30deg);
     transition:filter 0.8s ease;
   }
-  .artista-img:hover svg{filter:none;}
+  .artista-img:hover img, .artista-img:hover svg{filter:none;}
   .artista-img::before{
     content:"";
     position:absolute; inset:0;
@@ -408,181 +1057,212 @@
 <body>
 
 <header>
-  <div class="logo"><span class="rec-dot"></span>MARCHETTI</div>
+  <div class="logo"><span class="rec-dot"></span>${data.content.logo}</div>
   <nav>
     <ul>
-      <li><a href="#foglio">Foglio Contatti</a></li>
-      <li><a href="#processo">Sviluppo</a></li>
-      <li><a href="#artista">Artista</a></li>
-      <li><a href="#prenotazione">Prenotazione</a></li>
+      <li><a href="#foglio">${data.content.nav1}</a></li>
+      <li><a href="#processo">${data.content.nav2}</a></li>
+      <li><a href="#artista">${data.content.nav3}</a></li>
+      <li><a href="#prenotazione">${data.content.nav4}</a></li>
     </ul>
   </nav>
 </header>
 
 <section class="hero">
-  <span class="hero-label">CAMERA OSCURA — STUDIO PRIVATO</span>
-  <h1>Ogni pelle è un negativo<br>ancora da sviluppare.</h1>
-  <p>Portiamo alla luce quello che hai già in mente. Un processo lento, fatto di esposizione, sviluppo e fissaggio — come in una vera camera oscura.</p>
+  <span class="hero-label">${data.content.heroLabel}</span>
+  <h1>${heroTitleFormatted}</h1>
+  <p>${data.content.heroDesc}</p>
   <div class="hero-cta">
-    <a href="#prenotazione" class="btn">Prenota una seduta</a>
+    <a href="#prenotazione" class="btn">${data.content.heroCta}</a>
   </div>
-  <div class="scroll-hint">FOGLIO CONTATTI ↓</div>
+  <div class="scroll-hint">${data.content.heroScroll}</div>
 </section>
 
 <section class="section" id="foglio">
   <div class="section-head">
-    <h2>Foglio contatti</h2>
-    <p>Passa il mouse su ogni fotogramma per vedere l'opera sviluppata.</p>
+    <h2>${data.content.foglioTitle}</h2>
+    <p>${data.content.foglioDesc}</p>
   </div>
 
   <div class="foglio">
-    <article class="fotogramma">
-      <span class="frame-numero">FOTOGRAMMA 001</span>
-      <div class="frame-img">
-        <svg viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#c9a86a" stroke-linecap="round">
-          <path d="M100 42 C78 42, 62 58, 62 78 C62 96, 74 108, 88 112" stroke-width="1.1"/>
-          <path d="M100 42 C122 42, 138 58, 138 78 C138 96, 126 108, 112 112" stroke-width="1.1"/>
-          <path d="M62 78 C50 86, 46 100, 52 114 C58 126, 72 132, 84 128" stroke-width="1"/>
-          <path d="M138 78 C150 86, 154 100, 148 114 C142 126, 128 132, 116 128" stroke-width="1"/>
-          <path d="M100 55 C88 55, 80 64, 80 76 C80 88, 90 96, 100 98" stroke-width="0.9"/>
-          <path d="M100 55 C112 55, 120 64, 120 76 C120 88, 110 96, 100 98" stroke-width="0.9"/>
-          <circle cx="100" cy="90" r="6" stroke-width="0.8"/>
-          <path d="M100 112 C98 140, 102 160, 96 182" stroke-width="1.1"/>
-          <path d="M97 130 C90 128, 84 132, 80 140" stroke-width="0.9"/>
-          <path d="M98 148 C80 146, 68 156, 64 172 C80 174, 94 166, 98 148Z" stroke-width="0.9"/>
-        </svg>
-      </div>
-      <div class="frame-titolo">Studio in Bianco e Nero</div>
-      <div class="frame-hint">6 ore · avambraccio</div>
-    </article>
-
-    <article class="fotogramma">
-      <span class="frame-numero">FOTOGRAMMA 002</span>
-      <div class="frame-img">
-        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#c9a86a" stroke-linecap="round">
-          <circle cx="100" cy="100" r="82" stroke-width="0.7"/>
-          <circle cx="100" cy="100" r="68" stroke-width="1"/>
-          <g stroke-width="0.9">
-            <path d="M100 32 C112 50, 112 66, 100 78 C88 66, 88 50, 100 32Z"/>
-            <path d="M100 168 C112 150, 112 134, 100 122 C88 134, 88 150, 100 168Z"/>
-            <path d="M32 100 C50 88, 66 88, 78 100 C66 112, 50 112, 32 100Z"/>
-            <path d="M168 100 C150 88, 134 88, 122 100 C134 112, 150 112, 168 100Z"/>
-          </g>
-          <circle cx="100" cy="100" r="14" stroke-width="1"/>
-          <circle cx="100" cy="100" r="6" stroke-width="0.7"/>
-        </svg>
-      </div>
-      <div class="frame-titolo">Composizione Florale</div>
-      <div class="frame-hint">9 ore · costato</div>
-    </article>
-
-    <article class="fotogramma">
-      <span class="frame-numero">FOTOGRAMMA 003</span>
-      <div class="frame-img">
-        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#c9a86a" stroke-linecap="round">
-          <circle cx="100" cy="100" r="78" stroke-width="0.7"/>
-          <circle cx="100" cy="100" r="26" stroke-width="0.7"/>
-          <circle cx="100" cy="74" r="26" stroke-width="0.6" opacity="0.85"/>
-          <circle cx="100" cy="126" r="26" stroke-width="0.6" opacity="0.85"/>
-          <circle cx="77" cy="87" r="26" stroke-width="0.6" opacity="0.85"/>
-          <circle cx="123" cy="87" r="26" stroke-width="0.6" opacity="0.85"/>
-          <polygon points="100,32 156,132 44,132" stroke-width="1.1"/>
-          <polygon points="100,168 44,68 156,68" stroke-width="1.1"/>
-        </svg>
-      </div>
-      <div class="frame-titolo">Geometria Sacra</div>
-      <div class="frame-hint">5 ore · scapola</div>
-    </article>
-
-    <article class="fotogramma">
-      <span class="frame-numero">FOTOGRAMMA 004</span>
-      <div class="frame-img">
-        <svg viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#c9a86a" stroke-linecap="round">
-          <path d="M78 42 C72 50, 68 62, 70 76 C64 80, 62 90, 66 98 C68 112, 76 124, 88 130" stroke-width="1"/>
-          <path d="M78 42 C92 30, 116 30, 128 46 C138 58, 138 78, 132 96 C128 110, 118 122, 104 128" stroke-width="1"/>
-          <path d="M90 76 C96 71, 106 71, 112 76 C106 81, 96 81, 90 76Z" stroke-width="0.9"/>
-          <circle cx="101" cy="76" r="3.2" stroke-width="0.7"/>
-          <path d="M96 112 C102 116, 112 116, 118 110" stroke-width="0.8"/>
-          <path d="M88 130 C86 142, 84 150, 80 158" stroke-width="1"/>
-          <path d="M104 128 C108 140, 112 148, 118 156" stroke-width="1"/>
-        </svg>
-      </div>
-      <div class="frame-titolo">Ritratto Realista</div>
-      <div class="frame-hint">14 ore · braccio</div>
-    </article>
+    ${framesHTML}
   </div>
 </section>
 
 <section class="section" id="processo">
   <div class="section-head">
-    <h2>Il processo di sviluppo</h2>
-    <p>Quattro fasi, come in una vera camera oscura: dall'esposizione alla stampa finale.</p>
+    <h2>${data.content.processTitle}</h2>
+    <p>${data.content.processDesc}</p>
   </div>
   <div class="vasche">
-    <div class="vasca">
-      <span class="vasca-tempo">FASE 01</span>
-      <h3>Esposizione</h3>
-      <p>Il primo incontro: ascoltiamo l'idea e la superficie che la ospiterà, senza ancora disegnare nulla.</p>
-    </div>
-    <div class="vasca">
-      <span class="vasca-tempo">FASE 02</span>
-      <h3>Sviluppo</h3>
-      <p>Il progetto prende forma su carta, in un dialogo continuo fino alla versione definitiva.</p>
-    </div>
-    <div class="vasca">
-      <span class="vasca-tempo">FASE 03</span>
-      <h3>Fissaggio</h3>
-      <p>L'opera viene realizzata sulla pelle, con la cura tecnica che ogni pezzo richiede.</p>
-    </div>
-    <div class="vasca">
-      <span class="vasca-tempo">FASE 04</span>
-      <h3>Stampa</h3>
-      <p>A guarigione avvenuta, il risultato finale viene fotografato e archiviato nel foglio contatti.</p>
-    </div>
+    ${vascheHTML}
   </div>
 </section>
 
 <section class="section" id="artista">
   <div class="artista-wrap">
     <div class="artista-img">
-      <svg viewBox="0 0 200 260" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#c9a86a" stroke-linecap="round">
-        <path d="M100 34 C68 34, 52 62, 56 92 C46 96, 45 116, 56 122 C60 150, 78 172, 100 172 C122 172, 140 150, 144 122 C155 116, 154 96, 144 92 C148 62, 132 34, 100 34Z" stroke-width="1"/>
-        <path d="M72 96 C78 90, 90 90, 96 96 C90 102, 78 102, 72 96Z" stroke-width="0.9"/>
-        <path d="M104 96 C110 90, 122 90, 128 96 C122 102, 110 102, 104 96Z" stroke-width="0.9"/>
-        <circle cx="84" cy="96" r="3" stroke-width="0.6"/>
-        <circle cx="116" cy="96" r="3" stroke-width="0.6"/>
-        <path d="M84 138 C92 143, 108 143, 116 138" stroke-width="0.9"/>
-        <path d="M100 172 L100 196 M56 240 C64 210, 84 196, 100 196 C116 196, 136 210, 144 240" stroke-width="1"/>
-      </svg>
+      ${artistMedia}
     </div>
     <div class="artista-testo">
-      <span class="kicker">L'ARTISTA</span>
-      <h2>Lorenzo Marchetti</h2>
-      <p>Formatosi tra Milano e Osaka, Lorenzo lavora esclusivamente su appuntamento da oltre dodici anni. Il suo studio conserva ogni progetto come un negativo originale: irripetibile.</p>
-      <p>Ogni sessione avviene sotto la stessa luce controllata, lontano da distrazioni — solo l'artista, la pelle e il disegno da sviluppare.</p>
+      <span class="kicker">${data.content.artistKicker}</span>
+      <h2>${data.content.artistName}</h2>
+      <p>${data.content.artistBio1}</p>
+      <p>${data.content.artistBio2}</p>
       <div class="stat-row">
-        <div><span class="stat-num">312</span><span class="stat-label">Opere sviluppate</span></div>
-        <div><span class="stat-num">12</span><span class="stat-label">Anni di attività</span></div>
-        <div><span class="stat-num">6</span><span class="stat-label">Mesi di lista d'attesa</span></div>
+        <div><span class="stat-num">${data.content.stat1Num}</span><span class="stat-label">${data.content.stat1Label}</span></div>
+        <div><span class="stat-num">${data.content.stat2Num}</span><span class="stat-label">${data.content.stat2Label}</span></div>
+        <div><span class="stat-num">${data.content.stat3Num}</span><span class="stat-label">${data.content.stat3Label}</span></div>
       </div>
     </div>
   </div>
 </section>
 
 <section class="section prenotazione" id="prenotazione">
-  <h2>Porta alla luce la tua idea</h2>
-  <p>I posti in agenda sono limitati. Ogni richiesta viene esaminata personalmente prima della prenotazione.</p>
-  <a href="mailto:studio@marchetti-tattoo.it" class="btn">Scrivi allo studio</a>
+  <h2>${data.content.ctaTitle}</h2>
+  <p>${data.content.ctaDesc}</p>
+  <a href="mailto:${data.content.ctaMail}" class="btn">${data.content.ctaBtn}</a>
 </section>
 
 <footer>
-  <div class="logo"><span class="rec-dot"></span>MARCHETTI</div>
+  <div class="logo"><span class="rec-dot"></span>${data.content.logo}</div>
   <div class="footer-links">
-    <a href="#">Instagram</a>
-    <a href="#">Milano, Via Brera 14</a>
-    <a href="#">© 2026</a>
+    <a href="#">${data.content.footLink1}</a>
+    <a href="#">${data.content.footLink2}</a>
+    <a href="#">${data.content.footLink3}</a>
   </div>
 </footer>
 
+</body>
+</html>`;
+    }
+
+    // Update Iframe Preview
+    function updatePreview() {
+      const iframe = document.getElementById('preview-iframe');
+      const cleanHTML = generateCleanHTML(appState);
+      
+      // Preservare scroll posizione iframe durante modifiche
+      const scrollY = iframe.contentWindow ? iframe.contentWindow.scrollY : 0;
+      
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      doc.open();
+      doc.write(cleanHTML);
+      doc.close();
+
+      setTimeout(() => {
+        if (iframe.contentWindow) iframe.contentWindow.scrollTo(0, scrollY);
+      }, 50);
+    }
+
+    // Save State and Refresh UI
+    function saveAndRefresh() {
+      localStorage.setItem('marchetti_template_state', JSON.stringify(appState));
+      updatePreview();
+    }
+
+    // Viewport Toggle
+    document.getElementById('view-desktop').addEventListener('click', () => {
+      const wrapper = document.getElementById('device-wrapper');
+      wrapper.className = "device-desktop relative bg-black shadow-2xl transition-all duration-300";
+      document.getElementById('view-desktop').classList.add('bg-[#241c19]', 'text-white');
+      document.getElementById('view-mobile').classList.remove('bg-[#241c19]', 'text-white');
+    });
+
+    document.getElementById('view-mobile').addEventListener('click', () => {
+      const wrapper = document.getElementById('device-wrapper');
+      wrapper.className = "device-mobile relative bg-black shadow-2xl transition-all duration-300";
+      document.getElementById('view-mobile').classList.add('bg-[#241c19]', 'text-white');
+      document.getElementById('view-desktop').classList.remove('bg-[#241c19]', 'text-white');
+    });
+
+    // Toggle Sidebar visibility
+    document.getElementById('btn-toggle-sidebar').addEventListener('click', () => {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('-ml-96');
+    });
+
+    // DOWNLOAD INDEX.HTML (Ready for GitHub)
+    document.getElementById('btn-download').addEventListener('click', () => {
+      const htmlCode = generateCleanHTML(appState);
+      const blob = new Blob([htmlCode], { type: 'text/html;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'index.html';
+      link.click();
+      URL.revokeObjectURL(link.href);
+    });
+
+    // COPY HTML CODE TO CLIPBOARD
+    document.getElementById('btn-copy').addEventListener('click', () => {
+      const htmlCode = generateCleanHTML(appState);
+      const dummy = document.createElement('textarea');
+      document.body.appendChild(dummy);
+      dummy.value = htmlCode;
+      dummy.select();
+      document.execCommand('copy');
+      document.body.removeChild(dummy);
+      
+      const btn = document.getElementById('btn-copy');
+      const originalText = btn.innerText;
+      btn.innerText = "Copiato!";
+      btn.classList.add('bg-green-700');
+      setTimeout(() => {
+        btn.innerText = originalText;
+        btn.classList.remove('bg-green-700');
+      }, 2000);
+    });
+
+    // RESET DEFAULT
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      if (confirm('Sei sicuro di voler ripristinare il template iniziale? Tutte le modifiche andranno perse.')) {
+        appState = JSON.parse(JSON.stringify(defaultData));
+        localStorage.removeItem('marchetti_template_state');
+        initApp();
+      }
+    });
+
+    // EXPORT / IMPORT JSON CONFIG
+    document.getElementById('btn-export-json').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(appState, null, 2)], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'marchetti-config.json';
+      link.click();
+    });
+
+    document.getElementById('btn-import-json').addEventListener('click', () => {
+      document.getElementById('input-import-json').click();
+    });
+
+    document.getElementById('input-import-json').addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          try {
+            appState = JSON.parse(evt.target.result);
+            initApp();
+          } catch(err) {
+            alert('File JSON non valido!');
+          }
+        };
+        reader.readAsText(e.target.files[0]);
+      }
+    });
+
+    // Initialize App
+    function initApp() {
+      bindInputs();
+      renderDynamicControls();
+      updatePreview();
+    }
+
+    window.onload = function() {
+      initApp();
+      // Apri il primo accordion per default
+      const firstAccordion = document.querySelector('.accordion-content');
+      if (firstAccordion) firstAccordion.classList.add('open');
+    };
+  </script>
 </body>
 </html>
