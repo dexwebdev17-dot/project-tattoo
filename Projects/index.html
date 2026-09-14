@@ -19,6 +19,7 @@
             --text-primary: #f8f8fa;
             --text-secondary: #9a9ab0;
             --text-muted: #575766;
+            --heart-red: #ff4757;
         }
 
         * {
@@ -74,13 +75,6 @@
             z-index: 10000;
         }
 
-        .hovered #custom-cursor {
-            width: 50px;
-            height: 50px;
-            background-color: rgba(212, 175, 55, 0.1);
-            border-color: #fff;
-        }
-
         /* App Wrapper */
         .app-wrapper {
             position: relative;
@@ -126,10 +120,17 @@
             gap: 8px;
         }
 
-        .control-btn:hover {
+        .control-btn:hover, .control-btn.active {
             border-color: var(--accent-gold);
             background: rgba(212, 175, 55, 0.15);
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .control-btn.active-fav {
+            border-color: var(--heart-red);
+            color: var(--heart-red);
+            background: rgba(255, 71, 87, 0.15);
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.2);
         }
 
         .category-badge {
@@ -200,6 +201,36 @@
             color: #000;
             font-weight: 700;
             box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Heart Button (Fav) Style */
+        .fav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            z-index: 10;
+        }
+
+        .fav-btn:hover {
+            transform: scale(1.15);
+            border-color: var(--heart-red);
+            color: var(--heart-red);
+        }
+
+        .fav-btn.active {
+            color: var(--heart-red);
+            border-color: var(--heart-red);
+            background: rgba(255, 71, 87, 0.2);
+            box-shadow: 0 0 12px rgba(255, 71, 87, 0.4);
         }
 
         /* 3D SHOWROOM CAROUSEL MODE */
@@ -301,7 +332,7 @@
             transition: transform 0.5s ease;
         }
 
-        .carousel-item:hover .card-visual svg {
+        .carousel-item:hover .card-visual svg, .grid-card:hover .card-visual svg {
             transform: scale(1.1) rotate(2deg);
         }
 
@@ -359,6 +390,12 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .card-number {
@@ -500,6 +537,15 @@
             box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
         }
 
+        .no-favs-msg {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
         footer {
             text-align: center;
             margin-top: 80px;
@@ -520,8 +566,8 @@
     <div class="app-wrapper">
         <header>
             <div class="nav-controls">
-                <button class="control-btn" id="audio-toggle">
-                    <span id="audio-icon">🔊</span> SOUND
+                <button class="control-btn" id="fav-filter-btn">
+                    <span>♥️</span> PREFERITI (<span id="fav-count">0</span>)
                 </button>
             </div>
 
@@ -606,6 +652,26 @@
             { id: '27', title: 'Yugen', file: 'yugen.html', style: 'Zen Minimal / Misterioso', icon: '<line x1="4" y1="12" x2="20" y2="12" stroke="#d4af37" stroke-width="2"/>' }
         ];
 
+        // PREFERITI GESTIONE LOCALSTORAGE
+        let favorites = JSON.parse(localStorage.getItem('tattoo_favorites')) || [];
+        let showOnlyFavs = false;
+
+        function saveFavorites() {
+            localStorage.setItem('tattoo_favorites', JSON.stringify(favorites));
+            document.getElementById('fav-count').innerText = favorites.length;
+        }
+
+        function toggleFavorite(id, e) {
+            if (e) e.stopPropagation();
+            if (favorites.includes(id)) {
+                favorites = favorites.filter(favId => favId !== id);
+            } else {
+                favorites.push(id);
+            }
+            saveFavorites();
+            renderTemplates();
+        }
+
         // RENDER 3D CAROUSEL & GRID
         const carouselEl = document.getElementById('carousel3d');
         const gridEl = document.getElementById('grid-view');
@@ -615,14 +681,29 @@
             carouselEl.innerHTML = '';
             gridEl.innerHTML = '';
 
-            templates.forEach((t, i) => {
+            const listToRender = showOnlyFavs 
+                ? templates.filter(t => favorites.includes(t.id))
+                : templates;
+
+            if (listToRender.length === 0 && showOnlyFavs) {
+                gridEl.innerHTML = '<div class="no-favs-msg">Nessun template salvato nei preferiti. Clicca sul cuore ♥️ per aggiungerne uno!</div>';
+                carouselEl.innerHTML = '<div class="no-favs-msg">Nessun preferito presente.</div>';
+                return;
+            }
+
+            listToRender.forEach((t, i) => {
+                const isFav = favorites.includes(t.id);
+
                 // Item Carousel 3D
                 const cItem = document.createElement('div');
                 cItem.className = 'carousel-item';
                 cItem.innerHTML = `
                     <div class="card-header-flex">
                         <span class="card-title">${t.title}</span>
-                        <span class="card-number">${t.id}</span>
+                        <div class="header-actions">
+                            <span class="card-number">${t.id}</span>
+                            <button class="fav-btn ${isFav ? 'active' : ''}" title="Salva nei Preferiti">♥️</button>
+                        </div>
                     </div>
                     <div class="card-visual">
                         <svg viewBox="0 0 24 24">${t.icon}</svg>
@@ -634,6 +715,7 @@
                         </div>
                     </div>
                 `;
+                cItem.querySelector('.fav-btn').addEventListener('click', (e) => toggleFavorite(t.id, e));
                 cItem.addEventListener('click', () => openModal(t));
                 carouselEl.appendChild(cItem);
 
@@ -643,7 +725,10 @@
                 gCard.innerHTML = `
                     <div class="card-header-flex">
                         <span class="card-title">${t.title}</span>
-                        <span class="card-number">${t.id}</span>
+                        <div class="header-actions">
+                            <span class="card-number">${t.id}</span>
+                            <button class="fav-btn ${isFav ? 'active' : ''}" title="Salva nei Preferiti">♥️</button>
+                        </div>
                     </div>
                     <div class="card-visual">
                         <svg viewBox="0 0 24 24">${t.icon}</svg>
@@ -656,16 +741,18 @@
                         </div>
                     </div>
                 `;
+                gCard.querySelector('.fav-btn').addEventListener('click', (e) => toggleFavorite(t.id, e));
                 gCard.addEventListener('click', () => openModal(t));
                 gridEl.appendChild(gCard);
             });
 
+            if (currIndex >= listToRender.length) currIndex = 0;
             updateCarousel();
         }
 
         function updateCarousel() {
             const items = document.querySelectorAll('.carousel-item');
-            const total = items.length;
+            if (!items.length) return;
 
             items.forEach((item, index) => {
                 const offset = index - currIndex;
@@ -687,15 +774,26 @@
         }
 
         document.getElementById('next-btn').addEventListener('click', () => {
-            if (currIndex < templates.length - 1) currIndex++;
+            const items = document.querySelectorAll('.carousel-item');
+            if (currIndex < items.length - 1) currIndex++;
             else currIndex = 0;
             updateCarousel();
         });
 
         document.getElementById('prev-btn').addEventListener('click', () => {
+            const items = document.querySelectorAll('.carousel-item');
             if (currIndex > 0) currIndex--;
-            else currIndex = templates.length - 1;
+            else currIndex = items.length - 1;
             updateCarousel();
+        });
+
+        // FILTRO PREFERITI TOGGLE
+        const favFilterBtn = document.getElementById('fav-filter-btn');
+        favFilterBtn.addEventListener('click', () => {
+            showOnlyFavs = !showOnlyFavs;
+            favFilterBtn.classList.toggle('active-fav', showOnlyFavs);
+            currIndex = 0;
+            renderTemplates();
         });
 
         // SWITCH VIEW MODES
@@ -798,6 +896,8 @@
             cursorDot.style.top = `${e.clientY}px`;
         });
 
+        // INIT
+        saveFavorites();
         renderTemplates();
     </script>
 </body>
