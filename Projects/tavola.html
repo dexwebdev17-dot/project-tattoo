@@ -1,0 +1,329 @@
+<meta charset="utf-8">
+<title>Tavola</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Rubik:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap">
+
+<style>
+  :root{
+    --bg:#fdf6e8;
+    --panel:#fff9ec;
+    --ink:#161412;
+    --muted:#6b6152;
+    --red:#e8432c;
+    --blue:#2f5fa8;
+    --yellow:#f4c430;
+    --shadow-hard:#161412;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Rubik',Helvetica,Arial,sans-serif;font-weight:400;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+  ::selection{background:var(--yellow);color:var(--ink);}
+  h1,h2,h3{font-family:'Bangers',cursive;font-weight:400;margin:0;letter-spacing:.02em;text-wrap:balance;}
+  p{line-height:1.7;color:var(--muted);max-width:56ch;}
+  .eyebrow{
+    font-family:'Rubik',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--red);
+  }
+  @media (prefers-reduced-motion: reduce){ *{transition-duration:0s !important;animation-duration:0s !important;} }
+
+  .wrap{max-width:1160px;margin:0 auto;padding-inline:6vw;}
+  @media (max-width:640px){ .wrap{padding-inline:20px;} }
+
+  .halftone{
+    background-image:radial-gradient(var(--ink) 1px, transparent 1.4px);
+    background-size:7px 7px;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:20px 6vw;border-bottom:3px solid var(--ink);
+    font-family:'Rubik',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:.1em;
+  }
+  @media (max-width:640px){ .masthead{padding-inline:20px;flex-direction:column;gap:6px;text-align:center;} }
+  .wordmark{
+    font-family:'Bangers',cursive;font-size:1.7rem;letter-spacing:.03em;color:var(--red);
+    -webkit-text-stroke:1.5px var(--ink);
+  }
+
+  /* ---------- hero ---------- */
+  .hero{padding:52px 0 60px;position:relative;overflow:hidden;}
+  .hero-panel{
+    border:3px solid var(--ink);background:var(--panel);border-radius:4px;
+    padding:56px 7vw;position:relative;box-shadow:8px 8px 0 var(--shadow-hard);
+    text-align:center;
+  }
+  .hero-panel::before{
+    content:"";position:absolute;inset:0;border-radius:4px;opacity:.06;pointer-events:none;
+  }
+  .burst{
+    position:absolute;top:-26px;right:6%;width:96px;height:96px;
+    background:var(--yellow);border:3px solid var(--ink);
+    clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(8deg);
+  }
+  .burst span{
+    font-family:'Bangers',cursive;font-size:.85rem;color:var(--ink);transform:rotate(-8deg);
+    text-align:center;line-height:1;
+  }
+  @media (max-width:700px){ .burst{display:none;} }
+  .hero h1{font-size:clamp(2.6rem,7.5vw,5.4rem);color:var(--ink);}
+  .hero h1 em{font-style:normal;color:var(--red);-webkit-text-stroke:1.5px var(--ink);}
+  .hero p{margin:18px auto 0;text-align:center;font-size:1.05rem;}
+
+  .bubble{
+    display:inline-block;margin-top:28px;position:relative;
+    background:#fff;border:3px solid var(--ink);border-radius:20px;
+    padding:14px 24px;font-family:'Rubik',sans-serif;font-weight:700;font-size:.95rem;
+  }
+  .bubble::after{
+    content:"";position:absolute;left:50%;bottom:-16px;transform:translateX(-50%);
+    border:10px solid transparent;border-top-color:var(--ink);
+  }
+  .bubble::before{
+    content:"";position:absolute;left:50%;bottom:-11px;transform:translateX(-50%);
+    border:8px solid transparent;border-top-color:#fff;z-index:1;
+  }
+
+  /* ---------- tavole / portfolio ---------- */
+  .pages{padding:20px 0 100px;}
+  .pages-head{text-align:center;margin-bottom:44px;}
+  .pages-head h2{font-size:clamp(2rem,5vw,3.2rem);}
+  .pages-head p{margin:12px auto 0;}
+
+  .page-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:160px;gap:14px;
+  }
+  @media (max-width:860px){ .page-grid{grid-template-columns:repeat(2,1fr);grid-auto-rows:170px;} }
+  .panel-cell{
+    border:3px solid var(--ink);border-radius:2px;position:relative;overflow:hidden;
+    background:var(--panel);box-shadow:5px 5px 0 var(--shadow-hard);
+    transition:transform .18s ease, box-shadow .18s ease;cursor:pointer;
+  }
+  .panel-cell:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 var(--shadow-hard);}
+  .panel-cell .art{
+    position:absolute;inset:0;
+    background:
+      linear-gradient(150deg, color-mix(in srgb, var(--blue) 18%, var(--panel)), color-mix(in srgb, var(--red) 14%, var(--panel)) 120%);
+  }
+  .panel-cell .art .dots{position:absolute;inset:0;opacity:.5;}
+  .panel-cell .cap{
+    position:absolute;left:0;right:0;bottom:0;background:var(--ink);color:#fff;
+    padding:8px 12px;display:flex;justify-content:space-between;align-items:baseline;
+    font-family:'Rubik',sans-serif;font-weight:700;font-size:.68rem;letter-spacing:.04em;text-transform:uppercase;
+  }
+  .panel-cell .cap b{font-family:'Bangers',cursive;font-weight:400;font-size:.95rem;letter-spacing:.02em;text-transform:none;}
+
+  .g1{grid-column:span 2;grid-row:span 2;}
+  .g2{grid-column:span 2;grid-row:span 1;}
+  .g3{grid-column:span 1;grid-row:span 2;}
+  .g4{grid-column:span 1;grid-row:span 1;}
+  .g5{grid-column:span 2;grid-row:span 1;}
+  .g6{grid-column:span 2;grid-row:span 1;}
+  @media (max-width:860px){ .g1,.g2,.g3,.g4,.g5,.g6{grid-column:span 1;grid-row:span 1;} }
+
+  /* ---------- schede stile ---------- */
+  .roster{padding:0 0 100px;}
+  .roster-head{text-align:center;margin-bottom:44px;}
+  .roster-head h2{font-size:clamp(2rem,5vw,3.2rem);}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+  @media (max-width:860px){ .stat-grid{grid-template-columns:repeat(2,1fr);} }
+  .stat-card{
+    border:3px solid var(--ink);border-radius:4px;background:var(--panel);
+    box-shadow:5px 5px 0 var(--shadow-hard);padding:20px;
+  }
+  .stat-card .tag{
+    display:inline-block;background:var(--red);color:#fff;font-family:'Bangers',cursive;
+    font-size:.72rem;letter-spacing:.05em;padding:3px 10px;border-radius:3px;margin-bottom:10px;
+    border:2px solid var(--ink);
+  }
+  .stat-card h3{font-size:1.5rem;}
+  .stat-card p{font-size:.84rem;margin-top:8px;}
+  .stat-bar{margin-top:14px;}
+  .stat-bar .row{display:flex;justify-content:space-between;font-size:.68rem;font-weight:700;color:var(--muted);margin-bottom:3px;text-transform:uppercase;}
+  .stat-bar .track{height:8px;border:2px solid var(--ink);border-radius:4px;background:#fff;overflow:hidden;}
+  .stat-bar .fill{height:100%;background:var(--blue);}
+
+  /* ---------- bio ---------- */
+  .bio{padding:0 0 100px;}
+  .bio-panel{
+    border:3px solid var(--ink);border-radius:4px;background:var(--panel);
+    box-shadow:8px 8px 0 var(--shadow-hard);padding:48px 6vw;text-align:center;
+  }
+  .bio-panel h2{font-size:clamp(1.9rem,4vw,2.8rem);}
+  .bio-panel p{margin:16px auto 0;text-align:center;}
+  .bio-panel .bubble{margin-top:22px;}
+
+  /* ---------- contatti ---------- */
+  .cta-section{padding:0 0 90px;}
+  .cta-panel{
+    border:3px solid var(--ink);border-radius:4px;background:var(--red);color:#fff;
+    box-shadow:8px 8px 0 var(--shadow-hard);padding:48px 6vw;
+  }
+  .cta-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:48px;max-width:960px;margin:0 auto;align-items:start;}
+  @media (max-width:820px){ .cta-grid{grid-template-columns:1fr;gap:28px;} }
+  .cta-panel h2{font-size:clamp(2rem,4.4vw,3rem);color:#fff;-webkit-text-stroke:1px var(--ink);}
+  .cta-panel p{color:rgba(255,255,255,.9);margin-top:14px;}
+  .info-list{margin-top:18px;display:flex;flex-direction:column;gap:10px;font-size:.86rem;font-weight:500;}
+  .info-list span:first-child{opacity:.8;display:block;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;}
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+  .field label{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;}
+  .field input,.field textarea{
+    all:unset;background:#fff;border:2px solid var(--ink);border-radius:3px;color:var(--ink);
+    padding:10px 12px;font-size:.95rem;font-family:'Rubik',sans-serif;
+  }
+  .submit{
+    all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+    font-family:'Bangers',cursive;font-size:1.15rem;letter-spacing:.03em;
+    background:#fff;color:var(--red);padding:13px 26px;border-radius:4px;border:3px solid var(--ink);
+    transition:transform .15s ease;
+  }
+  .submit:hover{transform:translate(-2px,-2px);}
+
+  footer{padding:22px 6vw;font-size:.66rem;color:var(--muted);display:flex;justify-content:space-between;border-top:3px solid var(--ink);}
+  @media (max-width:640px){ footer{flex-direction:column;gap:6px;text-align:center;padding-inline:20px;} }
+</style>
+
+<header class="masthead">
+  <span>LUCCA</span>
+  <span class="wordmark">TAVOLA</span>
+  <span>SU APPUNTAMENTO</span>
+</header>
+
+<section class="hero wrap">
+  <div class="hero-panel halftone">
+    <div class="burst"><span>NUOVA<br>STAGIONE</span></div>
+    <span class="eyebrow">Ogni tatuaggio è una tavola a sé</span>
+    <h1>La pelle come<br><em>carta da disegno</em></h1>
+    <p>Non facciamo illustrazioni piatte: costruiamo scene, inquadrature, ritmo. Un buon tatuaggio si legge come una vignetta ben scritta.</p>
+    <div class="bubble">Prima parliamo, poi disegniamo. Sempre in quest'ordine.</div>
+  </div>
+</section>
+
+<section class="pages wrap" id="tavole">
+  <div class="pages-head">
+    <span class="eyebrow">Il Portfolio</span>
+    <h2>Le Tavole</h2>
+    <p style="max-width:46ch;margin-inline:auto;text-align:center;">Ogni riquadro è una seduta. Nessuna vignetta uguale all'altra.</p>
+  </div>
+  <div class="page-grid">
+    <div class="panel-cell g1"><span class="art halftone dots"></span><span class="cap"><b>Corvo</b><span>Avambraccio · Blackwork</span></span></div>
+    <div class="panel-cell g2"><span class="art halftone dots"></span><span class="cap"><b>Rampicante</b><span>Caviglia · Fineline</span></span></div>
+    <div class="panel-cell g3"><span class="art halftone dots"></span><span class="cap"><b>Onda</b><span>Schiena · Irezumi</span></span></div>
+    <div class="panel-cell g4"><span class="art halftone dots"></span><span class="cap"><b>Santo</b><span>Petto · Chicano</span></span></div>
+    <div class="panel-cell g5"><span class="art halftone dots"></span><span class="cap"><b>Germoglio</b><span>Polso · Fineline</span></span></div>
+    <div class="panel-cell g6"><span class="art halftone dots"></span><span class="cap"><b>Bastione</b><span>Costato · Blackwork</span></span></div>
+  </div>
+</section>
+
+<section class="roster wrap">
+  <div class="roster-head">
+    <span class="eyebrow">Schede Tecniche</span>
+    <h2>Stili</h2>
+  </div>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="tag">STILE 01</span>
+      <h3>Blackwork</h3>
+      <p>Campiture piene, nessuna sfumatura.</p>
+      <div class="stat-bar">
+        <div class="row"><span>Impegno</span><span>2–6H</span></div>
+        <div class="track"><div class="fill" style="width:70%;"></div></div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="tag">STILE 02</span>
+      <h3>Fineline</h3>
+      <p>Linea sottile e continua.</p>
+      <div class="stat-bar">
+        <div class="row"><span>Impegno</span><span>1–3H</span></div>
+        <div class="track"><div class="fill" style="width:35%;"></div></div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="tag">STILE 03</span>
+      <h3>Irezumi</h3>
+      <p>Composizione tradizionale giapponese, a tappe.</p>
+      <div class="stat-bar">
+        <div class="row"><span>Impegno</span><span>A tappe</span></div>
+        <div class="track"><div class="fill" style="width:95%;"></div></div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="tag">STILE 04</span>
+      <h3>Chicano</h3>
+      <p>Ombreggiatura a scala di grigi.</p>
+      <div class="stat-bar">
+        <div class="row"><span>Impegno</span><span>3–5H</span></div>
+        <div class="track"><div class="fill" style="width:60%;"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bio wrap">
+  <div class="bio-panel halftone">
+    <span class="eyebrow">Chi disegna</span>
+    <h2 style="margin-top:10px;">Bea Tosi</h2>
+    <p>Ho iniziato disegnando fumetti autoprodotti, prima di scoprire che la pelle è la carta più difficile su cui lavorare — e la più onesta: non perdona una linea insicura.</p>
+    <div class="bubble">Ogni sessione è un albo a episodio unico. Nessun sequel forzato.</div>
+  </div>
+</section>
+
+<section class="cta-section wrap" id="contatti">
+  <div class="cta-panel">
+    <div class="cta-grid">
+      <div>
+        <h2>Prenota<br>la tua tavola</h2>
+        <p>Racconta la tua idea: zona del corpo, riferimenti, disponibilità.</p>
+        <div class="info-list">
+          <div><span>Studio</span>Via Fillungo 55, Lucca</div>
+          <div><span>Orari</span>Mar–Sab, 11:00–19:00</div>
+          <div><span>Email</span><a href="mailto:redazione@tavola.it">redazione@tavola.it</a></div>
+        </div>
+      </div>
+      <form onsubmit="return false;">
+        <div class="field"><label for="tv-name">Nome</label><input id="tv-name" type="text" placeholder="Nome e cognome"></div>
+        <div class="field"><label for="tv-email">Email</label><input id="tv-email" type="email" placeholder="nome@email.it"></div>
+        <div class="field"><label for="tv-msg">La tua idea</label><textarea id="tv-msg" rows="3" placeholder="Riferimenti, zona del corpo, disponibilità"></textarea></div>
+        <button class="submit" type="submit">Invia!</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 TAVOLA</span>
+  <span>P.IVA 00000000000 — TEMPLATE DI STUDIO</span>
+</footer>
+
+<script>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) return;
+  document.querySelectorAll('.panel-cell').forEach(function(cell){
+    cell.addEventListener('click', function(e){
+      var burst = document.createElement('span');
+      var size = 46;
+      burst.style.cssText =
+        'position:absolute;left:' + (e.offsetX - size/2) + 'px;top:' + (e.offsetY - size/2) + 'px;' +
+        'width:' + size + 'px;height:' + size + 'px;pointer-events:none;z-index:5;' +
+        'background:var(--yellow);border:2px solid var(--ink);' +
+        'clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);' +
+        'transform:scale(0);opacity:1;transition:transform .45s cubic-bezier(.2,.9,.3,1), opacity .45s ease;';
+      cell.appendChild(burst);
+      requestAnimationFrame(function(){
+        burst.style.transform = 'scale(1.4) rotate(20deg)';
+        burst.style.opacity = '0';
+      });
+      setTimeout(function(){ burst.remove(); }, 460);
+    });
+  });
+})();
+</script>
