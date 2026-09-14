@@ -63,7 +63,7 @@
             box-shadow: 0 0 25px var(--gold-glow), inset 0 0 15px rgba(212, 175, 55, 0.1);
         }
 
-        /* Medallion Medallion Circle Sweep Effect */
+        /* Medallion Circle Sweep Effect */
         .sigil-medallion {
             position: relative;
             width: 190px;
@@ -276,7 +276,7 @@
                             <option value="fa-ankh">Ankh (Chiave della Vita)</option>
                             <option value="fa-eye">Occhio della Provvidenza</option>
                             <option value="fa-moon">Luna Crescente</option>
-                            <option value="fa-[#fa-sun]">Sole Alchemico</option>
+                            <option value="fa-sun">Sole Alchemico</option>
                             <option value="fa-compass-drafting">Compasso Esoterico</option>
                             <option value="fa-dragon">Dragone Arcano</option>
                         </select>
@@ -300,6 +300,12 @@
                 <button id="save-cust-btn" class="w-full py-3 rounded-lg bg-amber-400 text-black font-cinzel font-bold text-xs uppercase tracking-widest hover:bg-amber-300 transition">
                     Applica e Salva
                 </button>
+                
+                <!-- NUOVO PULSANTE PER L'ESPORTAZIONE PERMANENTE DEL CODICE -->
+                <button id="export-code-btn" class="w-full py-3 rounded-lg bg-gradient-to-r from-amber-500 to-amber-300 text-black font-cinzel font-bold text-xs uppercase tracking-widest hover:opacity-90 transition shadow-[0_0_15px_rgba(212,175,55,0.4)] flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-file-arrow-down text-sm"></i> Scarica Codice HTML Aggiornato
+                </button>
+
                 <button id="reset-cust-btn" class="w-full py-2.5 rounded-lg border border-amber-500/30 text-amber-400 font-cinzel text-xs uppercase tracking-widest hover:bg-amber-500/10 transition">
                     Ripristina Default
                 </button>
@@ -676,8 +682,13 @@
                 logoIcon: 'fa-ankh',
                 goldColor: '#d4af37'
             };
+            localStorage.removeItem('aurum_sigils');
+            localStorage.removeItem('aurum_settings');
+            sigils = [...DEFAULT_SIGILS];
             initCustomizerInputs();
             applyStudioSettings();
+            renderSigils();
+            hideDrawer();
         });
 
         document.querySelectorAll('.gold-color-picker').forEach(btn => {
@@ -685,6 +696,40 @@
                 studioSettings.goldColor = btn.getAttribute('data-gold');
                 applyStudioSettings();
             });
+        });
+
+        // FUNZIONE PER L'ESPORTAZIONE PERMANENTE DEL CODICE HTML COMPLETO
+        document.getElementById('export-code-btn').addEventListener('click', () => {
+            // Assicurati che le impostazioni correnti siano applicate
+            studioSettings.name = document.getElementById('cust-studio-name').value || 'AURUM ATELIER';
+            studioSettings.slogan = document.getElementById('cust-studio-slogan').value || '';
+            studioSettings.logoIcon = document.getElementById('cust-logo-icon').value;
+            
+            saveSigilsToStorage();
+            localStorage.setItem('aurum_settings', JSON.stringify(studioSettings));
+
+            // Clona la struttura HTML attuale
+            let fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+            // Sostituisci la definizione predefinita di DEFAULT_SIGILS e studioSettings con i dati correnti
+            const updatedSigilsArrayStr = 'const DEFAULT_SIGILS = ' + JSON.stringify(sigils, null, 12) + ';';
+            const updatedSettingsObjStr = 'let studioSettings = JSON.parse(localStorage.getItem(\'aurum_settings\')) || ' + JSON.stringify(studioSettings, null, 12) + ';';
+
+            fullHtml = fullHtml.replace(/const DEFAULT_SIGILS = \[[\s\S]*?\];/, updatedSigilsArrayStr);
+            fullHtml = fullHtml.replace(/let studioSettings = JSON\.parse\(localStorage\.getItem\('aurum_settings'\)\) \|\| \{[\s\S]*?\};/, updatedSettingsObjStr);
+
+            // Genera e scarica il file index.html
+            const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
+            const downloadUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = 'index.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(downloadUrl);
+
+            alert('File index.html scaricato con successo!\nPuoi caricarlo sul tuo server web per rendere visibili le modifiche a tutti i clienti.');
         });
 
         // Modal & Drawer Animation Helpers
