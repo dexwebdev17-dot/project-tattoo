@@ -674,32 +674,32 @@
     </div>
 
     <script>
-        // DATI DEI 24 MODELLI (Rimovuti: Alone, Archivio, Nuvole Di Carta)
+        // DATI DEI 24 MODELLI RE-INDICIZZATI DA 01 A 24 IN SEQUENZA PERFETTA
         const templates = [
             { id: '01', title: 'Alchemical', file: 'alchemical.html', style: 'Esoterico & Simbolico', icon: '<path d="M12 2L2 22h20L12 2zm0 4l6.5 13h-13L12 6z" fill="#d4af37"/>' },
-            { id: '04', title: 'Bottega Inchiostro', file: 'bottega-inchiostro.html', style: 'Artigianale Classico', icon: '<path d="M12 2L4 10v12h16V10L12 2z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '05', title: 'Camera Oscura', file: 'camera-oscura.html', style: 'Fotografico High-Contrast', icon: '<circle cx="12" cy="12" r="5" fill="#d4af37"/>' },
-            { id: '06', title: 'Cartella Clinica', file: 'cartellaclinica.html', style: 'Avant-Garde Anatomico', icon: '<path d="M12 4v16M4 12h16" stroke="#d4af37" stroke-width="2"/>' },
-            { id: '07', title: 'Casa Degli Arcani', file: 'casa-degli-arcani.html', style: 'Tarot & Mistico', icon: '<polygon points="12,2 22,12 12,22 2,12" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '08', title: 'Dopo La Pioggia', file: 'dopo-la-pioggia.html', style: 'Etereo & Fluido', icon: '<path d="M12 2.5C12 2.5 5 9.5 5 14.5C5 18.37 8.13 21.5 12 21.5C15.87 21.5 19 18.37 19 14.5C19 9.5 12 2.5 12 2.5Z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '09', title: 'Erbario Tattoo', file: 'erbario-tattoo-template.html', style: 'Botanico / Micro-Realismo', icon: '<path d="M12 22V2M12 8c4-4 8-2 8 2s-4 6-8 6M12 14c-4-4-8-2-8 2s4 6 8 6" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '10', title: 'Holographic', file: 'holographic.html', style: 'Futuristico / Cyber', icon: '<polygon points="12,2 19,7 19,17 12,22 5,17 5,7" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '11', title: 'Luce Bianca', file: 'luce-bianca.html', style: 'Luminoso Minimal', icon: '<circle cx="12" cy="12" r="8" stroke="#ffffff" stroke-width="2" fill="none"/>' },
-            { id: '12', title: 'Manoscritto', file: 'manoscritto.html', style: 'Calligrafico Script', icon: '<path d="M4 20h16M4 14h12M4 8h16" stroke="#d4af37" stroke-width="2"/>' },
-            { id: '13', title: 'Mappa Astrale', file: 'mappa-astrale.html', style: 'Geometrico & Costellazioni', icon: '<circle cx="12" cy="12" r="9" stroke="#d4af37" stroke-width="1"/><circle cx="12" cy="12" r="3" fill="#d4af37"/>' },
-            { id: '14', title: 'Marchetti', file: 'marchetti.html', style: 'Heritage Traditional', icon: '<path d="M12 2l10 10-10 10L2 12z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '15', title: 'Marea', file: 'marea.html', style: 'Onde / Inchiostro Giapponese', icon: '<path d="M2 12c3-3 6-3 9 0s6 3 9 0" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '16', title: 'Mirabilia Tattoo', file: 'mirabilia-tattoo-template.html', style: 'Wunderkammer / Antiquariato', icon: '<polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9 12 2" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '17', title: 'Miraggio', file: 'miraggio.html', style: 'Astratto / Atmosferico', icon: '<circle cx="12" cy="12" r="7" stroke="#d4af37" stroke-dasharray="2 2" stroke-width="2" fill="none"/>' },
-            { id: '19', title: 'Ordito', file: 'ordito.html', style: 'Tessitura Geometrica', icon: '<path d="M4 4l16 16M4 20L20 4" stroke="#d4af37" stroke-width="2"/>' },
-            { id: '20', title: 'Ossidiana Tattoo', file: 'ossidiana-tattoo-template.html', style: 'Blackwork Pesante', icon: '<polygon points="12 2 20 22 4 22" fill="#d4af37"/>' },
-            { id: '21', title: 'Parco Sculture', file: 'parco-sculture.html', style: '3D Neoclassico', icon: '<rect x="7" y="7" width="10" height="10" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '22', title: 'Pelle Viva Tattoo', file: 'pelle-viva-tattoo-template.html', style: 'Organico / Tessuto', icon: '<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" fill="#d4af37"/>' },
-            { id: '23', title: 'Rosa e Inchiostro', file: 'rosa-e-inchiostro.html', style: 'Botanico & Inchiostro Rosa', icon: '<path d="M12 3a6 6 0 0 1 6 6c0 5-6 11-6 11S6 14 6 9a6 6 0 0 1 6-6z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '24', title: 'Serra Botanica', file: 'serra-botanica.html', style: 'Natura Fine Line', icon: '<path d="M12 22s8-4 8-10A8 8 0 0 0 4 12c0 6 8 10 8 10z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
-            { id: '25', title: 'Suminagashi', file: 'suminagashi.html', style: 'Inchiostro ad Acqua', icon: '<circle cx="12" cy="12" r="9" stroke="#d4af37" stroke-width="1"/><circle cx="12" cy="12" r="5" stroke="#d4af37" stroke-width="1"/>' },
-            { id: '26', title: 'Tavola', file: 'tavola.html', style: 'Editoriale / Layout Minimale', icon: '<rect x="3" y="3" width="18" height="18" rx="2" stroke="#d4af37" stroke-width="2" fill="none"/><line x1="3" y1="9" x2="21" y2="9" stroke="#d4af37" stroke-width="1.5"/>' },
-            { id: '27', title: 'Yugen', file: 'yugen.html', style: 'Zen Minimal / Misterioso', icon: '<line x1="4" y1="12" x2="20" y2="12" stroke="#d4af37" stroke-width="2"/>' }
+            { id: '02', title: 'Bottega Inchiostro', file: 'bottega-inchiostro.html', style: 'Artigianale Classico', icon: '<path d="M12 2L4 10v12h16V10L12 2z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '03', title: 'Camera Oscura', file: 'camera-oscura.html', style: 'Fotografico High-Contrast', icon: '<circle cx="12" cy="12" r="5" fill="#d4af37"/>' },
+            { id: '04', title: 'Cartella Clinica', file: 'cartellaclinica.html', style: 'Avant-Garde Anatomico', icon: '<path d="M12 4v16M4 12h16" stroke="#d4af37" stroke-width="2"/>' },
+            { id: '05', title: 'Casa Degli Arcani', file: 'casa-degli-arcani.html', style: 'Tarot & Mistico', icon: '<polygon points="12,2 22,12 12,22 2,12" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '06', title: 'Dopo La Pioggia', file: 'dopo-la-pioggia.html', style: 'Etereo & Fluido', icon: '<path d="M12 2.5C12 2.5 5 9.5 5 14.5C5 18.37 8.13 21.5 12 21.5C15.87 21.5 19 18.37 19 14.5C19 9.5 12 2.5 12 2.5Z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '07', title: 'Erbario Tattoo', file: 'erbario-tattoo-template.html', style: 'Botanico / Micro-Realismo', icon: '<path d="M12 22V2M12 8c4-4 8-2 8 2s-4 6-8 6M12 14c-4-4-8-2-8 2s4 6 8 6" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '08', title: 'Holographic', file: 'holographic.html', style: 'Futuristico / Cyber', icon: '<polygon points="12,2 19,7 19,17 12,22 5,17 5,7" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '09', title: 'Luce Bianca', file: 'luce-bianca.html', style: 'Luminoso Minimal', icon: '<circle cx="12" cy="12" r="8" stroke="#ffffff" stroke-width="2" fill="none"/>' },
+            { id: '10', title: 'Manoscritto', file: 'manoscritto.html', style: 'Calligrafico Script', icon: '<path d="M4 20h16M4 14h12M4 8h16" stroke="#d4af37" stroke-width="2"/>' },
+            { id: '11', title: 'Mappa Astrale', file: 'mappa-astrale.html', style: 'Geometrico & Costellazioni', icon: '<circle cx="12" cy="12" r="9" stroke="#d4af37" stroke-width="1"/><circle cx="12" cy="12" r="3" fill="#d4af37"/>' },
+            { id: '12', title: 'Marchetti', file: 'marchetti.html', style: 'Heritage Traditional', icon: '<path d="M12 2l10 10-10 10L2 12z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '13', title: 'Marea', file: 'marea.html', style: 'Onde / Inchiostro Giapponese', icon: '<path d="M2 12c3-3 6-3 9 0s6 3 9 0" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '14', title: 'Mirabilia Tattoo', file: 'mirabilia-tattoo-template.html', style: 'Wunderkammer / Antiquariato', icon: '<polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9 12 2" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '15', title: 'Miraggio', file: 'miraggio.html', style: 'Astratto / Atmosferico', icon: '<circle cx="12" cy="12" r="7" stroke="#d4af37" stroke-dasharray="2 2" stroke-width="2" fill="none"/>' },
+            { id: '16', title: 'Ordito', file: 'ordito.html', style: 'Tessitura Geometrica', icon: '<path d="M4 4l16 16M4 20L20 4" stroke="#d4af37" stroke-width="2"/>' },
+            { id: '17', title: 'Ossidiana Tattoo', file: 'ossidiana-tattoo-template.html', style: 'Blackwork Pesante', icon: '<polygon points="12 2 20 22 4 22" fill="#d4af37"/>' },
+            { id: '18', title: 'Parco Sculture', file: 'parco-sculture.html', style: '3D Neoclassico', icon: '<rect x="7" y="7" width="10" height="10" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '19', title: 'Pelle Viva Tattoo', file: 'pelle-viva-tattoo-template.html', style: 'Organico / Tessuto', icon: '<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" fill="#d4af37"/>' },
+            { id: '20', title: 'Rosa e Inchiostro', file: 'rosa-e-inchiostro.html', style: 'Botanico & Inchiostro Rosa', icon: '<path d="M12 3a6 6 0 0 1 6 6c0 5-6 11-6 11S6 14 6 9a6 6 0 0 1 6-6z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '21', title: 'Serra Botanica', file: 'serra-botanica.html', style: 'Natura Fine Line', icon: '<path d="M12 22s8-4 8-10A8 8 0 0 0 4 12c0 6 8 10 8 10z" stroke="#d4af37" stroke-width="2" fill="none"/>' },
+            { id: '22', title: 'Suminagashi', file: 'suminagashi.html', style: 'Inchiostro ad Acqua', icon: '<circle cx="12" cy="12" r="9" stroke="#d4af37" stroke-width="1"/><circle cx="12" cy="12" r="5" stroke="#d4af37" stroke-width="1"/>' },
+            { id: '23', title: 'Tavola', file: 'tavola.html', style: 'Editoriale / Layout Minimale', icon: '<rect x="3" y="3" width="18" height="18" rx="2" stroke="#d4af37" stroke-width="2" fill="none"/><line x1="3" y1="9" x2="21" y2="9" stroke="#d4af37" stroke-width="1.5"/>' },
+            { id: '24', title: 'Yugen', file: 'yugen.html', style: 'Zen Minimal / Misterioso', icon: '<line x1="4" y1="12" x2="20" y2="12" stroke="#d4af37" stroke-width="2"/>' }
         ];
 
         // SISTEMA AUDIO (WEB AUDIO API DELICATO & SOFT)
@@ -713,7 +713,6 @@
             }
         }
 
-        // Effetto sonoro al click generale (Soffice / Mite)
         function playSoundClick() {
             if (!audioCtx) return;
             try {
@@ -721,11 +720,9 @@
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
                 
-                // Frequenza bassa e morbida
                 osc.frequency.setValueAtTime(220, audioCtx.currentTime); 
                 osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.08);
                 
-                // Volume molto delicato con inviluppo morbido
                 gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
                 gain.gain.linearRampToValueAtTime(0.04, audioCtx.currentTime + 0.01);
                 gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.08);
@@ -737,7 +734,6 @@
             } catch (e) {}
         }
 
-        // Effetto sonoro al click sui preferiti (Cuore - Armonia Calda Marimba / Campana Soft)
         function playSoundFav() {
             if (!audioCtx) return;
             try {
@@ -748,7 +744,6 @@
                 osc1.type = 'sine';
                 osc2.type = 'sine';
                 
-                // Nota C5 e G5 (Quinta calda)
                 osc1.frequency.setValueAtTime(523.25, audioCtx.currentTime);
                 osc2.frequency.setValueAtTime(783.99, audioCtx.currentTime);
                 
@@ -767,13 +762,11 @@
             } catch (e) {}
         }
 
-        // Musica Ambientale Sottofondo Delicatamente Calibrata
         function toggleAmbientMusic() {
             initAudio();
             if (audioCtx.state === 'suspended') audioCtx.resume();
 
             if (isAudioPlaying) {
-                // Spegni Musica
                 if (ambientGain) {
                     ambientGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.5);
                     setTimeout(() => {
@@ -785,7 +778,6 @@
                 document.getElementById('audio-status-text').innerText = "MUSIC OFF";
                 document.getElementById('audio-toggle-btn').classList.remove('audio-on');
             } else {
-                // Avvia Musica Ambient - Volume Basso Soft
                 ambientOsc1 = audioCtx.createOscillator();
                 ambientOsc2 = audioCtx.createOscillator();
                 ambientGain = audioCtx.createGain();
@@ -793,12 +785,11 @@
                 ambientOsc1.type = 'sine';
                 ambientOsc2.type = 'sine';
 
-                // Frequenze rilassanti in armonia
-                ambientOsc1.frequency.setValueAtTime(65.41, audioCtx.currentTime); // C2
-                ambientOsc2.frequency.setValueAtTime(130.81, audioCtx.currentTime); // C3
+                ambientOsc1.frequency.setValueAtTime(65.41, audioCtx.currentTime);
+                ambientOsc2.frequency.setValueAtTime(130.81, audioCtx.currentTime);
 
                 ambientGain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-                ambientGain.gain.exponentialRampToValueAtTime(0.018, audioCtx.currentTime + 3); // Fade in molto dolce
+                ambientGain.gain.exponentialRampToValueAtTime(0.018, audioCtx.currentTime + 3);
 
                 ambientOsc1.connect(ambientGain);
                 ambientOsc2.connect(ambientGain);
@@ -858,12 +849,10 @@
 
             let listToRender = templates;
 
-            // Filtro Preferiti
             if (showOnlyFavs) {
                 listToRender = listToRender.filter(t => favorites.includes(t.id));
             }
 
-            // Filtro Ricerca
             if (searchQuery !== '') {
                 listToRender = listToRender.filter(t => 
                     t.title.toLowerCase().includes(searchQuery) || 
