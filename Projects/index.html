@@ -705,7 +705,7 @@
             { id: '27', title: 'Yugen', file: 'yugen.html', style: 'Zen Minimal / Misterioso', icon: '<line x1="4" y1="12" x2="20" y2="12" stroke="#d4af37" stroke-width="2"/>' }
         ];
 
-        // SISTEMA AUDIO (WEB AUDIO API SINTETIZZATO)
+        // SISTEMA AUDIO (WEB AUDIO API DELICATO & SOFT)
         let audioCtx = null;
         let isAudioPlaying = false;
         let ambientOsc1 = null, ambientOsc2 = null, ambientGain = null;
@@ -716,43 +716,61 @@
             }
         }
 
-        // Effetto sonoro al click dei pulsanti (Click / Metallo)
+        // Effetto sonoro al click generale (Soffice / Mite)
         function playSoundClick() {
             if (!audioCtx) return;
             try {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.05);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                
+                // Frequenza bassa e morbida
+                osc.frequency.setValueAtTime(220, audioCtx.currentTime); 
+                osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.08);
+                
+                // Volume molto delicato con inviluppo morbido
+                gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.04, audioCtx.currentTime + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.08);
+                
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.05);
+                osc.stop(audioCtx.currentTime + 0.08);
             } catch (e) {}
         }
 
-        // Effetto sonoro al click sui preferiti (Cuore / Cristallo)
+        // Effetto sonoro al click sui preferiti (Cuore - Armonia Calda Marimba / Campana Soft)
         function playSoundFav() {
             if (!audioCtx) return;
             try {
-                const osc = audioCtx.createOscillator();
+                const osc1 = audioCtx.createOscillator();
+                const osc2 = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-                osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.15); // C6
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-                osc.connect(gain);
+                
+                osc1.type = 'sine';
+                osc2.type = 'sine';
+                
+                // Nota C5 e G5 (Quinta calda)
+                osc1.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                osc2.frequency.setValueAtTime(783.99, audioCtx.currentTime);
+                
+                gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.25);
+                
+                osc1.connect(gain);
+                osc2.connect(gain);
                 gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.15);
+                
+                osc1.start();
+                osc2.start();
+                osc1.stop(audioCtx.currentTime + 0.25);
+                osc2.stop(audioCtx.currentTime + 0.25);
             } catch (e) {}
         }
 
-        // Musica Ambientale Sottofondo Sintetizzata
+        // Musica Ambientale Sottofondo Delicatamente Calibrata
         function toggleAmbientMusic() {
             initAudio();
             if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -760,30 +778,30 @@
             if (isAudioPlaying) {
                 // Spegni Musica
                 if (ambientGain) {
-                    ambientGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1);
+                    ambientGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.5);
                     setTimeout(() => {
                         if (ambientOsc1) ambientOsc1.stop();
                         if (ambientOsc2) ambientOsc2.stop();
-                    }, 1000);
+                    }, 1500);
                 }
                 isAudioPlaying = false;
                 document.getElementById('audio-status-text').innerText = "MUSIC OFF";
                 document.getElementById('audio-toggle-btn').classList.remove('audio-on');
             } else {
-                // Avvia Musica Ambient Dark
+                // Avvia Musica Ambient - Volume Basso Soft
                 ambientOsc1 = audioCtx.createOscillator();
                 ambientOsc2 = audioCtx.createOscillator();
                 ambientGain = audioCtx.createGain();
 
                 ambientOsc1.type = 'sine';
-                ambientOsc2.type = 'triangle';
+                ambientOsc2.type = 'sine';
 
-                // Accordo Frequenze Dronanti
-                ambientOsc1.frequency.setValueAtTime(55, audioCtx.currentTime); // A1
-                ambientOsc2.frequency.setValueAtTime(110, audioCtx.currentTime); // A2
+                // Frequenze rilassanti in armonia
+                ambientOsc1.frequency.setValueAtTime(65.41, audioCtx.currentTime); // C2
+                ambientOsc2.frequency.setValueAtTime(130.81, audioCtx.currentTime); // C3
 
-                ambientGain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-                ambientGain.gain.exponentialRampToValueAtTime(0.05, audioCtx.currentTime + 2); // Fade in
+                ambientGain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+                ambientGain.gain.exponentialRampToValueAtTime(0.018, audioCtx.currentTime + 3); // Fade in molto dolce
 
                 ambientOsc1.connect(ambientGain);
                 ambientOsc2.connect(ambientGain);
@@ -1083,7 +1101,7 @@
             cursorDot.style.top = `${e.clientY}px`;
         });
 
-        // PRIMO CLICK UTENTE (Per abilitare Audio Context del Browser)
+        // PRIMO CLICK UTENTE
         window.addEventListener('click', () => {
             initAudio();
         }, { once: true });
